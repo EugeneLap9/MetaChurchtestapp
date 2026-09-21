@@ -423,7 +423,16 @@ img { display:block; max-width:100%; }
 .seg button { flex: 1; padding: 9px 4px; border-radius: 100px; font-size: 13px; font-weight: 500; color: var(--text-2); }
 .seg button.active { background: var(--text); color: var(--bg); font-weight: 600; }
 .pad { padding: 0 20px; }
-.prio-item { display:flex; align-items:center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--line); }
+.prio-item { display:flex; align-items:center; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--line); background: var(--bg); position: relative; }
+.sort-list { position: relative; }
+.sort-item.dragging { z-index: 20; background: var(--surface-2); border-radius: 14px; border-bottom-color: transparent; box-shadow: 0 12px 30px rgba(0,0,0,.55); transition: none; }
+.sort-item.dragging .drag-handle { color: var(--text); }
+.sort-item.past .prio-title { color: var(--text-3); }
+.drag-handle { width: 36px; height: 44px; margin-left: -6px; flex-shrink: 0; display:flex; align-items:center; justify-content:center; color: var(--text-3); touch-action: none; cursor: grab; -webkit-user-select: none; user-select: none; }
+.drag-handle svg { width: 20px; height: 20px; fill: currentColor; }
+.sort-hint { display:flex; align-items:center; gap: 8px; font-size: 13px; color: var(--text-2); line-height: 1.45; margin: 0 0 6px; }
+.sort-hint svg { width: 18px; height: 18px; fill: var(--text-3); flex-shrink: 0; }
+body.sorting { -webkit-user-select: none; user-select: none; }
 .prio-badge { width: 36px; height: 36px; border-radius: 10px; display:flex; align-items:center; justify-content:center; font-family: var(--display); font-weight: 700; font-size: 14px; flex-shrink: 0; background: var(--surface-2); border: 1px solid var(--line); }
 .prio-badge.hi { background: var(--ember); color: #111; border-color: var(--ember); }
 .prio-badge.mid { background: rgba(242,133,90,.16); color: var(--ember); border-color: transparent; }
@@ -479,6 +488,16 @@ img { display:block; max-width:100%; }
 .success p { font-size: 15px; color: var(--text-2); line-height: 1.5; max-width: 300px; }
 .form-badge { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 600; color: var(--sky); margin-left: 8px; }
 .prio-btn.on { background: rgba(90,176,232,.16); color: var(--sky); border-color: transparent; }
+
+/* === Поле фото === */
+.img-preview { position: relative; aspect-ratio: 21/9; border-radius: 14px; overflow: hidden; background: var(--bg); border: 1px dashed var(--line); margin-bottom: 10px; display: flex; align-items: center; justify-content: center; color: var(--text-3); font-size: 13px; text-align: center; padding: 10px; }
+.img-preview img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.img-actions { display: flex; gap: 8px; margin-bottom: 10px; }
+.img-actions .btn { flex: 1; cursor: pointer; }
+.hint.bad { color: var(--danger); }
+.hint.good { color: var(--lime); }
+.admin-edit { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--sky); margin-bottom: 16px; }
+.admin-edit svg { width: 15px; height: 15px; stroke: currentColor; stroke-width: 2; fill: none; }
 
 /* === Видеоплеер === */
 .player { margin: calc(-12px - var(--safe-top)) -20px 18px; padding-top: var(--safe-top); background: #000; }
@@ -719,10 +738,9 @@ img { display:block; max-width:100%; }
         </div>
         <div class="form-group"><label class="form-label" for="ev-capacity">Мест</label><input class="input" id="ev-capacity" type="number" value="100" min="1"></div>
       </div>
-      <div class="form-group"><label class="form-label" for="ev-image">Ссылка на фото</label><input class="input" id="ev-image" placeholder="https://…"><div class="hint">Без фото афиша оформится в цвете направления.</div></div>
+      <div class="form-group"><label class="form-label">Фото</label><div id="ev-imgbox"></div></div>
       <label class="toggle-row" style="margin-bottom:16px"><div><span>Регистрация с анкетой</span><small>ФИО, возраст, город, церковь. Заявки попадут в Google Таблицу</small></div>
         <span class="switch"><input type="checkbox" id="ev-form"><i></i></span></label>
-      <div class="form-group"><label class="form-label">Приоритет</label><div class="slider-val" id="ev-prio-val">5</div><input class="slider" id="ev-prio" type="range" min="1" max="10" value="5" oninput="document.getElementById('ev-prio-val').textContent=this.value"></div>
       <button class="btn btn-light btn-full" onclick="createNewEvent()">Создать событие</button>
     </div>
 
@@ -733,7 +751,6 @@ img { display:block; max-width:100%; }
         <div class="form-group"><label class="form-label" for="po-topic">Тема</label>
           <select class="select" id="po-topic"><option value="announce">Анонс</option><option value="life">Жизнь церкви</option><option value="important">Важно</option></select>
         </div>
-        <div class="form-group"><label class="form-label">Приоритет</label><div class="slider-val" id="po-prio-val">5</div><input class="slider" id="po-prio" type="range" min="1" max="10" value="5" oninput="document.getElementById('po-prio-val').textContent=this.value"></div>
       </div>
       <button class="btn btn-light btn-full" onclick="createPost()">Опубликовать</button>
     </div>
@@ -767,7 +784,7 @@ img { display:block; max-width:100%; }
   </div>
 
   <div id="admin-content" class="pad hidden">
-    <p class="hint" style="margin:0 0 6px;font-size:13px;">Чем выше приоритет, тем выше событие или объявление в ленте.</p>
+    <p class="sort-hint"><svg viewBox="0 0 24 24"><circle cx="9" cy="6" r="1.6"/><circle cx="15" cy="6" r="1.6"/><circle cx="9" cy="12" r="1.6"/><circle cx="15" cy="12" r="1.6"/><circle cx="9" cy="18" r="1.6"/><circle cx="15" cy="18" r="1.6"/></svg>Зажмите значок слева и перетащите — в таком порядке события, объявления и группы будут показаны в приложении.</p>
     <div class="sub-title">События</div><div id="prio-events"></div>
     <div class="sub-title">Объявления</div><div id="prio-posts"></div>
     <div class="sub-title">Проповеди</div><div id="list-sermons"></div>
@@ -861,7 +878,8 @@ const DB = {
     } catch (e) {}
   },
   save() {
-    try { localStorage.setItem(STORE_KEY, JSON.stringify(state)); } catch (e) {}
+    try { localStorage.setItem(STORE_KEY, JSON.stringify(state)); return true; }
+    catch (e) { console.error(e); toast('Не хватает памяти на устройстве. Уменьшите фото или используйте ссылку'); return false; }
   }
 };
 
@@ -1079,7 +1097,7 @@ function youthPattern() {
 }
 function posterBg(e) {
   const src = img(e.image);
-  if (src) return `<div class="poster-bg photo grain"><img src="${src}" alt="" loading="lazy"></div>`;
+  if (src) return `<div class="poster-bg photo grain"><img src="${src}" alt="" loading="lazy" onerror="this.style.display='none'"></div>`;
   if (e.category === 'youth') return `<div class="poster-bg">${youthPattern()}</div>`;
   return `<div class="poster-bg grain"><div class="pat-${e.category === 'prayer' ? 'prayer' : e.category === 'group' ? 'group' : 'service'}"></div></div>`;
 }
@@ -1114,7 +1132,7 @@ function eventRowHtml(e) {
   const src = img(e.image);
   return `
     <div class="ev-row" onclick="showEventDetail('${e.id}')">
-      <div class="ev-row-img">${src ? `<img src="${src}" alt="" loading="lazy">` : (e.category === 'youth' ? youthPattern() : '')}</div>
+      <div class="ev-row-img">${src ? `<img src="${src}" alt="" loading="lazy" onerror="this.style.display='none'">` : (e.category === 'youth' ? youthPattern() : '')}</div>
       <div class="datebox"><small>${WD_SHORT[d.getDay()]}</small><b>${d.getDate()}</b><small>${MON_SHORT[d.getMonth()]}</small></div>
       <div class="ev-row-info">
         <div class="ev-row-title">${esc(e.title)}</div>
@@ -1127,7 +1145,7 @@ function sortEvents(list) {
   return [...list].sort((a, b) => {
     const pa = isPast(a), pb = isPast(b);
     if (pa !== pb) return pa ? 1 : -1;
-    return (b.priority || 0) - (a.priority || 0) || parseDate(a.date) - parseDate(b.date);
+    return byOrder(a, b) || parseDate(a.date) - parseDate(b.date);
   });
 }
 
@@ -1154,13 +1172,13 @@ function renderHome() {
 
   // События — ближайшие по дате, с учётом приоритета
   const upcoming = state.events.filter(e => !isPast(e))
-    .sort((a, b) => parseDate(a.date) - parseDate(b.date) || (b.priority || 0) - (a.priority || 0));
+    .sort((a, b) => byOrder(a, b) || parseDate(a.date) - parseDate(b.date));
   document.getElementById('home-events').innerHTML = upcoming.length
     ? upcoming.slice(0, 3).map(eventRowHtml).join('')
     : `<div class="post" style="color:var(--text-2);font-size:14px;">Новые события появятся здесь, как только их опубликуют.</div>`;
 
   // Объявления
-  const posts = [...state.posts].sort((a, b) => (b.priority || 0) - (a.priority || 0) || b.createdAt - a.createdAt);
+  const posts = [...state.posts].sort(byOrder);
   document.getElementById('home-posts-wrap').classList.toggle('hidden', !posts.length);
   document.getElementById('home-posts').innerHTML = posts.slice(0, 2).map(postHtml).join('');
   const unread = state.posts.some(p => !state.readPosts.includes(p.id));
@@ -1386,17 +1404,14 @@ function renderAdmin() {
   renderContentAdmin();
   renderTeam();
 }
-function prioItem(kind, x, meta) {
-  const cls = x.priority >= 8 ? 'hi' : x.priority >= 5 ? 'mid' : '';
-  return `<div class="prio-item">
-    <div class="prio-badge ${cls}">${x.priority}</div>
-    <div class="prio-info"><div class="prio-title">${esc(x.title)}</div><div class="prio-meta">${meta}</div></div>
-    <div class="prio-ctrls">
-      ${kind === 'event' ? formToggleBtn(x) : ''}
-      <button class="prio-btn" onclick="changePriority('${kind}','${x.id}',1)" aria-label="Выше">${ICON.up}</button>
-      <button class="prio-btn" onclick="changePriority('${kind}','${x.id}',-1)" aria-label="Ниже">${ICON.down}</button>
-      <button class="prio-btn del" onclick="deleteContent('${kind}','${x.id}')" aria-label="Удалить">${ICON.x}</button>
-    </div></div>`;
+const GRIP = '<svg viewBox="0 0 24 24"><circle cx="9" cy="6" r="1.6"/><circle cx="15" cy="6" r="1.6"/><circle cx="9" cy="12" r="1.6"/><circle cx="15" cy="12" r="1.6"/><circle cx="9" cy="18" r="1.6"/><circle cx="15" cy="18" r="1.6"/></svg>';
+const PENCIL = '<svg viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg>';
+function sortItem(kind, id, title, meta, extra, past) {
+  return `<div class="prio-item sort-item ${past ? 'past' : ''}" data-id="${id}">
+    <div class="drag-handle" aria-label="Перетащить">${GRIP}</div>
+    <div class="prio-info"><div class="prio-title">${esc(title)}</div><div class="prio-meta">${meta}</div></div>
+    <div class="prio-ctrls">${extra || ''}<button class="prio-btn del" onclick="deleteContent('${kind}','${id}')" aria-label="Удалить">${ICON.x}</button></div>
+  </div>`;
 }
 function simpleItem(kind, id, title, meta) {
   return `<div class="prio-item"><div class="prio-info"><div class="prio-title">${esc(title)}</div><div class="prio-meta">${meta}</div></div>
@@ -1412,13 +1427,101 @@ function toggleEventForm(id) {
 }
 function renderContentAdmin() {
   const none = '<p class="hint">Пусто</p>';
-  const ev = [...state.events].sort((a, b) => b.priority - a.priority);
-  document.getElementById('prio-events').innerHTML = ev.length ? ev.map(e => prioItem('event', e, cat(e.category).name + ' · ' + longDate(e.date) + (isPast(e) ? ' · прошло' : '') + ' · идут: ' + state.registrations.filter(r => r.eventId === e.id).length)).join('') : none;
-  const po = [...state.posts].sort((a, b) => b.priority - a.priority);
-  document.getElementById('prio-posts').innerHTML = po.length ? po.map(p => prioItem('post', p, topic(p.topic).name + ' · ' + timeAgo(p.createdAt))).join('') : none;
+  const ev = [...state.events].sort(byOrder);
+  const evEl = document.getElementById('prio-events');
+  evEl.innerHTML = ev.length ? ev.map(e => sortItem('event', e.id, e.title,
+    cat(e.category).name + ' · ' + longDate(e.date) + (isPast(e) ? ' · прошло' : '') + (e.needsForm ? ' · анкета' : ''),
+    `<button class="prio-btn" onclick="editEvent('${e.id}')" aria-label="Изменить">${PENCIL}</button>` + formToggleBtn(e), isPast(e))).join('') : none;
+  makeSortable(evEl, ids => applyOrder(state.events, ids));
+
+  const po = [...state.posts].sort(byOrder);
+  const poEl = document.getElementById('prio-posts');
+  poEl.innerHTML = po.length ? po.map(p => sortItem('post', p.id, p.title, topic(p.topic).name + ' · ' + timeAgo(p.createdAt))).join('') : none;
+  makeSortable(poEl, ids => applyOrder(state.posts, ids));
+
   const se = [...state.sermons].sort((a, b) => parseDate(b.date) - parseDate(a.date));
   document.getElementById('list-sermons').innerHTML = se.length ? se.map(s => simpleItem('sermon', s.id, s.title, esc(s.speaker) + ' · ' + longDate(s.date, true) + (ytId(s.url) ? ' · YouTube' : s.url ? ' · ссылка' : ' · без видео'))).join('') : none;
-  document.getElementById('list-groups').innerHTML = state.groups.length ? state.groups.map(g => simpleItem('group', g.id, g.name, 'участников: ' + state.memberships.filter(m => m.groupId === g.id).length)).join('') : none;
+
+  const grEl = document.getElementById('list-groups');
+  grEl.innerHTML = state.groups.length ? state.groups.map(g => sortItem('group', g.id, g.name, 'участников: ' + state.memberships.filter(m => m.groupId === g.id).length)).join('') : none;
+  makeSortable(grEl, ids => { state.groups = ids.map(id => state.groups.find(g => g.id === id)).filter(Boolean); });
+}
+
+// === ПОРЯДОК: перетаскивание ===
+function byOrder(a, b) { return (a.order ?? 0) - (b.order ?? 0); }
+function applyOrder(arr, ids) { ids.forEach((id, i) => { const x = arr.find(o => o.id === id); if (x) x.order = i; }); }
+function topOrder(arr) { return arr.length ? Math.min(...arr.map(x => x.order ?? 0)) - 1 : 0; }
+function ensureOrder() {
+  // переносим старые «приоритеты» в порядок списка
+  if (state.events.some(e => typeof e.order !== 'number')) {
+    [...state.events].sort((a, b) => (b.priority || 0) - (a.priority || 0) || parseDate(a.date) - parseDate(b.date))
+      .forEach((e, i) => { e.order = i; });
+  }
+  if (state.posts.some(p => typeof p.order !== 'number')) {
+    [...state.posts].sort((a, b) => (b.priority || 0) - (a.priority || 0) || b.createdAt - a.createdAt)
+      .forEach((p, i) => { p.order = i; });
+  }
+}
+function makeSortable(list, onDone) {
+  list.classList.add('sort-list');
+  list.querySelectorAll('.drag-handle').forEach(handle => {
+    handle.addEventListener('pointerdown', ev => {
+      if (ev.button !== undefined && ev.button !== 0) return;
+      ev.preventDefault();
+      const item = handle.closest('.sort-item');
+      const scroller = item.closest('.screen') || document.scrollingElement;
+      let startY = ev.clientY + scroller.scrollTop, lastY = ev.clientY, moved = false, raf = 0;
+      handle.setPointerCapture(ev.pointerId);
+      item.classList.add('dragging'); document.body.classList.add('sorting');
+      haptic('light');
+
+      const update = () => {
+        const dy = lastY + scroller.scrollTop - startY;
+        item.style.transform = `translateY(${dy}px)`;
+        const r = item.getBoundingClientRect(), mid = r.top + r.height / 2;
+        const next = item.nextElementSibling, prev = item.previousElementSibling;
+        if (next && next.classList.contains('sort-item')) {
+          const nr = next.getBoundingClientRect();
+          if (mid > nr.top + nr.height / 2) { swap(() => list.insertBefore(next, item)); return; }
+        }
+        if (prev && prev.classList.contains('sort-item')) {
+          const pr = prev.getBoundingClientRect();
+          if (mid < pr.top + pr.height / 2) { swap(() => list.insertBefore(item, prev)); }
+        }
+      };
+      const swap = (fn) => {
+        const before = item.offsetTop; fn(); const after = item.offsetTop;
+        startY += after - before; moved = true;
+        item.style.transform = `translateY(${lastY + scroller.scrollTop - startY}px)`;
+        try { tg && tg.HapticFeedback && tg.HapticFeedback.selectionChanged(); } catch (e) {}
+      };
+      const autoScroll = () => {
+        const sr = scroller === document.scrollingElement ? { top: 0, bottom: innerHeight } : scroller.getBoundingClientRect();
+        const edge = 70; let d = 0;
+        if (lastY < sr.top + edge) d = -Math.ceil((sr.top + edge - lastY) / 6);
+        else if (lastY > sr.bottom - edge) d = Math.ceil((lastY - (sr.bottom - edge)) / 6);
+        if (d) { scroller.scrollTop += d; update(); }
+        raf = requestAnimationFrame(autoScroll);
+      };
+      raf = requestAnimationFrame(autoScroll);
+
+      const onMove = e => { lastY = e.clientY; update(); };
+      const onUp = () => {
+        cancelAnimationFrame(raf);
+        handle.removeEventListener('pointermove', onMove);
+        handle.removeEventListener('pointerup', onUp);
+        handle.removeEventListener('pointercancel', onUp);
+        item.style.transform = ''; item.classList.remove('dragging'); document.body.classList.remove('sorting');
+        if (moved) {
+          onDone([...list.querySelectorAll('.sort-item')].map(el => el.dataset.id));
+          DB.save(); toast('Порядок сохранён');
+        }
+      };
+      handle.addEventListener('pointermove', onMove);
+      handle.addEventListener('pointerup', onUp);
+      handle.addEventListener('pointercancel', onUp);
+    });
+  });
 }
 function renderTeam() {
   document.getElementById('team-list').innerHTML = state.allUsers.filter(u => u._onboarded).map(u => `
@@ -1482,7 +1585,7 @@ function myPeopleCount(eid) {
 }
 function eventCover(e) {
   const src = img(e.image);
-  return `<div class="modal-cover grain">${src ? `<img src="${src}" alt="">` : posterBg(e)}</div>`;
+  return `<div class="modal-cover grain">${src ? `<img src="${src}" alt="" onerror="this.style.display='none'">` : posterBg(e)}</div>`;
 }
 function showEventDetail(id) {
   const e = state.events.find(x => x.id === id); if (!e) return;
@@ -1501,6 +1604,7 @@ function showEventDetail(id) {
     ${eventCover(e)}
     <div class="post-tag" style="color:${cat(e.category).color}">${cat(e.category).name}${e.needsForm ? '<span class="form-badge">· нужна регистрация</span>' : ''}</div>
     <h3 style="font-size:26px">${esc(e.title)}</h3>
+    ${isAdmin() ? `<button class="admin-edit" onclick="editEvent('${e.id}')"><svg viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg>Изменить событие</button>` : ''}
     <div class="meta-list">
       <div>${ICON.cal}${WD_FULL[d.getDay()]}, ${longDate(e.date)}</div>
       <div>${ICON.clock}${esc(e.time)}</div>
@@ -1668,7 +1772,7 @@ function showNewsDetail(id) {
   rerender();
 }
 function showAnnouncements() {
-  const posts = [...state.posts].sort((a, b) => (b.priority || 0) - (a.priority || 0) || b.createdAt - a.createdAt);
+  const posts = [...state.posts].sort(byOrder);
   openModal(`<div class="modal-handle"></div><h3>Объявления</h3>
     ${posts.length ? posts.map(p => postHtml(p).replace('onclick="', 'onclick="closeModal();')).join('') : `<div class="empty"><p>Объявлений пока нет.</p></div>`}`);
 }
@@ -1782,17 +1886,157 @@ function createNewEvent() {
     id: genId(), title, lead: val('ev-lead'), description: val('ev-desc'),
     date, time: val('ev-time') || '19:00', location: val('ev-location') || 'Главный зал',
     category: val('ev-category'), capacity: parseInt(val('ev-capacity')) || 100,
-    image: val('ev-image'), priority: parseInt(val('ev-prio')), createdBy: me(),
+    image: getImageValue('ev'), order: topOrder(state.events), createdBy: me(),
     needsForm: document.getElementById('ev-form').checked
   });
-  if (document.getElementById('ev-form').checked && !CONFIG.sheetsUrl) toast('Событие создано. Подключите Google Таблицу, чтобы принимать анкеты');
-  DB.save(); clear('ev-title', 'ev-lead', 'ev-desc', 'ev-location', 'ev-image');
+  if (!DB.save()) { state.events.pop(); return; }
+  const warn = document.getElementById('ev-form').checked && !CONFIG.sheetsUrl;
+  clear('ev-title', 'ev-lead', 'ev-desc', 'ev-location');
+  clearImage('ev');
   document.getElementById('ev-form').checked = false;
-  toast('Событие создано'); renderContentAdmin();
+  toast(warn ? 'Событие создано. Подключите Google Таблицу, чтобы принимать анкеты' : 'Событие создано — оно первое в списке'); renderContentAdmin();
 }
+// === ФОТО: загрузка с телефона или ссылка ===
+const imgState = {};
+function imageFieldHtml(prefix) {
+  return `
+    <div class="img-preview" id="${prefix}-prev">Фото не выбрано — афиша оформится в цвете направления</div>
+    <div class="img-actions">
+      <label class="btn btn-dark btn-small"><input type="file" accept="image/*" hidden onchange="onImageFile('${prefix}', this)">Загрузить с телефона</label>
+      <button type="button" class="btn btn-dark btn-small" onclick="clearImage('${prefix}')">Убрать фото</button>
+    </div>
+    <input class="input" id="${prefix}-image" placeholder="или вставьте ссылку на картинку" inputmode="url" oninput="imgUrlChanged('${prefix}')">
+    <div class="hint" id="${prefix}-imgmsg">Подойдёт прямая ссылка на картинку или ссылка Google Диска с открытым доступом.</div>`;
+}
+function normalizeImageUrl(u) {
+  u = (u || '').trim();
+  if (!u) return '';
+  let m = u.match(/drive\.google\.com\/(?:file\/d\/|open\?id=|uc\?(?:.*&)?id=)([\w-]{20,})/);
+  if (m) return `https://drive.google.com/thumbnail?id=${m[1]}&sz=w1600`;
+  if (/dropbox\.com\//.test(u)) return u.replace(/([?&])dl=0/, '$1raw=1').replace(/^(?!.*[?&]raw=1)(.*)$/, (x) => x + (x.includes('?') ? '&' : '?') + 'raw=1');
+  m = u.match(/^https?:\/\/(?:www\.)?imgur\.com\/([\w]+)$/);
+  if (m) return `https://i.imgur.com/${m[1]}.jpg`;
+  return u;
+}
+function getImageValue(prefix) {
+  const st = imgState[prefix];
+  if (st && st.data) return st.data;
+  const el = document.getElementById(prefix + '-image');
+  return el ? normalizeImageUrl(el.value) : '';
+}
+function setImageField(prefix, value) {
+  imgState[prefix] = { data: '' };
+  const input = document.getElementById(prefix + '-image');
+  if (value && (value.startsWith('data:') || value.startsWith('img:'))) { imgState[prefix].data = value; input.value = ''; }
+  else input.value = value || '';
+  updatePreview(prefix);
+}
+function clearImage(prefix) {
+  imgState[prefix] = { data: '' };
+  const input = document.getElementById(prefix + '-image'); if (input) input.value = '';
+  updatePreview(prefix);
+}
+function imgUrlChanged(prefix) {
+  imgState[prefix] = { data: '' };
+  clearTimeout(imgUrlChanged.t);
+  imgUrlChanged.t = setTimeout(() => updatePreview(prefix), 400);
+}
+function updatePreview(prefix) {
+  const box = document.getElementById(prefix + '-prev'), msg = document.getElementById(prefix + '-imgmsg');
+  if (!box) return;
+  const raw = getImageValue(prefix);
+  const src = img(raw);
+  const typed = (document.getElementById(prefix + '-image').value || '').trim();
+  if (!src) {
+    box.innerHTML = 'Фото не выбрано — афиша оформится в цвете направления';
+    if (typed) { msg.className = 'hint bad'; msg.textContent = 'Ссылка должна начинаться с https://'; }
+    else { msg.className = 'hint'; msg.textContent = 'Подойдёт прямая ссылка на картинку или ссылка Google Диска с открытым доступом.'; }
+    return;
+  }
+  box.innerHTML = 'Загружаем…';
+  const im = new Image();
+  im.onload = () => {
+    box.innerHTML = ''; box.appendChild(im);
+    msg.className = 'hint good';
+    msg.textContent = raw.startsWith('data:') ? 'Фото загружено с телефона' : raw.startsWith('img:') ? 'Стандартное фото' : 'Картинка найдена';
+  };
+  im.onerror = () => {
+    box.innerHTML = 'Картинка не открывается';
+    msg.className = 'hint bad';
+    msg.textContent = 'По этой ссылке нет картинки. Нужна прямая ссылка на изображение (обычно заканчивается на .jpg или .png) или ссылка Google Диска с доступом «Все, у кого есть ссылка». Проще всего — загрузить фото с телефона.';
+  };
+  im.alt = ''; im.src = src;
+}
+function onImageFile(prefix, input) {
+  const file = input.files && input.files[0]; input.value = '';
+  if (!file) return;
+  if (!/^image\//.test(file.type)) { toast('Выберите файл с фото'); return; }
+  const box = document.getElementById(prefix + '-prev'); box.innerHTML = 'Обрабатываем фото…';
+  const reader = new FileReader();
+  reader.onload = () => {
+    const im = new Image();
+    im.onload = () => {
+      const max = 1280, k = Math.min(1, max / Math.max(im.width, im.height));
+      const c = document.createElement('canvas');
+      c.width = Math.round(im.width * k); c.height = Math.round(im.height * k);
+      c.getContext('2d').drawImage(im, 0, 0, c.width, c.height);
+      imgState[prefix] = { data: c.toDataURL('image/jpeg', 0.8) };
+      document.getElementById(prefix + '-image').value = '';
+      updatePreview(prefix);
+    };
+    im.onerror = () => { box.innerHTML = 'Не удалось открыть фото'; toast('Этот формат фото не поддерживается, попробуйте JPG или PNG'); };
+    im.src = reader.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+// === РЕДАКТИРОВАНИЕ СОБЫТИЯ ===
+function editEvent(id) {
+  if (!isAdmin()) return;
+  const e = state.events.find(x => x.id === id); if (!e) return;
+  const opt = (v, t) => `<option value="${v}" ${e.category === v ? 'selected' : ''}>${t}</option>`;
+  openModal(`
+    <div style="height:30px"></div>
+    <h3 style="padding-right:44px">Изменить событие</h3>
+    <div class="form-group"><label class="form-label" for="ee-title">Название</label><input class="input" id="ee-title" value="${esc(e.title)}"></div>
+    <div class="form-group"><label class="form-label" for="ee-lead">Подзаголовок</label><input class="input" id="ee-lead" value="${esc(e.lead)}" placeholder="Одна строка на афише"></div>
+    <div class="form-group"><label class="form-label" for="ee-desc">Описание</label><textarea class="textarea" id="ee-desc" style="min-height:140px">${esc(e.description)}</textarea></div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label" for="ee-date">Дата</label><input class="input" id="ee-date" type="date" value="${esc(e.date)}"></div>
+      <div class="form-group"><label class="form-label" for="ee-time">Время</label><input class="input" id="ee-time" type="time" value="${esc(e.time)}"></div>
+    </div>
+    <div class="form-group"><label class="form-label" for="ee-location">Место</label><input class="input" id="ee-location" value="${esc(e.location)}"></div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label" for="ee-category">Направление</label>
+        <select class="select" id="ee-category">${opt('service', 'Служение')}${opt('youth', 'Молодёжь')}${opt('prayer', 'Молитва')}${opt('group', 'Группа')}</select></div>
+      <div class="form-group"><label class="form-label" for="ee-capacity">Мест</label><input class="input" id="ee-capacity" type="number" min="1" value="${esc(e.capacity)}"></div>
+    </div>
+    <div class="form-group"><label class="form-label">Фото</label>${imageFieldHtml('ee')}</div>
+    <label class="toggle-row" style="margin-bottom:16px"><div><span>Регистрация с анкетой</span><small>ФИО, возраст, город, церковь</small></div>
+      <span class="switch"><input type="checkbox" id="ee-form" ${e.needsForm ? 'checked' : ''}><i></i></span></label>
+  `, { full: true, foot: `<button class="btn btn-light btn-full" onclick="saveEvent('${e.id}')">Сохранить изменения</button>` });
+  setImageField('ee', e.image);
+}
+function saveEvent(id) {
+  const e = state.events.find(x => x.id === id); if (!e) return;
+  const title = val('ee-title'); if (!title) { toast('Введите название'); return; }
+  const date = val('ee-date'); if (!date) { toast('Выберите дату'); return; }
+  const backup = { ...e };
+  Object.assign(e, {
+    title, lead: val('ee-lead'), description: val('ee-desc'), date,
+    time: val('ee-time') || e.time, location: val('ee-location') || e.location,
+    category: val('ee-category'), capacity: parseInt(val('ee-capacity')) || e.capacity,
+    image: getImageValue('ee'), needsForm: document.getElementById('ee-form').checked
+  });
+  if (!DB.save()) { Object.assign(e, backup); return; }
+  closeModal();
+  if (currentTab === 'admin') renderContentAdmin(); else rerender();
+  toast('Изменения сохранены');
+}
+
 function createPost() {
   const title = val('po-title'); if (!title) { toast('Введите заголовок'); return; }
-  state.posts.push({ id: genId(), title, text: val('po-text'), topic: val('po-topic'), priority: parseInt(val('po-prio')), createdAt: Date.now(), createdBy: me() });
+  state.posts.push({ id: genId(), title, text: val('po-text'), topic: val('po-topic'), order: topOrder(state.posts), createdAt: Date.now(), createdBy: me() });
   DB.save(); clear('po-title', 'po-text');
   toast('Объявление опубликовано'); renderContentAdmin();
 }
@@ -1835,12 +2079,6 @@ function createGroup() {
   state.groups.push({ id: genId(), name, sub: val('gr-sub'), description: val('gr-desc'), when: val('gr-when'), leader: val('gr-leader'), image: val('gr-image') });
   DB.save(); clear('gr-name', 'gr-sub', 'gr-desc', 'gr-when', 'gr-leader', 'gr-image');
   toast('Группа создана'); renderContentAdmin();
-}
-function changePriority(kind, id, delta) {
-  const arr = kind === 'event' ? state.events : state.posts;
-  const x = arr.find(i => i.id === id);
-  if (x) x.priority = Math.max(1, Math.min(10, (x.priority || 5) + delta));
-  DB.save(); renderContentAdmin();
 }
 function deleteContent(kind, id) {
   if (!confirm('Удалить без возможности восстановления?')) return;
@@ -1911,7 +2149,10 @@ function renderAll() { renderHome(); renderMore(); }
 function init() {
   DB.load();
   seedData();
+  ensureOrder(); DB.save();
   renderLogos();
+  document.getElementById('ev-imgbox').innerHTML = imageFieldHtml('ev');
+  imgState.ev = { data: '' };
   document.getElementById('splash-img').src = IMG.prayer;
   if (initAuth()) {
     renderAll();
