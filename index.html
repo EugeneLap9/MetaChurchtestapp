@@ -593,6 +593,72 @@ img.ld { opacity: 0; }
 .net.online i { background: var(--mint); }
 .net.slow i { width: 14px; height: 14px; background: none; border: 2px solid var(--amber); border-right-color: transparent; animation: spin .8s linear infinite; }
 
+/* === Библия: вкладки, планы, размышления === */
+.bb-tabs { display: flex; gap: 4px; margin: 0 20px 14px; padding: 4px; border-radius: 100px; background: var(--surface); border: 1px solid var(--line); }
+.bb-tabs button { flex: 1; padding: 9px 4px; border-radius: 100px; font-size: 13px; font-weight: 500; color: var(--text-2); }
+.bb-tabs button.active { background: var(--text); color: var(--bg); font-weight: 600; }
+.bb-text .fn { font-family: var(--body); font-size: .56em; font-weight: 700; color: var(--sky); margin-left: 2px; padding: 0 3px; cursor: pointer; }
+.bb-notes { margin-top: 30px; padding-top: 18px; border-top: 1px solid var(--line); font-family: var(--body); }
+.bb-notes h4 { font-size: 12px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--text-2); margin-bottom: 12px; }
+.bb-notes p { display: flex; gap: 10px; font-size: 14px; line-height: 1.55; color: var(--text-2); margin-bottom: 10px; }
+.bb-notes p b { color: var(--sky); font-size: 12px; min-width: 14px; padding-top: 2px; }
+.bb-notes em { font-style: normal; color: var(--text); }
+.fn-link { color: var(--sky); text-decoration: underline; text-underline-offset: 3px; font: inherit; padding: 0; }
+.bb-nav.has-plan { left: 12px; right: 12px; padding: 0; }
+.pl-now { pointer-events: auto; flex: 1; display: flex; align-items: center; gap: 10px; padding: 10px 10px 10px 8px; border-radius: 20px; background: rgba(28,28,31,.96); border: 1px solid var(--line); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); box-shadow: 0 10px 30px rgba(0,0,0,.5); }
+.pl-now-x { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.pl-now-x svg { width: 15px; height: 15px; stroke: var(--text-2); stroke-width: 2.2; fill: none; }
+.pl-now-info { flex: 1; min-width: 0; }
+.pl-now-info b { display: block; font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pl-now-info span { font-size: 12px; color: var(--text-2); }
+.pl-now .btn svg { width: 16px; height: 16px; }
+.pl-tile { position: relative; overflow: hidden; aspect-ratio: 1; border-radius: 18px; padding: 14px; display: flex; flex-direction: column; justify-content: flex-end; text-align: left;
+  background: radial-gradient(120% 90% at 100% 0%, color-mix(in srgb, var(--c) 55%, transparent), transparent 60%), radial-gradient(90% 70% at 0% 100%, color-mix(in srgb, var(--c) 18%, transparent), transparent 65%), #121214; border: 1px solid var(--line); }
+.pl-tile .pl-mark { position: absolute; right: 12px; top: 12px; width: 26%; height: auto; opacity: .9; }
+.pl-tile b { position: relative; font-family: var(--display); font-size: 15px; font-weight: 700; line-height: 1.15; letter-spacing: -.2px; }
+.pl-tile small { position: relative; font-size: 12px; color: rgba(255,255,255,.7); margin-top: 6px; }
+.pl-tile.big { aspect-ratio: 2/1; padding: 20px; }
+.pl-tile.big b { font-size: 24px; }
+.pl-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.pl-grid button:active, .pl-mine:active { transform: scale(.98); }
+.pl-mine { display: flex; gap: 14px; align-items: center; width: 100%; text-align: left; padding: 10px; margin-bottom: 10px; border-radius: 20px; background: var(--surface); border: 1px solid var(--line); }
+.pl-mine .pl-tile { width: 76px; flex-shrink: 0; padding: 8px; border-radius: 14px; }
+.pl-mine .pl-tile b, .pl-mine .pl-tile small { display: none; }
+.pl-mine .pl-tile .pl-mark { width: 34%; }
+.pl-mine-info { flex: 1; min-width: 0; }
+.pl-mine-info b { display: block; font-size: 15px; font-weight: 600; }
+.pl-mine-info span { font-size: 12px; color: var(--text-2); }
+.pl-mine-info small { display: block; font-size: 12px; color: var(--text-3); margin-top: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pl-bar { height: 4px; border-radius: 4px; background: var(--line); overflow: hidden; margin-top: 8px; }
+.pl-bar i { display: block; height: 100%; border-radius: 4px; }
+.pl-bar.big { height: 6px; }
+.pl-days { display: flex; gap: 8px; overflow-x: auto; margin: 0 -20px 6px; padding: 2px 20px 8px; }
+.pl-days::-webkit-scrollbar { display: none; }
+.pl-days button { flex: 0 0 54px; height: 60px; border-radius: 14px; background: var(--bg); border: 1px solid var(--line); font-family: var(--display); font-size: 17px; font-weight: 700; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.pl-days small { font-family: var(--body); font-size: 9px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--text-3); }
+.pl-days button.done { color: var(--lime); border-color: rgba(217,242,75,.35); }
+.pl-days button.sel { background: var(--text); color: var(--bg); border-color: var(--text); }
+.pl-days button.sel small { color: var(--bg); opacity: .6; }
+.pl-row { display: flex; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--line); font-size: 14px; }
+.pl-day { color: var(--text-3); min-width: 56px; }
+.pl-read { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--line); }
+.pl-check { width: 34px; height: 34px; border-radius: 50%; border: 1.5px solid var(--text-3); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.pl-check svg { width: 16px; height: 16px; stroke: transparent; stroke-width: 2.6; fill: none; }
+.pl-check.on { background: var(--lime); border-color: var(--lime); }
+.pl-check.on svg { stroke: #111; }
+.pl-read-title { flex: 1; text-align: left; padding: 4px 0; }
+.pl-read-title b { display: block; font-size: 16px; font-weight: 600; }
+.pl-read-title small { font-size: 12px; color: var(--text-3); }
+.rf-intro { margin: 0 20px 16px; padding: 18px; border-radius: 20px; background: radial-gradient(120% 100% at 100% 0%, rgba(169,155,255,.22), transparent 60%), var(--surface); border: 1px solid var(--line); font-size: 14px; line-height: 1.5; color: var(--text-2); }
+.rf-intro b { display: block; font-family: var(--display); font-size: 20px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+.rf-card { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 16px; margin-bottom: 10px; }
+.rf-ref { display: inline-flex; font-size: 12px; font-weight: 600; color: var(--violet); background: rgba(169,155,255,.12); padding: 5px 10px; border-radius: 100px; margin-bottom: 10px; }
+.rf-quote { font-family: 'PT Serif', Georgia, serif; font-size: 15px; line-height: 1.55; color: var(--text-2); border-left: 2px solid var(--violet); padding-left: 12px; margin: 0 0 12px; }
+.rf-text { font-size: 15px; line-height: 1.55; white-space: pre-wrap; }
+.rf-pre { display: flex; flex-direction: column; gap: 6px; padding: 12px 14px; border-radius: 14px; background: var(--bg); border: 1px solid var(--line); margin-bottom: 16px; }
+.rf-pre b { font-size: 12px; color: var(--violet); }
+.rf-pre span { font-family: 'PT Serif', Georgia, serif; font-size: 14px; line-height: 1.5; color: var(--text-2); }
+
 /* === Общая база === */
 .cloud-box { margin: 0 20px 16px; padding: 14px 16px; border-radius: 16px; background: var(--surface); border: 1px solid var(--line); font-size: 13px; color: var(--text-2); line-height: 1.5; }
 .cloud-box b { display: block; color: var(--text); font-size: 15px; margin-bottom: 4px; }
@@ -633,9 +699,9 @@ img.ld { opacity: 0; }
 .bb-skel div:nth-child(2) { width: 22%; height: 54px; margin: 0 auto 30px; border-radius: 12px; }
 .bb-skel div:nth-child(3n) { width: 86%; }
 .bb-nav { position: fixed; left: 0; right: 0; bottom: calc(var(--tabbar-h) + var(--safe-bottom) + 14px); display: flex; justify-content: space-between; padding: 0 14px; pointer-events: none; z-index: 60; }
-.bb-nav button { pointer-events: auto; width: 46px; height: 46px; border-radius: 50%; background: rgba(28,28,31,.92); border: 1px solid var(--line); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); display: flex; align-items: center; justify-content: center; }
-.bb-nav button svg { width: 20px; height: 20px; stroke: var(--text); stroke-width: 2.2; fill: none; }
-.bb-nav button:disabled { opacity: .3; }
+.bb-nav > button { pointer-events: auto; width: 46px; height: 46px; border-radius: 50%; background: rgba(28,28,31,.92); border: 1px solid var(--line); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); display: flex; align-items: center; justify-content: center; }
+.bb-nav > button svg { width: 20px; height: 20px; stroke: var(--text); stroke-width: 2.2; fill: none; }
+.bb-nav > button:disabled { opacity: .3; }
 .bb-sel { position: fixed; left: 12px; right: 12px; bottom: calc(var(--tabbar-h) + var(--safe-bottom) + 10px); z-index: 70; background: var(--surface-2); border: 1px solid var(--line); border-radius: 22px; padding: 14px 14px 12px; box-shadow: 0 14px 40px rgba(0,0,0,.6); animation: fadeIn .2s ease; }
 .bb-sel-head { display: flex; align-items: center; justify-content: space-between; font-size: 14px; font-weight: 600; }
 .bb-sel-head button { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: var(--surface); }
@@ -813,12 +879,10 @@ img.ld { opacity: 0; }
   <div class="chips" id="com-chips">
     <button class="chip active" data-com="groups">Группы</button>
     <button class="chip" data-com="bible">Библия</button>
-    <button class="chip" data-com="people">Люди</button>
     <button class="chip" data-com="prayer">Молитвенные нужды</button>
   </div>
   <div id="com-groups"></div>
   <div id="com-bible" class="hidden"></div>
-  <div id="com-people" class="hidden"></div>
   <div id="com-prayer" class="hidden"></div>
 </section>
 
@@ -1510,13 +1574,12 @@ let comTab = 'groups';
 function setComTab(t) {
   comTab = t;
   document.querySelectorAll('#com-chips .chip').forEach(c => c.classList.toggle('active', c.dataset.com === t));
-  ['groups', 'bible', 'people', 'prayer'].forEach(k => document.getElementById('com-' + k).classList.toggle('hidden', k !== t));
+  ['groups', 'bible', 'prayer'].forEach(k => document.getElementById('com-' + k).classList.toggle('hidden', k !== t));
   renderCommunity();
 }
 function renderCommunity() {
   if (comTab === 'groups') renderGroups();
   if (comTab === 'bible') renderBible();
-  if (comTab === 'people') renderPeople();
   if (comTab === 'prayer') renderPrayers();
 }
 function groupCardHtml(g) {
@@ -2490,14 +2553,14 @@ function bibleCleanText(t) {
   // оставляем только безопасное оформление: курсив, жирный, подсветку поиска
   return esc(t).replace(/&lt;(\/?)(i|b|mark)&gt;/g, '<$1$2>').replace(/&lt;br\s*\/?&gt;/g, ' ');
 }
-function bibleCacheLoad() { try { return JSON.parse(localStorage.getItem('mc_bible') || '{}'); } catch (e) { return {}; } }
+function bibleCacheLoad() { try { return JSON.parse(localStorage.getItem('mc_bible2') || '{}'); } catch (e) { return {}; } }
 function bibleCacheSave(key, verses) {
   try {
     const c = bibleCacheLoad();
     c[key] = { t: Date.now(), d: verses };
     const keys = Object.keys(c).sort((a, b) => c[b].t - c[a].t);
     keys.slice(60).forEach(k => delete c[k]);   // храним последние 60 глав
-    localStorage.setItem('mc_bible', JSON.stringify(c));
+    localStorage.setItem('mc_bible2', JSON.stringify(c));
   } catch (e) {}
 }
 async function getChapter(tr, book, ch) {
@@ -2510,11 +2573,11 @@ async function getChapter(tr, book, ch) {
   const stop = setTimeout(() => ctrl.abort(), 20000);
   const slow = setTimeout(reportSlow, 3500);
   try {
-    const res = await fetch(`${BIBLE_API}/get-text/${tr}/${book}/${ch}/`, { signal: ctrl.signal });
+    const res = await fetch(`${BIBLE_API}/get-chapter/${tr}/${book}/${ch}/`, { signal: ctrl.signal });
     if (!res.ok) throw new Error('HTTP ' + res.status);
     const data = await res.json();
     if (!Array.isArray(data) || !data.length) throw new Error('empty');
-    const verses = data.map(v => [v.verse, v.text]);
+    const verses = data.map(v => [v.verse, v.text, v.comment || '']);
     bibleMem[key] = verses; bibleCacheSave(key, verses);
     return verses;
   } finally { clearTimeout(stop); clearTimeout(slow); }
@@ -2529,8 +2592,14 @@ function bibleNeighbor(d) {
 function renderBible(flashVerse) {
   const B = bible();
   if (B.ch > chCount(B.tr, B.book)) B.ch = chCount(B.tr, B.book);
-  const wrap = document.getElementById('com-bible');
+  const root = document.getElementById('com-bible');
+  root.innerHTML = bibleTabsHtml() + '<div id="bb-view"></div>';
+  const view = B.view || 'read';
+  if (view === 'plans') { renderPlans(); return; }
+  if (view === 'refl') { renderReflections(); return; }
+  const wrap = document.getElementById('bb-view');
   const prev = bibleNeighbor(-1), next = bibleNeighbor(1);
+  const planBar = planBarHtml();
   wrap.innerHTML = `
     <div class="bb-bar">
       <button class="bb-ref" onclick="biblePickBook()"><span>${esc(bookName(B.book))} ${B.ch}</span><svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button>
@@ -2540,9 +2609,9 @@ function renderBible(flashVerse) {
       <button class="icon-btn bb-aa" onclick="bibleSettings()" aria-label="Шрифт">Aa</button>
     </div>
     <div id="bb-body"><div class="bb-skel">${'<div class="shimmer"></div>'.repeat(12)}</div></div>
-    <div class="bb-nav" id="bb-nav">
+    <div class="bb-nav ${planBar ? 'has-plan' : ''}" id="bb-nav">${planBar || `
       <button onclick="bibleStep(-1)" ${prev ? '' : 'disabled'} aria-label="Предыдущая глава"><svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg></button>
-      <button onclick="bibleStep(1)" ${next ? '' : 'disabled'} aria-label="Следующая глава"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></button>
+      <button onclick="bibleStep(1)" ${next ? '' : 'disabled'} aria-label="Следующая глава"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></button>`}
     </div>
     <div id="bb-sel-box"></div>`;
   bibleSel = new Set();
@@ -2550,14 +2619,18 @@ function renderBible(flashVerse) {
   getChapter(B.tr, B.book, B.ch).then(verses => {
     if (token !== bibleToken) return;
     const body = document.getElementById('bb-body'); if (!body) return;
+    const showFn = B.notes !== false, fns = [];
     body.innerHTML = `
       <article class="bb-text ${B.serif ? '' : 'sans'}" id="bb-text" style="font-size:${B.size}px">
         <div class="bb-book">${esc(bookName(B.book))}</div>
         <div class="bb-chnum">${B.ch}</div>
-        <p>${verses.map(([n, t]) => {
+        <p>${verses.map(([n, t, c]) => {
           const h = B.hl[B.book + '.' + B.ch + '.' + n];
-          return `<span class="v ${h ? 'hl-' + h : ''}" data-v="${n}"><sup>${n}</sup>${bibleCleanText(t)} </span>`;
+          let mark = '';
+          if (showFn && c) { fns.push([n, c]); mark = `<sup class="fn" data-fn="${n}">${fns.length}</sup>`; }
+          return `<span class="v ${h ? 'hl-' + h : ''}" data-v="${n}"><sup>${n}</sup>${bibleCleanText(t)}${mark} </span>`;
         }).join('')}</p>
+        ${showFn && fns.length ? `<section class="bb-notes"><h4>Примечания</h4>${fns.map(([n, c], i) => `<p><b>${i + 1}</b><span><em>ст. ${n}.</em> ${fnHtml(c)}</span></p>`).join('')}</section>` : ''}
         <div class="bb-foot">${BIBLE_TR[B.tr].copy}<br>Текст предоставлен bolls.life</div>
       </article>`;
     document.getElementById('bb-text').addEventListener('click', bibleTap);
@@ -2578,7 +2651,9 @@ function renderBible(flashVerse) {
   });
 }
 function bibleGo(book, ch, verse) {
-  const B = bible(); B.book = book; B.ch = ch; DB.save();
+  const B = bible(); B.book = book; B.ch = ch; B.view = 'read'; saveLocalOnly();
+  if (currentTab !== 'community') switchTab('community');
+  if (comTab !== 'bible') { comTab = 'bible'; document.querySelectorAll('#com-chips .chip').forEach(c => c.classList.toggle('active', c.dataset.com === 'bible')); ['groups', 'bible', 'prayer'].forEach(k => document.getElementById('com-' + k).classList.toggle('hidden', k !== 'bible')); }
   document.getElementById('community-screen').scrollTop = 0;
   renderBible(verse);
 }
@@ -2590,6 +2665,8 @@ function bibleStep(d) {
 
 // Выделение стихов и действия
 function bibleTap(e) {
+  const fn = e.target.closest('.fn');
+  if (fn) { showFootnote(Number(fn.dataset.fn)); return; }
   const v = e.target.closest('.v'); if (!v) return;
   const n = Number(v.dataset.v);
   if (bibleSel.has(n)) { bibleSel.delete(n); v.classList.remove('sel'); }
@@ -2622,6 +2699,7 @@ function renderBibleSel() {
       <div class="bb-actions">
         <button onclick="bibleCopy()"><svg viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="2.5"/><path d="M16 8V6a2 2 0 00-2-2H6a2 2 0 00-2 2v8a2 2 0 002 2h2"/></svg>Копировать</button>
         <button onclick="bibleShare()"><svg viewBox="0 0 24 24"><path d="M4 12v7a1 1 0 001 1h14a1 1 0 001-1v-7"/><path d="M12 3v12M7 8l5-5 5 5"/></svg>Поделиться</button>
+        <button onclick="bibleReflect()"><svg viewBox="0 0 24 24"><path d="M4 5.5A1.5 1.5 0 015.5 4h13A1.5 1.5 0 0120 5.5v9a1.5 1.5 0 01-1.5 1.5H10l-4 4v-4H5.5A1.5 1.5 0 014 14.5z"/></svg>Мысль</button>
       </div>
     </div>`;
 }
@@ -2716,6 +2794,8 @@ function bibleSettings() {
       <button type="button" class="${B.serif ? 'on' : ''}" style="font-family:'PT Serif',Georgia,serif" onclick="bibleFont(true)">С засечками</button>
       <button type="button" class="${B.serif ? '' : 'on'}" onclick="bibleFont(false)">Без засечек</button>
     </div>
+    <label class="toggle-row" style="margin-top:12px"><div><span>Примечания переводчика</span><small>Пояснения к стихам: значком в тексте и списком в конце главы. Есть в Новом русском переводе</small></div>
+      <span class="switch"><input type="checkbox" ${B.notes !== false ? 'checked' : ''} onchange="bibleNotesToggle(this.checked)"><i></i></span></label>
   `);
 }
 function bibleSize(d) {
@@ -2763,6 +2843,290 @@ async function bibleRunSearch() {
   }
 }
 
+// === БИБЛИЯ: вкладки, примечания, планы чтения, размышления ===
+function bibleView(k) {
+  bible().view = k; saveLocalOnly();
+  document.getElementById('community-screen').scrollTop = 0;
+  renderBible();
+}
+function bibleTabsHtml() {
+  const v = bible().view || 'read';
+  return `<div class="bb-tabs">${[['read', 'Чтение'], ['plans', 'Планы'], ['refl', 'Размышления']]
+    .map(([k, t]) => `<button class="${v === k ? 'active' : ''}" onclick="bibleView('${k}')">${t}</button>`).join('')}</div>`;
+}
+
+// --- Примечания переводчика ---
+function fnHtml(c) {
+  const links = [];
+  let t = String(c || '').replace(/<a\s+href=['"]\/[A-Za-z0-9]+\/(\d+)\/(\d+)\/(\d+)[^'"]*['"]\s*>([\s\S]*?)<\/a>/g, (m, b, ch, v, label) => {
+    links.push([+b, +ch, +v, label.replace(/<[^>]+>/g, '')]); return '\u0001' + (links.length - 1) + '\u0001';
+  });
+  t = esc(t.replace(/<[^>]+>/g, ''));
+  return t.replace(/\u0001(\d+)\u0001/g, (m, i) => {
+    const [b, ch, v, l] = links[i];
+    return b >= 1 && b <= 66 ? `<button class="fn-link" onclick="closeModal();bibleGo(${b},${ch},${v})">${esc(l)}</button>` : esc(l);
+  });
+}
+function showFootnote(n) {
+  const B = bible(); const verses = bibleMem[B.tr + '/' + B.book + '/' + B.ch] || [];
+  const v = verses.find(x => x[0] === n); if (!v || !v[2]) return;
+  openModal(`<div class="modal-handle"></div><h3>Примечание</h3><p class="hint" style="margin:-6px 0 12px">${esc(bookName(B.book))} ${B.ch}:${n}</p><div class="desc" style="color:var(--text)">${fnHtml(v[2])}</div>`);
+}
+function bibleNotesToggle(on) { bible().notes = on; saveLocalOnly(); if ((bible().view || 'read') === 'read') renderBible(); }
+
+// --- Планы чтения ---
+const planRange = (a, b) => Array.from({ length: b - a + 1 }, (_, i) => a + i);
+function planChapters(books) { const out = []; books.forEach(b => { for (let c = 1; c <= BIBLE_CH.NRT[b - 1]; c++) out.push([b, c]); }); return out; }
+function planSpread(list, days) { const r = []; for (let i = 0; i < days; i++) r.push(list.slice(Math.floor(i * list.length / days), Math.floor((i + 1) * list.length / days))); return r; }
+const PLANS = [
+  { id: 'john21', title: 'Евангелие от Иоанна', days: 21, color: '#A99BFF', desc: 'Жизнь и слова Иисуса глазами «ученика, которого любил Иисус». По одной главе в день — хорошее начало для тех, кто только открывает Библию.', build: () => planSpread(planChapters([43]), 21) },
+  { id: 'psprov', title: 'Псалмы и Притчи', days: 31, color: '#5ED3A5', desc: 'Каждый день — одна глава Притчей и несколько псалмов. За месяц вы прочитаете обе книги целиком: молитва и мудрость на каждый день.', build: () => planRange(1, 31).map(d => [[20, d], ...[0, 30, 60, 90, 120].map(k => [19, d + k]).filter(x => x[1] <= 150)]) },
+  { id: 'gospels30', title: 'Четыре Евангелия', days: 30, color: '#D9F24B', desc: 'Матфей, Марк, Лука и Иоанн за месяц — около трёх глав в день. Вся история Иисуса от рождения до воскресения.', build: () => planSpread(planChapters(planRange(40, 43)), 30) },
+  { id: 'paul30', title: 'Послания Павла', days: 30, color: '#FFC24B', desc: 'От Римлянам до Филимону: вера, благодать, жизнь церкви. Около трёх глав в день.', build: () => planSpread(planChapters(planRange(45, 57)), 30) },
+  { id: 'nt90', title: 'Новый Завет за 90 дней', days: 90, color: '#5AB0E8', desc: 'Весь Новый Завет по порядку за три месяца — примерно три главы в день.', build: () => planSpread(planChapters(planRange(40, 66)), 90) },
+  { id: 'year', title: 'Библия за год', days: 365, color: '#F2855A', desc: 'Вся Библия от Бытия до Откровения за 365 дней — три-четыре главы в день, около 15 минут чтения.', build: () => planSpread(planChapters(planRange(1, 66)), 365) }
+];
+const planCache = {};
+const planById = id => PLANS.find(p => p.id === id);
+function planDays(id) { return planCache[id] || (planCache[id] = planById(id).build()); }
+function plansState() { if (!state.plans) state.plans = {}; return state.plans; }
+const chKey = (b, c) => b + '.' + c;
+function planDayDone(id, d) { const st = plansState()[id]; const done = (st && st.done[d]) || []; return planDays(id)[d - 1].every(([b, c]) => done.includes(chKey(b, c))); }
+function planInfo(id) {
+  const days = planDays(id), st = plansState()[id];
+  let total = 0, read = 0, cur = days.length + 1;
+  days.forEach((list, i) => {
+    total += list.length;
+    const done = (st && st.done[i + 1]) || [];
+    read += list.filter(([b, c]) => done.includes(chKey(b, c))).length;
+    if (cur > days.length && !list.every(([b, c]) => done.includes(chKey(b, c)))) cur = i + 1;
+  });
+  return { total, read, cur, pct: total ? Math.round(read * 100 / total) : 0, finished: cur > days.length };
+}
+function groupReadings(list) {
+  const g = [];
+  list.forEach(([b, c]) => {
+    const last = g[g.length - 1];
+    if (last && last.b === b && last.to === c - 1) { last.to = c; last.items.push([b, c]); }
+    else g.push({ b, from: c, to: c, items: [[b, c]] });
+  });
+  return g.map(x => ({ ...x, label: bookName(x.b) + ' ' + (x.from === x.to ? x.from : x.from + '–' + x.to) }));
+}
+function dayLabel(id, d) { return groupReadings(planDays(id)[d - 1]).map(x => x.label).join(', '); }
+function planTile(p, big) {
+  return `<div class="pl-tile ${big ? 'big' : ''}" style="--c:${p.color}">
+    <svg class="pl-mark" viewBox="0 0 483 685" fill="${p.color}">${MARK}</svg>
+    <b>${esc(p.title)}</b><small>${p.days} ${p.days % 10 === 1 && p.days % 100 !== 11 ? 'день' : (p.days % 10 >= 2 && p.days % 10 <= 4 && (p.days % 100 < 12 || p.days % 100 > 14)) ? 'дня' : 'дней'}</small></div>`;
+}
+function renderPlans() {
+  const view = document.getElementById('bb-view');
+  const mine = PLANS.filter(p => plansState()[p.id]);
+  view.innerHTML = `
+    ${mine.length ? `<div class="section" style="margin-top:6px"><div class="section-head"><div class="section-title">Мои планы</div></div>
+      ${mine.map(p => { const i = planInfo(p.id); return `
+        <button class="pl-mine" onclick="showPlan('${p.id}')">
+          ${planTile(p)}
+          <div class="pl-mine-info">
+            <b>${esc(p.title)}</b>
+            <span>${i.finished ? 'План завершён' : 'День ' + i.cur + ' из ' + p.days}</span>
+            <div class="pl-bar"><i style="width:${i.pct}%;background:${p.color}"></i></div>
+            ${i.finished ? '' : `<small>${esc(dayLabel(p.id, i.cur))}</small>`}
+          </div>
+        </button>`; }).join('')}
+    </div>` : ''}
+    <div class="section" style="margin-top:${mine.length ? 28 : 6}px">
+      <div class="section-head"><div class="section-title">Популярные планы</div></div>
+      <div class="pl-grid">${PLANS.map(p => `<button onclick="showPlan('${p.id}')">${planTile(p)}</button>`).join('')}</div>
+    </div>
+    <div style="height:90px"></div>`;
+}
+let planSelDay = 1;
+function showPlan(id, keep) {
+  const p = planById(id); if (!p) return;
+  const st = plansState()[id];
+  if (!st) {
+    const per = Math.round(planDays(id).reduce((n, d) => n + d.length, 0) / p.days * 10) / 10;
+    openModal(`
+      <div style="height:30px"></div>
+      ${planTile(p, true)}
+      <h3 style="margin-top:20px;padding-right:0">${esc(p.title)}</h3>
+      <p class="hint" style="margin:-6px 0 14px">${p.days} дней · в среднем ${String(per).replace('.', ',')} гл. в день</p>
+      <div class="desc">${esc(p.desc)}</div>
+      <div class="sub-title" style="margin-top:4px">Первые дни</div>
+      ${[1, 2, 3].filter(d => d <= p.days).map(d => `<div class="pl-row"><span class="pl-day">День ${d}</span><span>${esc(dayLabel(id, d))}</span></div>`).join('')}
+    `, { full: true, foot: `<button class="btn btn-light btn-full" onclick="planStart('${id}')">Начать план</button>` });
+    return;
+  }
+  const info = planInfo(id);
+  if (!keep) planSelDay = Math.min(info.cur, p.days);
+  const d = planSelDay, done = st.done[d] || [];
+  const groups = groupReadings(planDays(id)[d - 1]);
+  openModal(`
+    <div style="height:30px"></div>
+    <h3 style="padding-right:44px">${esc(p.title)}</h3>
+    <div class="pl-bar big"><i style="width:${info.pct}%;background:${p.color}"></i></div>
+    <p class="hint" style="margin:8px 0 16px">${info.finished ? 'План завершён — слава Богу!' : 'Прочитано ' + info.pct + '% · сейчас день ' + info.cur + ' из ' + p.days}</p>
+    <div class="pl-days" id="pl-days">${planDays(id).map((_, i) => `
+      <button class="${i + 1 === d ? 'sel' : ''} ${planDayDone(id, i + 1) ? 'done' : ''}" onclick="planSelDay=${i + 1};showPlan('${id}',true)">
+        <small>День</small>${i + 1}</button>`).join('')}</div>
+    <div class="sub-title">День ${d}</div>
+    ${groups.map(gr => {
+      const allDone = gr.items.every(([b, c]) => done.includes(chKey(b, c)));
+      return `<div class="pl-read">
+        <button class="pl-check ${allDone ? 'on' : ''}" onclick="planToggleGroup('${id}',${d},'${gr.items.map(([b, c]) => chKey(b, c)).join(',')}')" aria-label="Отметить прочитанным">${ICON.check}</button>
+        <button class="pl-read-title" onclick="planRead('${id}',${d},${gr.b},${gr.from})"><b>${esc(gr.label)}</b><small>${gr.items.length > 1 ? gr.items.filter(([b, c]) => done.includes(chKey(b, c))).length + ' из ' + gr.items.length + ' глав' : allDone ? 'Прочитано' : 'Открыть'}</small></button>
+      </div>`;
+    }).join('')}
+    <button class="link-danger" style="margin-top:26px;display:block" onclick="planReset('${id}')">Остановить план и сбросить прогресс</button>
+  `, { full: true, keepScroll: keep, foot: `<button class="btn btn-light btn-full" onclick="planRead('${id}',${d})">${planDayDone(id, d) ? 'Перечитать' : 'Читать'} день ${d} ${ICON.arrow}</button>` });
+  setTimeout(() => { const s = document.querySelector('#pl-days .sel'); s && s.scrollIntoView({ inline: 'center', block: 'nearest' }); }, 20);
+}
+function planStart(id) {
+  plansState()[id] = { started: Date.now(), done: {} }; saveLocalOnly();
+  haptic('medium'); toast('План начат — день 1');
+  showPlan(id); if ((bible().view || 'read') === 'plans') renderPlans();
+}
+function planReset(id) {
+  if (!confirm('Остановить план? Прогресс будет удалён.')) return;
+  delete plansState()[id]; if (bible().planCtx && bible().planCtx.id === id) bible().planCtx = null;
+  saveLocalOnly(); closeModal(); renderBible();
+}
+function planToggleGroup(id, d, keys) {
+  const st = plansState()[id]; const ks = keys.split(',');
+  const done = new Set(st.done[d] || []);
+  const all = ks.every(k => done.has(k));
+  ks.forEach(k => all ? done.delete(k) : done.add(k));
+  st.done[d] = [...done]; saveLocalOnly(); haptic('light');
+  showPlan(id, true); if ((bible().view || 'read') === 'plans') renderPlans();
+}
+function planRead(id, d, b, c) {
+  const list = planDays(id)[d - 1]; const done = plansState()[id].done[d] || [];
+  if (!b) { const next = list.find(([bb, cc]) => !done.includes(chKey(bb, cc))) || list[0]; b = next[0]; c = next[1]; }
+  bible().planCtx = { id, d };
+  closeModal(); bibleGo(b, c);
+}
+function planBarHtml() {
+  const B = bible(), ctx = B.planCtx; if (!ctx || !planById(ctx.id) || !plansState()[ctx.id]) return '';
+  const list = planDays(ctx.id)[ctx.d - 1];
+  if (!list || !list.some(([b, c]) => b === B.book && c === B.ch)) return '';
+  const done = plansState()[ctx.id].done[ctx.d] || [];
+  const idx = list.findIndex(([b, c]) => b === B.book && c === B.ch) + 1;
+  const p = planById(ctx.id);
+  return `<div class="pl-now">
+    <button class="pl-now-x" onclick="bible().planCtx=null;saveLocalOnly();renderBible()" aria-label="Выйти из плана"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    <div class="pl-now-info"><b>${esc(p.title)} · день ${ctx.d}</b><span>Глава ${idx} из ${list.length}${done.includes(chKey(B.book, B.ch)) ? ' · прочитано' : ''}</span></div>
+    <button class="btn btn-light btn-small" onclick="planNext()">Прочитано ${ICON.arrow}</button>
+  </div>`;
+}
+function planNext() {
+  const B = bible(), ctx = B.planCtx; const st = plansState()[ctx.id];
+  const list = planDays(ctx.id)[ctx.d - 1];
+  const done = new Set(st.done[ctx.d] || []); done.add(chKey(B.book, B.ch)); st.done[ctx.d] = [...done];
+  saveLocalOnly(); haptic('medium');
+  const next = list.find(([b, c]) => !done.has(chKey(b, c)));
+  if (next) { bibleGo(next[0], next[1]); return; }
+  B.planCtx = null; saveLocalOnly(); renderBible();
+  const p = planById(ctx.id), info = planInfo(ctx.id);
+  openModal(`
+    <div class="success">
+      <div class="success-ic" style="background:${p.color}">${ICON.check}</div>
+      <h3>${info.finished ? 'План завершён!' : 'День ' + ctx.d + ' прочитан'}</h3>
+      <p>${info.finished ? 'Вы прочитали весь план «' + esc(p.title) + '». Слава Богу за верность в Слове.' : 'Прочитано ' + info.pct + '% плана «' + esc(p.title) + '». Поделитесь тем, что Бог открыл вам сегодня.'}</p>
+    </div>`, { full: true, foot: info.finished
+      ? `<button class="btn btn-light btn-full" onclick="closeModal();showReflForm()">Написать размышление</button>`
+      : `<button class="btn btn-light btn-full" onclick="planRead('${ctx.id}',${info.cur})">Читать день ${info.cur}</button><button class="btn btn-dark btn-full" onclick="closeModal();showReflForm()">Написать размышление</button>` });
+}
+
+// --- Размышления ---
+async function loadRefl() {
+  const { collection, query, orderBy, limit, getDocs } = cloud.m;
+  const s = await getDocs(query(collection(cloud.fs, 'reflections'), orderBy('at', 'desc'), limit(60)));
+  cloud.refl = s.docs.map(d => ({ id: d.id, ...d.data() }));
+}
+function renderReflections() {
+  const view = document.getElementById('bb-view');
+  const intro = `<div class="rf-intro"><b>Размышления</b>Делитесь тем, что Бог открыл вам в Слове: мыслью, откровением, свидетельством. Можно под своим именем или анонимно.
+    <button class="btn btn-light btn-full" style="margin-top:14px" onclick="showReflForm()">Написать размышление</button></div>`;
+  if (!CLOUD || !cloud.on || !cloud.uid || cloud.refl === undefined || cloud.refl === null) {
+    view.innerHTML = intro + `<div class="pad"><div class="bb-skel" style="padding:0">${'<div class="shimmer" style="width:100%;height:120px;margin:0 0 10px;border-radius:18px"></div>'.repeat(3)}</div>
+      ${CLOUD && !cloud.uid ? '<p class="hint" style="text-align:center">Подключаемся к общей базе…</p>' : ''}</div>`;
+    if (CLOUD && cloud.on && cloud.uid) loadRefl().then(() => { if ((bible().view || 'read') === 'refl') renderReflections(); })
+      .catch(() => { const v = document.getElementById('bb-view'); if (v) v.innerHTML = intro + '<div class="empty"><p>Не удалось загрузить. Потяните экран вниз, чтобы обновить.</p></div>'; });
+    return;
+  }
+  view.innerHTML = intro + `<div class="pad">${cloud.refl.length ? cloud.refl.map(r => {
+    const n = (r.amen || []).length, on = (r.amen || []).includes(cloud.uid), mine = r.uid === cloud.uid;
+    return `<article class="rf-card">
+      <div class="prayer-head"><span>${r.anonymous ? 'Анонимно' : esc(r.name || 'Участник')}${mine ? ' · вы' : ''}</span><span>${timeAgo(r.at)}</span></div>
+      ${r.ref ? `<button class="rf-ref" onclick="bibleGo(${Number(r.rb) || 1},${Number(r.rc) || 1},${Number(r.rv) || 0})">${esc(r.ref)}</button>` : ''}
+      ${r.quote ? `<blockquote class="rf-quote">${esc(r.quote)}</blockquote>` : ''}
+      <div class="rf-text">${esc(r.text)}</div>
+      <div class="prayer-foot">
+        <button class="pray-btn ${on ? 'on' : ''}" onclick="toggleAmen('${r.id}')">${ICON.hands}Аминь${n ? ' · ' + n : ''}</button>
+        ${mine || isAdmin() ? `<button class="link-danger" onclick="deleteRefl('${r.id}')">Удалить</button>` : ''}
+      </div>
+    </article>`;
+  }).join('') : `<div class="empty">${ICON.hands}<p>Пока здесь пусто. Будьте первым, кто поделится размышлением.</p></div>`}</div><div style="height:90px"></div>`;
+}
+let reflDraft = null;
+function showReflForm(pre) {
+  reflDraft = pre || null;
+  openModal(`
+    <div class="modal-handle"></div>
+    <h3>Размышление</h3>
+    ${pre ? `<div class="rf-pre"><b>${esc(pre.ref)}</b><span>${esc(pre.quote.length > 220 ? pre.quote.slice(0, 220) + '…' : pre.quote)}</span></div>` : ''}
+    <div class="form-group"><label class="form-label" for="rf-text">Чем Бог говорит к вам?</label>
+      <textarea class="textarea" id="rf-text" maxlength="1500" style="min-height:140px" placeholder="Мысль, откровение, свидетельство…"></textarea></div>
+    <div class="form-group"><label class="check"><input type="checkbox" id="rf-anon"> Опубликовать анонимно</label></div>
+    <button class="btn btn-light btn-full" id="rf-btn" onclick="createRefl()">Опубликовать</button>
+  `);
+  setTimeout(() => { const t = document.getElementById('rf-text'); t && t.focus(); }, 300);
+}
+async function createRefl() {
+  const text = document.getElementById('rf-text').value.trim();
+  if (text.length < 3) { toast('Напишите размышление'); return; }
+  if (!CLOUD || !cloud.uid) { toast('Нет связи с общей базой. Проверьте интернет'); return; }
+  const anonymous = document.getElementById('rf-anon').checked, pre = reflDraft;
+  const item = {
+    text: text.slice(0, 1500), anonymous, name: anonymous ? '' : (state.user.name || '').slice(0, 60), uid: cloud.uid, at: Date.now(),
+    ref: pre ? pre.ref.slice(0, 60) : '', rb: pre ? pre.b : 0, rc: pre ? pre.c : 0, rv: pre ? pre.v : 0, quote: pre ? pre.quote.slice(0, 500) : '', amen: []
+  };
+  const btn = document.getElementById('rf-btn'); btn.disabled = true; btn.innerHTML = '<span class="spin"></span>&nbsp; Публикуем…';
+  try {
+    const ref = await cloud.m.addDoc(cloud.m.collection(cloud.fs, 'reflections'), item);
+    cloud.refl = [{ id: ref.id, ...item }, ...(cloud.refl || [])];
+    reflDraft = null; closeModal(); haptic('medium'); toast('Размышление опубликовано');
+    bible().view = 'refl'; saveLocalOnly();
+    if (currentTab !== 'community') switchTab('community');
+    setComTab('bible');
+  } catch (e) {
+    btn.disabled = false; btn.textContent = 'Опубликовать';
+    toast('Не удалось опубликовать. Проверьте интернет');
+  }
+}
+function toggleAmen(id) {
+  const r = (cloud.refl || []).find(x => x.id === id); if (!r || !cloud.uid) return;
+  const on = (r.amen || []).includes(cloud.uid);
+  r.amen = on ? r.amen.filter(u => u !== cloud.uid) : [...(r.amen || []), cloud.uid];
+  if (!on) haptic(); renderReflections();
+  const { doc, updateDoc, arrayUnion, arrayRemove } = cloud.m;
+  updateDoc(doc(cloud.fs, 'reflections', id), { amen: on ? arrayRemove(cloud.uid) : arrayUnion(cloud.uid) }).catch(() => toast('Не удалось сохранить'));
+}
+function deleteRefl(id) {
+  if (!confirm('Удалить это размышление?')) return;
+  cloud.m.deleteDoc(cloud.m.doc(cloud.fs, 'reflections', id))
+    .then(() => { cloud.refl = cloud.refl.filter(r => r.id !== id); renderReflections(); toast('Удалено'); })
+    .catch(() => toast('Не удалось удалить'));
+}
+function bibleReflect() {
+  const B = bible(); const nums = [...bibleSel].sort((a, b) => a - b);
+  const verses = bibleMem[B.tr + '/' + B.book + '/' + B.ch] || [];
+  const quote = nums.map(n => { const v = verses.find(x => x[0] === n); return v ? v[1].replace(/<[^>]+>/g, '') : ''; }).join(' ').replace(/\s+/g, ' ').trim();
+  const pre = { ref: bibleRef() + ' (' + BIBLE_TR[B.tr].short + ')', quote, b: B.book, c: B.ch, v: nums[0] || 0 };
+  bibleClearSel();
+  showReflForm(pre);
+}
+
 // === ОБЩАЯ БАЗА (Firebase) ===
 // Контент (события, объявления, проповеди, группы) хранится в одной записи app/content.
 // Фото — в коллекции images, каждое скачивается телефоном один раз и хранится в памяти устройства.
@@ -2798,7 +3162,7 @@ async function cloudInit() {
       cloud.uid = user.uid;
       cloud.admin = !user.isAnonymous && user.providerData.some(p => p.providerId === 'password');
       cloud.email = user.email || '';
-      cloud.prayers = null; cloud.people = null;
+      cloud.prayers = null; cloud.people = null; cloud.refl = null;
       cloudReadyResolve();
       subscribeContent();
       syncUserDoc();
@@ -3150,7 +3514,7 @@ document.addEventListener('touchend', () => {
     settleModal(g.box, dy > 110 || (dy > 60 && fast), 'translateY(100%)');
   } else if (ctx === 'screen' && axis === 'x' && Math.abs(dx) > 70 && Math.abs(dx) > Math.abs(dy) * 1.5 && fast) {
     if (currentTab === 'admin') { if (dx > 0) { haptic(); switchTab('more', -1); } }
-    else if (currentTab === 'community' && comTab === 'bible' && !document.getElementById('com-bible').classList.contains('hidden')) {
+    else if (currentTab === 'community' && comTab === 'bible' && (bible().view || 'read') === 'read' && !document.getElementById('com-bible').classList.contains('hidden')) {
       bibleStep(dx < 0 ? 1 : -1);   // в Библии свайп листает главы
     }
     else {
