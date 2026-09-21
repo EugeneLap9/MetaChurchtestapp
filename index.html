@@ -659,6 +659,18 @@ img.ld { opacity: 0; }
 .rf-pre b { font-size: 12px; color: var(--violet); }
 .rf-pre span { font-family: 'PT Serif', Georgia, serif; font-size: 14px; line-height: 1.5; color: var(--text-2); }
 
+.cloud-box .input { background: var(--bg); }
+.ok-dot { font-family: var(--body); font-size: 12px; font-weight: 600; color: var(--mint); margin-left: 6px; }
+.sh-steps { margin-top: 10px; }
+.sh-steps summary { color: var(--text); font-weight: 500; cursor: pointer; padding: 4px 0; }
+.sh-steps ol { padding-left: 18px; margin-top: 8px; }
+.sh-steps li { margin-bottom: 10px; }
+.sh-steps li b { color: var(--text); display: inline; font-size: inherit; margin: 0; }
+.fm-card { background: var(--bg); border: 1px solid var(--line); border-radius: 14px; padding: 12px 14px; margin-bottom: 10px; }
+.fm-p { display: flex; gap: 8px; font-size: 14px; line-height: 1.45; padding: 4px 0; }
+.fm-p b { color: var(--text-3); }
+.fm-p small { display: block; font-size: 12px; color: var(--text-3); }
+
 /* === Общая база === */
 .cloud-box { margin: 0 20px 16px; padding: 14px 16px; border-radius: 16px; background: var(--surface); border: 1px solid var(--line); font-size: 13px; color: var(--text-2); line-height: 1.5; }
 .cloud-box b { display: block; color: var(--text); font-size: 15px; margin-bottom: 4px; }
@@ -914,7 +926,7 @@ img.ld { opacity: 0; }
     <div class="menu-gap"></div>
     <button class="menu-item hidden" id="menu-login" onclick="showAdminLogin()">
       <svg viewBox="0 0 24 24"><rect x="4" y="10.5" width="16" height="10.5" rx="2.5"/><path d="M8 10.5V7a4 4 0 018 0v3.5"/></svg>
-      <span>Вход для служителей</span><svg class="chev" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg>
+      <span>Вход для администрации</span><svg class="chev" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg>
     </button>
     <button class="menu-item hidden" id="menu-admin" onclick="openAdmin()">
       <svg viewBox="0 0 24 24"><path d="M12 3l7 3v5c0 5-3 8.5-7 10-4-1.5-7-5-7-10V6z"/><path d="M9 12l2 2 4-4"/></svg>
@@ -951,12 +963,12 @@ img.ld { opacity: 0; }
   <div id="sync-line"></div>
   <div id="cloud-banner"></div>
   <div class="seg" id="admin-seg">
-    <button class="active" data-atab="create">Создать</button>
-    <button data-atab="content">Контент</button>
-    <button data-atab="team">Доступ</button>
+    <button class="active" data-atab="content">Контент</button>
+    <button data-atab="create">Создание</button>
+    <button data-atab="team">Доступы</button>
   </div>
 
-  <div id="admin-create" class="pad">
+  <div id="admin-create" class="pad hidden">
     <div class="chips" style="padding:0;margin:0 0 18px;" id="ctype-chips">
       <button class="chip active" data-ctype="event">Событие</button>
       <button class="chip" data-ctype="post">Объявление</button>
@@ -1024,7 +1036,7 @@ img.ld { opacity: 0; }
     </div>
   </div>
 
-  <div id="admin-content" class="pad hidden">
+  <div id="admin-content" class="pad">
     <p class="sort-hint"><svg viewBox="0 0 24 24"><circle cx="9" cy="6" r="1.6"/><circle cx="15" cy="6" r="1.6"/><circle cx="9" cy="12" r="1.6"/><circle cx="15" cy="12" r="1.6"/><circle cx="9" cy="18" r="1.6"/><circle cx="15" cy="18" r="1.6"/></svg>Зажмите значок слева и перетащите — в таком порядке события, объявления и группы будут показаны в приложении.</p>
     <div class="sub-title">События</div><div id="prio-events"></div>
     <div class="sub-title">Объявления</div><div id="prio-posts"></div>
@@ -1678,7 +1690,7 @@ function renderPrayers() {
 // === RENDER: MORE ===
 function renderMore() {
   const u = state.user; if (!u) return;
-  const roleName = CLOUD ? (cloud.admin ? 'Служитель' : 'Участник') : (u.role === 'owner' ? 'Владелец' : u.role === 'admin' ? 'Администратор' : 'Участник');
+  const roleName = CLOUD ? (cloud.admin ? 'Администратор' : 'Участник') : (u.role === 'owner' ? 'Владелец' : u.role === 'admin' ? 'Администратор' : 'Участник');
   document.getElementById('me-card').innerHTML = `
     ${avatarHtml(u)}
     <div style="flex:1;min-width:0"><div class="me-name">${esc(u.name)}</div><div class="person-sub">${u.username ? '@' + esc(u.username) : 'Meta Church'}</div></div>
@@ -1692,7 +1704,7 @@ function renderMore() {
 }
 
 // === ADMIN ===
-let adminTab = 'create', contentType = 'event';
+let adminTab = 'content', contentType = 'event';
 function openAdmin() { if (!isAdmin()) { toast('Нет доступа'); return; } switchTab('admin'); }
 function closeAdmin() { switchTab('more'); }
 function renderAdmin() {
@@ -1721,7 +1733,7 @@ function formToggleBtn(e) {
 function toggleEventForm(id) {
   const e = state.events.find(x => x.id === id); if (!e) return;
   e.needsForm = !e.needsForm; DB.save(); renderContentAdmin();
-  toast(e.needsForm ? (CONFIG.sheetsUrl ? 'Анкета включена' : 'Анкета включена. Подключите Google Таблицу') : 'Анкета выключена');
+  toast(e.needsForm ? 'Анкета включена' : 'Анкета выключена');
 }
 function renderContentAdmin() {
   const none = '<p class="hint">Пусто</p>';
@@ -1825,8 +1837,9 @@ function renderTeam() {
   if (CLOUD) {
     document.getElementById('team-list').innerHTML = `
       <div class="cloud-box" style="margin:0 0 14px"><b>Вы вошли как</b>${esc(cloud.email)}</div>
-      <div class="cloud-box" style="margin:0 0 14px"><b>Как добавить служителя</b>Firebase Console → Authentication → Users → Add user: почта и пароль. Передайте их служителю — он войдёт через «Ещё → Вход для служителей».<br><br><b>Как убрать доступ</b>Там же удалите пользователя или отключите его (Disable account).</div>
-      <button class="btn btn-danger btn-full" onclick="adminLogout()">Выйти из аккаунта служителя</button>`;
+      ${sheetsBoxHtml()}
+      <div class="cloud-box" style="margin:0 0 14px"><b>Как добавить администратора</b>Firebase Console → Authentication → Users → Add user: почта и пароль. Передайте их человеку — он войдёт через «Ещё → Вход для администрации».<br><br><b>Как убрать доступ</b>Там же удалите пользователя или отключите его (Disable account).</div>
+      <button class="btn btn-danger btn-full" onclick="adminLogout()">Выйти из аккаунта администратора</button>`;
     document.querySelector('#admin-team > p.hint').style.display = 'none';
     return;
   }
@@ -1928,7 +1941,7 @@ function showEventDetail(id) {
     ${eventCover(e)}
     <div class="post-tag" style="color:${cat(e.category).color}">${cat(e.category).name}${e.needsForm ? '<span class="form-badge">· нужна регистрация</span>' : ''}</div>
     <h3 style="font-size:26px">${esc(e.title)}</h3>
-    ${isAdmin() ? `<button class="admin-edit" onclick="editEvent('${e.id}')"><svg viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg>Изменить событие</button>`  + (CLOUD ? `<button class="admin-edit" onclick="showPeopleOf('rsvps','eventId','${e.id}','Кто идёт')">${ICON.users}Кто идёт</button>` : '') : ''}
+    ${isAdmin() ? `<button class="admin-edit" onclick="editEvent('${e.id}')"><svg viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg>Изменить событие</button>`  + (CLOUD ? (e.needsForm ? `<button class="admin-edit" onclick="showForms('${e.id}')">${ICON.users}Анкеты</button>` : `<button class="admin-edit" onclick="showPeopleOf('rsvps','eventId','${e.id}','Кто идёт')">${ICON.users}Кто идёт</button>`) : '') : ''}
     <div class="meta-list">
       <div>${ICON.cal}${WD_FULL[d.getDay()]}, ${longDate(e.date)}</div>
       <div>${ICON.clock}${esc(e.time)}</div>
@@ -2036,8 +2049,9 @@ async function submitReg() {
     if (blk) blk.scrollIntoView({ behavior: 'smooth', block: 'start' });
     return;
   }
-  if (!CONFIG.sheetsUrl) {
-    toast(isAdmin() ? 'Не подключена Google Таблица: заполните sheetsUrl в CONFIG' : 'Регистрация временно недоступна. Попробуйте позже');
+  const sUrl = sheetsUrl();
+  if (!sUrl && !(CLOUD && cloud.uid)) {
+    toast(CLOUD ? 'Нет связи с базой. Проверьте интернет и попробуйте ещё раз' : 'Регистрация временно недоступна. Попробуйте позже');
     return;
   }
   if (!regDraft.id) regDraft.id = genId();   // один ID на заявку — повторная отправка не создаст дубли
@@ -2059,9 +2073,27 @@ async function submitReg() {
   btn.disabled = true; btn.style.opacity = '.75'; btn.innerHTML = '<span class="spin"></span>&nbsp; Отправляем…';
   const slowTimer = setTimeout(() => { if (btn.isConnected && btn.disabled) btn.innerHTML = '<span class="spin"></span>&nbsp; Слабый интернет, ещё немного…'; }, 5000);
   try {
-    const res = await fetch(CONFIG.sheetsUrl, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(payload) });
-    const j = await res.json().catch(() => null);
-    if (!res.ok || (j && j.ok === false)) throw new Error((j && j.error) || ('HTTP ' + res.status));
+    // 1) всегда сохраняем анкету в общей базе приложения, 2) если подключена Google Таблица — отправляем и туда
+    let saved = false, lastErr = null;
+    if (CLOUD && cloud.uid) {
+      try {
+        await cloud.m.setDoc(cloud.m.doc(cloud.fs, 'forms', payload.id), {
+          eventId: e.id, eventTitle: e.title.slice(0, 120), eventDate: e.date, uid: cloud.uid,
+          name: (payload.submitter.name || '').slice(0, 60), username: payload.submitter.username || '',
+          people: payload.people, at: Date.now()
+        });
+        saved = true;
+      } catch (x) { lastErr = x; console.warn('forms', x); }
+    }
+    if (sUrl) {
+      try {
+        const res = await fetch(sUrl, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(payload) });
+        const j = await res.json().catch(() => null);
+        if (!res.ok || (j && j.ok === false)) throw new Error((j && j.error) || ('HTTP ' + res.status));
+        saved = true;
+      } catch (x) { lastErr = lastErr || x; console.warn('sheets', x); }
+    }
+    if (!saved) throw lastErr || new Error('not saved');
   } catch (err) {
     clearTimeout(slowTimer);
     console.error('Ошибка отправки анкеты:', err);
@@ -2233,7 +2265,7 @@ function createNewEvent() {
     needsForm: document.getElementById('ev-form').checked
   });
   if (!DB.save()) { state.events.pop(); return; }
-  const warn = document.getElementById('ev-form').checked && !CONFIG.sheetsUrl;
+  const warn = document.getElementById('ev-form').checked && !CLOUD && !sheetsUrl();
   clear('ev-title', 'ev-lead', 'ev-desc', 'ev-location');
   clearImage('ev');
   document.getElementById('ev-form').checked = false;
@@ -3127,6 +3159,104 @@ function bibleReflect() {
   showReflForm(pre);
 }
 
+// === АНКЕТЫ И GOOGLE ТАБЛИЦА ===
+const APPS_SCRIPT_CODE = "/**\n * Meta Church — приём анкет регистрации из мини-аппа в Google Таблицу.\n *\n * Для каждого события создаётся отдельный лист. Одна строка — один участник.\n * Заявка, отправленная повторно (например, после обрыва интернета), не дублируется.\n */\n\nconst HEADERS = [\n  'Отправлено', 'ID заявки', 'Событие', 'Дата события', 'Время',\n  'Кто записал', 'Telegram', 'Telegram ID',\n  '№ в заявке', 'ФИО', 'Возраст', 'Город', 'Посещает церковь', 'Церковь'\n];\n\nfunction doPost(e) {\n  const lock = LockService.getScriptLock();\n  lock.waitLock(20000);\n  try {\n    const data = JSON.parse(e.postData.contents);\n    if (!data || !data.id || !data.event || !Array.isArray(data.people) || !data.people.length) {\n      return json_({ ok: false, error: 'Пустая или неверная заявка' });\n    }\n\n    const ss = SpreadsheetApp.getActiveSpreadsheet();\n    const name = sheetName_(data.event);\n    let sh = ss.getSheetByName(name);\n    if (!sh) {\n      sh = ss.insertSheet(name);\n      sh.appendRow(HEADERS);\n      sh.setFrozenRows(1);\n      sh.getRange(1, 1, 1, HEADERS.length).setFontWeight('bold').setBackground('#f1f1f1');\n    }\n\n    // Защита от дублей: такая заявка уже записана?\n    const last = sh.getLastRow();\n    if (last > 1) {\n      const ids = sh.getRange(2, 2, last - 1, 1).getValues().flat();\n      if (ids.indexOf(data.id) !== -1) return json_({ ok: true, duplicate: true });\n    }\n\n    const s = data.submitter || {};\n    const now = new Date();\n    const rows = data.people.slice(0, 20).map(function (p, i) {\n      return [\n        now,\n        data.id,\n        clean_(data.event.title),\n        clean_(data.event.date),\n        clean_(data.event.time),\n        clean_(s.name),\n        s.username ? '@' + clean_(s.username) : '',\n        s.tgId ? String(s.tgId) : '',\n        i + 1,\n        clean_(p.fullName),\n        Number(p.age) || '',\n        clean_(p.city),\n        p.attends ? 'Да' : 'Нет',\n        clean_(p.church)\n      ];\n    });\n\n    sh.getRange(sh.getLastRow() + 1, 1, rows.length, HEADERS.length).setValues(rows);\n    return json_({ ok: true, count: rows.length });\n  } catch (err) {\n    return json_({ ok: false, error: String(err) });\n  } finally {\n    lock.releaseLock();\n  }\n}\n\n// Открыв ссылку …/exec в браузере, можно проверить, что скрипт работает.\nfunction doGet() {\n  return json_({ ok: true, message: 'Meta Church: приём анкет работает' });\n}\n\nfunction sheetName_(ev) {\n  return (String(ev.title || 'Событие') + ' ' + String(ev.date || ''))\n    .replace(/[\\[\\]\\*\\?\\/\\\\:]/g, ' ')\n    .trim()\n    .slice(0, 90);\n}\n\n// Обрезаем длину и не даём таблице принять текст за формулу.\nfunction clean_(v) {\n  let s = String(v == null ? '' : v).slice(0, 200);\n  if (/^[=+\\-@]/.test(s)) s = \"'\" + s;\n  return s;\n}\n\nfunction json_(obj) {\n  return ContentService.createTextOutput(JSON.stringify(obj)).setMimeType(ContentService.MimeType.JSON);\n}\n";
+function sheetsUrl() {
+  const c = (typeof cloud !== 'undefined' && cloud.settings) || state.cloudSettings || {};
+  return c.sheetsUrl || CONFIG.sheetsUrl || '';
+}
+function sheetsBoxHtml() {
+  const c = cloud.settings || state.cloudSettings || {};
+  const on = !!c.sheetsUrl;
+  return `<div class="cloud-box" style="margin:0 0 14px">
+    <b>Google Таблица для анкет ${on ? '<span class="ok-dot">● подключена</span>' : ''}</b>
+    Анкеты всегда сохраняются в приложении — откройте событие и нажмите «Анкеты». Если подключить Google Таблицу, каждая анкета будет сразу появляться и там.
+    <details class="sh-steps" ${on ? '' : 'open'}><summary>Как подключить — 3 шага</summary>
+      <ol>
+        <li>Создайте Google Таблицу → меню <b>Расширения → Apps Script</b>. Удалите всё в редакторе, вставьте код и сохраните.
+          <button class="btn btn-dark btn-small" style="margin-top:8px" onclick="copyScriptCode()">Скопировать код скрипта</button></li>
+        <li><b>Начать развёртывание → Новое развёртывание</b> → тип «Веб-приложение». Запуск от имени: <b>Я</b>, доступ: <b>Все</b>. Нажмите «Развернуть» и разрешите доступ.</li>
+        <li>Скопируйте ссылку, которая заканчивается на <b>/exec</b>, вставьте ниже и нажмите «Сохранить».</li>
+      </ol>
+    </details>
+    <div class="form-group" style="margin-top:12px"><label class="form-label" for="set-sheets">Ссылка на скрипт (…/exec)</label>
+      <input class="input" id="set-sheets" value="${esc(c.sheetsUrl || '')}" placeholder="https://script.google.com/macros/s/…/exec" inputmode="url"></div>
+    <div class="form-group"><label class="form-label" for="set-sheetlink">Ссылка на саму таблицу (необязательно)</label>
+      <input class="input" id="set-sheetlink" value="${esc(c.sheetLink || '')}" placeholder="https://docs.google.com/spreadsheets/…" inputmode="url">
+      <div class="hint">Тогда в анкетах появится кнопка «Открыть таблицу».</div></div>
+    <div class="img-actions" style="margin-bottom:6px">
+      <button class="btn btn-dark btn-small" onclick="checkSheets()">Проверить</button>
+      <button class="btn btn-light btn-small" onclick="saveSheets()">Сохранить</button>
+    </div>
+    <div class="hint" id="sheets-status"></div>
+  </div>`;
+}
+async function copyText(t) {
+  try { await navigator.clipboard.writeText(t); return true; }
+  catch (e) {
+    const ta = document.createElement('textarea'); ta.value = t; ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select(); let ok = false; try { ok = document.execCommand('copy'); } catch (x) {} ta.remove(); return ok;
+  }
+}
+async function copyScriptCode() { toast(await copyText(APPS_SCRIPT_CODE) ? 'Код скопирован — вставьте его в Apps Script' : 'Не удалось скопировать'); }
+function sheetsStatus(t, cls) { const el = document.getElementById('sheets-status'); if (el) { el.className = 'hint ' + (cls || ''); el.innerHTML = t; } }
+function validScriptUrl(u) { return /^https:\/\/script\.google\.com\/macros\/s\/[\w-]+\/exec$/.test(u); }
+async function checkSheets() {
+  const u = val('set-sheets');
+  if (!validScriptUrl(u)) { sheetsStatus('Ссылка должна выглядеть так: https://script.google.com/macros/s/…/exec', 'bad'); return false; }
+  sheetsStatus('<span class="spin"></span> Проверяем…');
+  try {
+    const r = await fetch(u); const j = await r.json();
+    if (j && j.ok) { sheetsStatus('Таблица отвечает — всё работает', 'good'); return true; }
+    throw new Error('bad');
+  } catch (e) {
+    sheetsStatus('Скрипт не отвечает. Проверьте, что при развёртывании выбран доступ «Все», и ссылка скопирована полностью.', 'bad');
+    return false;
+  }
+}
+async function saveSheets() {
+  const u = val('set-sheets'), link = val('set-sheetlink');
+  if (u && !validScriptUrl(u)) { sheetsStatus('Ссылка должна выглядеть так: https://script.google.com/macros/s/…/exec', 'bad'); return; }
+  if (link && !/^https:\/\/docs\.google\.com\//.test(link)) { sheetsStatus('Ссылка на таблицу должна начинаться с https://docs.google.com/', 'bad'); return; }
+  if (u && !(await checkSheets())) return;
+  try {
+    await cloud.m.setDoc(cloud.m.doc(cloud.fs, 'app', 'settings'), { sheetsUrl: u, sheetLink: link }, { merge: true });
+    cloud.settings = { ...(cloud.settings || {}), sheetsUrl: u, sheetLink: link };
+    toast(u ? 'Google Таблица подключена' : 'Google Таблица отключена'); renderTeam();
+  } catch (e) { sheetsStatus('Не удалось сохранить. Проверьте правила Firestore и интернет.', 'bad'); }
+}
+let formsCache = [];
+async function showForms(eventId) {
+  const e = state.events.find(x => x.id === eventId);
+  const c = cloud.settings || {};
+  openModal(`<div style="height:30px"></div><h3 style="padding-right:44px">Анкеты</h3>
+    <p class="hint" style="margin:-6px 0 14px">${esc(e ? e.title : '')}</p><div id="fm-list"><div class="bb-skel" style="padding:0">${'<div class="shimmer" style="width:100%;height:70px;margin:0 0 10px;border-radius:14px"></div>'.repeat(4)}</div></div>`,
+    { full: true, foot: `<button class="btn btn-light btn-full" onclick="copyForms()">Скопировать для Google Таблицы</button>${c.sheetLink ? `<button class="btn btn-dark btn-full" onclick="openUrl('${esc(c.sheetLink)}')">Открыть таблицу</button>` : ''}` });
+  try {
+    const { collection, query, where, getDocs } = cloud.m;
+    const s = await getDocs(query(collection(cloud.fs, 'forms'), where('eventId', '==', eventId)));
+    formsCache = s.docs.map(d => d.data()).sort((a, b) => a.at - b.at);
+    const total = formsCache.reduce((n, f) => n + (f.people || []).length, 0);
+    const el = document.getElementById('fm-list'); if (!el) return;
+    el.innerHTML = formsCache.length ? `<p class="hint" style="margin-bottom:10px">Заявок: ${formsCache.length} · записано ${peopleWord(total)}</p>` + formsCache.map(f => `
+      <div class="fm-card">
+        <div class="prayer-head"><span>${esc(f.name || 'Без имени')}${f.username ? ' · @' + esc(f.username) : ''}</span><span>${new Date(f.at).toLocaleDateString('ru-RU')}</span></div>
+        ${(f.people || []).map((p, i) => `<div class="fm-p"><b>${i + 1}.</b> <span>${esc(p.fullName)}, ${esc(p.age)} · ${esc(p.city)}<small>${p.attends ? 'Церковь: ' + esc(p.church || '—') : 'Не посещает церковь'}</small></span></div>`).join('')}
+      </div>`).join('') : '<p class="hint">Пока никто не зарегистрировался.</p>';
+  } catch (x) {
+    const el = document.getElementById('fm-list'); if (el) el.innerHTML = '<p class="hint">Не удалось загрузить анкеты. Проверьте интернет и правила Firestore.</p>';
+  }
+}
+async function copyForms() {
+  if (!formsCache.length) { toast('Анкет пока нет'); return; }
+  const clean = v => String(v == null ? '' : v).replace(/[\t\n\r]+/g, ' ');
+  const rows = [['Отправлено', 'Событие', 'Дата события', 'Кто записал', 'Telegram', '№', 'ФИО', 'Возраст', 'Город', 'Посещает церковь', 'Церковь']];
+  formsCache.forEach(f => (f.people || []).forEach((p, i) => rows.push([
+    new Date(f.at).toLocaleString('ru-RU'), f.eventTitle, f.eventDate, f.name, f.username ? '@' + f.username : '', i + 1, p.fullName, p.age, p.city, p.attends ? 'Да' : 'Нет', p.church || ''
+  ].map(clean))));
+  toast(await copyText(rows.map(r => r.join('\t')).join('\n')) ? 'Скопировано — вставьте в Google Таблицу' : 'Не удалось скопировать');
+}
+
 // === ОБЩАЯ БАЗА (Firebase) ===
 // Контент (события, объявления, проповеди, группы) хранится в одной записи app/content.
 // Фото — в коллекции images, каждое скачивается телефоном один раз и хранится в памяти устройства.
@@ -3181,6 +3311,10 @@ const pickContent = o => JSON.parse(JSON.stringify({ events: o.events || [], pos
 function subscribeContent() {
   if (contentUnsub) return;
   const { doc, onSnapshot } = cloud.m;
+  onSnapshot(doc(cloud.fs, 'app', 'settings'), snap => {
+    cloud.settings = snap.exists() ? snap.data() : {};
+    state.cloudSettings = cloud.settings; saveLocalOnly();
+  }, err => console.warn('settings', err));
   contentUnsub = onSnapshot(doc(cloud.fs, 'app', 'content'), snap => {
     if (!snap.exists()) { cloud.contentExists = false; if (currentTab === 'admin') renderCloudBanner(); return; }
     cloud.contentExists = true;
@@ -3335,12 +3469,12 @@ async function loadPeople() {
   cloud.people = s.docs.map(d => ({ uid: d.id, ...d.data() }));
 }
 
-// --- Вход для служителей ---
+// --- Вход для администрации ---
 function showAdminLogin() {
   if (!cloud.on) { toast('Подключаемся к базе, попробуйте через пару секунд'); return; }
   openModal(`
     <div class="modal-handle"></div>
-    <h3>Вход для служителей</h3>
+    <h3>Вход для администрации</h3>
     <p class="hint" style="margin:-4px 0 16px">Почта и пароль из Firebase → Authentication → Users.</p>
     <div class="form-group"><label class="form-label" for="ad-email">Почта</label><input class="input" id="ad-email" type="email" autocomplete="username" inputmode="email"></div>
     <div class="form-group"><label class="form-label" for="ad-pass">Пароль</label><input class="input" id="ad-pass" type="password" autocomplete="current-password" onkeydown="if(event.key==='Enter')adminLogin()"></div>
@@ -3353,14 +3487,14 @@ async function adminLogin() {
   const btn = document.getElementById('ad-btn'); btn.disabled = true; btn.innerHTML = '<span class="spin"></span>&nbsp; Входим…';
   try {
     await cloud.m.signInWithEmailAndPassword(cloud.auth, email, pass);
-    closeModal(); toast('Вы вошли как служитель'); haptic('medium');
+    closeModal(); toast('Вы вошли как администратор'); haptic('medium');
   } catch (e) {
     btn.disabled = false; btn.textContent = 'Войти';
     toast(/network/i.test(e.code || '') ? 'Нет интернета' : 'Неверная почта или пароль');
   }
 }
 async function adminLogout() {
-  if (!confirm('Выйти из аккаунта служителя на этом телефоне?')) return;
+  if (!confirm('Выйти из аккаунта администратора на этом телефоне?')) return;
   await cloud.m.signOut(cloud.auth).catch(() => {});
   switchTab('more'); toast('Вы вышли');
 }
