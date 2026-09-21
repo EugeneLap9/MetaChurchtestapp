@@ -8,7 +8,7 @@
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&family=Unbounded:wght@500;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&family=PT+Serif:ital,wght@0,400;0,700;1,400&family=Unbounded:wght@500;700;800&display=swap" rel="stylesheet">
 <style>
 :root {
   --bg: #0B0B0C;
@@ -593,6 +593,83 @@ img.ld { opacity: 0; }
 .net.online i { background: var(--mint); }
 .net.slow i { width: 14px; height: 14px; background: none; border: 2px solid var(--amber); border-right-color: transparent; animation: spin .8s linear infinite; }
 
+/* === БИБЛИЯ === */
+.bb-bar { display: flex; align-items: center; gap: 8px; margin: 0 20px 4px; }
+.bb-ref { display: inline-flex; align-items: center; gap: 6px; padding: 10px 14px 10px 16px; border-radius: 100px; background: var(--surface); border: 1px solid var(--line); font-size: 15px; font-weight: 600; max-width: 60%; }
+.bb-ref span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.bb-ref svg, .bb-tr svg { width: 14px; height: 14px; stroke: var(--text-2); stroke-width: 2.4; fill: none; flex-shrink: 0; }
+.bb-tr { display: inline-flex; align-items: center; gap: 5px; padding: 10px 12px; border-radius: 100px; background: var(--surface); border: 1px solid var(--line); font-size: 12px; font-weight: 700; letter-spacing: .06em; color: var(--text-2); }
+.bb-bar .grow { flex: 1; }
+.bb-aa { font-family: 'PT Serif', Georgia, serif; font-size: 17px; font-weight: 700; }
+.bb-text { padding: 6px 22px 150px; font-family: 'PT Serif', Georgia, 'Times New Roman', serif; line-height: 1.8; color: #ECEAE4; font-size: 19px; -webkit-user-select: none; user-select: none; }
+.bb-text.sans { font-family: var(--body); line-height: 1.7; }
+.bb-book { text-align: center; font-family: var(--body); font-size: 12px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--text-2); margin-top: 22px; }
+.bb-chnum { text-align: center; font-family: var(--display); font-size: 64px; font-weight: 700; line-height: 1; margin: 8px 0 26px; color: var(--text); }
+.bb-text p { margin: 0; }
+.v { cursor: pointer; border-radius: 4px; -webkit-box-decoration-break: clone; box-decoration-break: clone; transition: background .2s; }
+.v sup { font-family: var(--body); font-size: .56em; font-weight: 700; color: var(--text-3); margin: 0 4px 0 2px; line-height: 0; }
+.v b { font-weight: 700; color: var(--text-2); font-size: .9em; }
+.v.sel { text-decoration: underline dotted var(--text-2); text-decoration-thickness: 2px; text-underline-offset: 6px; }
+.v.hl-1 { background: rgba(248,227,107,.26); }
+.v.hl-2 { background: rgba(126,219,142,.24); }
+.v.hl-3 { background: rgba(110,184,245,.26); }
+.v.hl-4 { background: rgba(245,142,190,.26); }
+.v.hl-5 { background: rgba(247,168,98,.28); }
+.v.flash { background: rgba(255,255,255,.2); }
+.bb-foot { margin-top: 34px; padding-top: 16px; border-top: 1px solid var(--line); font-family: var(--body); font-size: 11px; color: var(--text-3); line-height: 1.5; text-align: center; }
+.bb-skel { padding: 30px 22px 150px; }
+.bb-skel div { height: 14px; border-radius: 6px; margin-bottom: 14px; }
+.bb-skel div:nth-child(1) { width: 30%; height: 12px; margin: 0 auto 14px; }
+.bb-skel div:nth-child(2) { width: 22%; height: 54px; margin: 0 auto 30px; border-radius: 12px; }
+.bb-skel div:nth-child(3n) { width: 86%; }
+.bb-nav { position: fixed; left: 0; right: 0; bottom: calc(var(--tabbar-h) + var(--safe-bottom) + 14px); display: flex; justify-content: space-between; padding: 0 14px; pointer-events: none; z-index: 60; }
+.bb-nav button { pointer-events: auto; width: 46px; height: 46px; border-radius: 50%; background: rgba(28,28,31,.92); border: 1px solid var(--line); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); display: flex; align-items: center; justify-content: center; }
+.bb-nav button svg { width: 20px; height: 20px; stroke: var(--text); stroke-width: 2.2; fill: none; }
+.bb-nav button:disabled { opacity: .3; }
+.bb-sel { position: fixed; left: 12px; right: 12px; bottom: calc(var(--tabbar-h) + var(--safe-bottom) + 10px); z-index: 70; background: var(--surface-2); border: 1px solid var(--line); border-radius: 22px; padding: 14px 14px 12px; box-shadow: 0 14px 40px rgba(0,0,0,.6); animation: fadeIn .2s ease; }
+.bb-sel-head { display: flex; align-items: center; justify-content: space-between; font-size: 14px; font-weight: 600; }
+.bb-sel-head button { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: var(--surface); }
+.bb-sel-head button svg { width: 15px; height: 15px; stroke: var(--text); stroke-width: 2.2; fill: none; }
+.bb-colors { display: flex; gap: 12px; margin: 14px 2px; align-items: center; }
+.bb-colors button { width: 30px; height: 30px; border-radius: 50%; border: 2px solid transparent; }
+.bb-colors button.on { border-color: var(--text); }
+.bb-colors .none { background: transparent; border: 1.5px dashed var(--text-3); display: flex; align-items: center; justify-content: center; }
+.bb-colors .none svg { width: 14px; height: 14px; stroke: var(--text-3); stroke-width: 2.2; fill: none; }
+.bb-actions { display: flex; gap: 8px; }
+.bb-actions button { flex: 1; display: flex; align-items: center; justify-content: center; gap: 7px; padding: 11px 6px; border-radius: 14px; background: var(--surface); border: 1px solid var(--line); font-size: 13px; font-weight: 500; }
+.bb-actions svg { width: 17px; height: 17px; stroke: currentColor; stroke-width: 1.8; fill: none; }
+.bb-err { text-align: center; padding: 60px 30px 150px; color: var(--text-2); font-size: 14px; line-height: 1.5; }
+.bb-err .btn { margin-top: 18px; }
+/* Выбор книги */
+.bk-seg { display: flex; gap: 4px; padding: 4px; border-radius: 100px; background: var(--bg); border: 1px solid var(--line); margin-bottom: 14px; }
+.bk-seg button { flex: 1; padding: 10px 4px; border-radius: 100px; font-size: 14px; font-weight: 500; color: var(--text-2); }
+.bk-seg button.active { background: var(--text); color: var(--bg); font-weight: 600; }
+.bk-row { display: flex; align-items: center; justify-content: space-between; width: 100%; padding: 15px 4px; border-bottom: 1px solid var(--line); font-size: 16px; text-align: left; }
+.bk-row.cur { color: var(--lime); font-weight: 600; }
+.bk-row svg { width: 16px; height: 16px; stroke: var(--text-3); stroke-width: 2; fill: none; transition: transform .2s; }
+.bk-row.open svg { transform: rotate(180deg); }
+.bk-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; padding: 12px 0 16px; border-bottom: 1px solid var(--line); }
+.bk-grid button { aspect-ratio: 1; border-radius: 12px; background: var(--bg); border: 1px solid var(--line); font-size: 15px; font-weight: 500; }
+.bk-grid button.cur { background: var(--text); color: var(--bg); font-weight: 700; border-color: var(--text); }
+/* Переводы и настройки */
+.tr-opt { display: flex; align-items: center; gap: 14px; width: 100%; padding: 16px 4px; border-bottom: 1px solid var(--line); text-align: left; }
+.tr-opt b { font-size: 12px; letter-spacing: .06em; width: 42px; height: 42px; border-radius: 12px; background: var(--bg); border: 1px solid var(--line); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.tr-opt.on b { background: var(--text); color: var(--bg); border-color: var(--text); }
+.tr-opt span { flex: 1; font-size: 15px; }
+.tr-opt small { display: block; font-size: 12px; color: var(--text-3); margin-top: 3px; }
+.size-row { display: flex; align-items: center; gap: 14px; margin: 6px 0 20px; }
+.size-row button { width: 48px; height: 48px; border-radius: 14px; background: var(--bg); border: 1px solid var(--line); font-family: 'PT Serif', Georgia, serif; font-weight: 700; }
+.size-row .val { flex: 1; text-align: center; font-size: 14px; color: var(--text-2); }
+.bb-sample { font-family: 'PT Serif', Georgia, serif; line-height: 1.7; color: #ECEAE4; padding: 14px 16px; border-radius: 14px; background: var(--bg); border: 1px solid var(--line); margin-bottom: 18px; }
+.bb-sample.sans { font-family: var(--body); }
+/* Поиск */
+.bs-form { display: flex; gap: 8px; margin-bottom: 14px; }
+.bs-form .input { flex: 1; }
+.bs-item { display: block; width: 100%; text-align: left; padding: 14px 2px; border-bottom: 1px solid var(--line); }
+.bs-item b { display: block; font-size: 12px; color: var(--text-2); letter-spacing: .04em; margin-bottom: 5px; }
+.bs-item p { font-family: 'PT Serif', Georgia, serif; font-size: 15px; line-height: 1.55; color: #ECEAE4; }
+.bs-item mark { background: rgba(217,242,75,.25); color: inherit; border-radius: 3px; padding: 0 1px; }
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
 }
@@ -725,10 +802,12 @@ img.ld { opacity: 0; }
   </div>
   <div class="chips" id="com-chips">
     <button class="chip active" data-com="groups">Группы</button>
+    <button class="chip" data-com="bible">Библия</button>
     <button class="chip" data-com="people">Люди</button>
     <button class="chip" data-com="prayer">Молитвенные нужды</button>
   </div>
   <div id="com-groups"></div>
+  <div id="com-bible" class="hidden"></div>
   <div id="com-people" class="hidden"></div>
   <div id="com-prayer" class="hidden"></div>
 </section>
@@ -1403,11 +1482,12 @@ let comTab = 'groups';
 function setComTab(t) {
   comTab = t;
   document.querySelectorAll('#com-chips .chip').forEach(c => c.classList.toggle('active', c.dataset.com === t));
-  ['groups', 'people', 'prayer'].forEach(k => document.getElementById('com-' + k).classList.toggle('hidden', k !== t));
+  ['groups', 'bible', 'people', 'prayer'].forEach(k => document.getElementById('com-' + k).classList.toggle('hidden', k !== t));
   renderCommunity();
 }
 function renderCommunity() {
   if (comTab === 'groups') renderGroups();
+  if (comTab === 'bible') renderBible();
   if (comTab === 'people') renderPeople();
   if (comTab === 'prayer') renderPrayers();
 }
@@ -2280,6 +2360,307 @@ if (tg && tg.BackButton) {
   });
 }
 
+// === БИБЛИЯ ===
+// Текст загружается из открытого API bolls.life и кэшируется на устройстве.
+const BIBLE_API = 'https://bolls.life';
+const BIBLE_TR = {
+  SYNOD: { short: 'СП',  name: 'Синодальный перевод', note: 'Классический русский перевод, 1876', copy: 'Синодальный перевод (общественное достояние).' },
+  NRT:   { short: 'НРП', name: 'Новый русский перевод', note: 'Современный язык, Biblica', copy: 'Новый русский перевод © Biblica, Inc. Все права защищены.' }
+};
+const BIBLE_BOOKS = ['Бытие','Исход','Левит','Числа','Второзаконие','Иисус Навин','Судьи','Руфь','1 Царств','2 Царств','3 Царств','4 Царств','1 Паралипоменон','2 Паралипоменон','Ездра','Неемия','Есфирь','Иов','Псалтирь','Притчи','Екклесиаст','Песнь Песней','Исаия','Иеремия','Плач Иеремии','Иезекииль','Даниил','Осия','Иоиль','Амос','Авдий','Иона','Михей','Наум','Аввакум','Софония','Аггей','Захария','Малахия','Матфея','Марка','Луки','Иоанна','Деяния','Римлянам','1 Коринфянам','2 Коринфянам','Галатам','Ефесянам','Филиппийцам','Колоссянам','1 Фессалоникийцам','2 Фессалоникийцам','1 Тимофею','2 Тимофею','Титу','Филимону','Евреям','Иакова','1 Петра','2 Петра','1 Иоанна','2 Иоанна','3 Иоанна','Иуды','Откровение'];
+const BIBLE_CH = {
+  NRT:   [50,40,27,36,34,24,21,4,31,24,22,25,29,36,10,13,10,42,150,31,12,8,66,52,5,48,12,14,3,9,1,4,7,3,3,3,2,14,4,28,16,24,21,28,16,16,13,6,6,4,4,5,3,6,4,3,1,13,5,5,3,5,1,1,1,22],
+  SYNOD: [50,40,27,36,34,24,21,4,31,24,22,25,29,36,10,13,10,42,151,31,12,8,66,52,5,48,14,14,3,9,1,4,7,3,3,3,2,14,4,28,16,24,21,28,16,16,13,6,6,4,4,5,3,6,4,3,1,13,5,5,3,5,1,1,1,22]
+};
+const HL_COLORS = ['#F8E36B', '#7EDB8E', '#6EB8F5', '#F58EBE', '#F7A862'];
+
+function bible() {
+  if (!state.bible) state.bible = { tr: 'SYNOD', book: 43, ch: 1, size: 19, serif: true, hl: {} };
+  return state.bible;
+}
+const bookName = b => BIBLE_BOOKS[b - 1] || '';
+const chCount = (tr, b) => BIBLE_CH[tr][b - 1] || 1;
+let bibleSel = new Set();
+let bibleToken = 0;
+const bibleMem = {};
+
+function bibleCleanText(t) {
+  // оставляем только безопасное оформление: курсив, жирный, подсветку поиска
+  return esc(t).replace(/&lt;(\/?)(i|b|mark)&gt;/g, '<$1$2>').replace(/&lt;br\s*\/?&gt;/g, ' ');
+}
+function bibleCacheLoad() { try { return JSON.parse(localStorage.getItem('mc_bible') || '{}'); } catch (e) { return {}; } }
+function bibleCacheSave(key, verses) {
+  try {
+    const c = bibleCacheLoad();
+    c[key] = { t: Date.now(), d: verses };
+    const keys = Object.keys(c).sort((a, b) => c[b].t - c[a].t);
+    keys.slice(60).forEach(k => delete c[k]);   // храним последние 60 глав
+    localStorage.setItem('mc_bible', JSON.stringify(c));
+  } catch (e) {}
+}
+async function getChapter(tr, book, ch) {
+  const key = tr + '/' + book + '/' + ch;
+  if (bibleMem[key]) return bibleMem[key];
+  const cached = bibleCacheLoad()[key];
+  if (cached) { bibleMem[key] = cached.d; return cached.d; }
+  if (!navigator.onLine) throw new Error('offline');
+  const ctrl = new AbortController();
+  const stop = setTimeout(() => ctrl.abort(), 20000);
+  const slow = setTimeout(reportSlow, 3500);
+  try {
+    const res = await fetch(`${BIBLE_API}/get-text/${tr}/${book}/${ch}/`, { signal: ctrl.signal });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    if (!Array.isArray(data) || !data.length) throw new Error('empty');
+    const verses = data.map(v => [v.verse, v.text]);
+    bibleMem[key] = verses; bibleCacheSave(key, verses);
+    return verses;
+  } finally { clearTimeout(stop); clearTimeout(slow); }
+}
+function bibleNeighbor(d) {
+  const B = bible(); let book = B.book, ch = B.ch + d;
+  if (ch < 1) { if (book === 1) return null; book--; ch = chCount(B.tr, book); }
+  else if (ch > chCount(B.tr, book)) { if (book === 66) return null; book++; ch = 1; }
+  return { book, ch };
+}
+
+function renderBible(flashVerse) {
+  const B = bible();
+  if (B.ch > chCount(B.tr, B.book)) B.ch = chCount(B.tr, B.book);
+  const wrap = document.getElementById('com-bible');
+  const prev = bibleNeighbor(-1), next = bibleNeighbor(1);
+  wrap.innerHTML = `
+    <div class="bb-bar">
+      <button class="bb-ref" onclick="biblePickBook()"><span>${esc(bookName(B.book))} ${B.ch}</span><svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button>
+      <button class="bb-tr" onclick="biblePickTr()">${BIBLE_TR[B.tr].short}<svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button>
+      <span class="grow"></span>
+      <button class="icon-btn" onclick="bibleSearch()" aria-label="Поиск по Библии"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg></button>
+      <button class="icon-btn bb-aa" onclick="bibleSettings()" aria-label="Шрифт">Aa</button>
+    </div>
+    <div id="bb-body"><div class="bb-skel">${'<div class="shimmer"></div>'.repeat(12)}</div></div>
+    <div class="bb-nav" id="bb-nav">
+      <button onclick="bibleStep(-1)" ${prev ? '' : 'disabled'} aria-label="Предыдущая глава"><svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg></button>
+      <button onclick="bibleStep(1)" ${next ? '' : 'disabled'} aria-label="Следующая глава"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></button>
+    </div>
+    <div id="bb-sel-box"></div>`;
+  bibleSel = new Set();
+  const token = ++bibleToken;
+  getChapter(B.tr, B.book, B.ch).then(verses => {
+    if (token !== bibleToken) return;
+    const body = document.getElementById('bb-body'); if (!body) return;
+    body.innerHTML = `
+      <article class="bb-text ${B.serif ? '' : 'sans'}" id="bb-text" style="font-size:${B.size}px">
+        <div class="bb-book">${esc(bookName(B.book))}</div>
+        <div class="bb-chnum">${B.ch}</div>
+        <p>${verses.map(([n, t]) => {
+          const h = B.hl[B.book + '.' + B.ch + '.' + n];
+          return `<span class="v ${h ? 'hl-' + h : ''}" data-v="${n}"><sup>${n}</sup>${bibleCleanText(t)} </span>`;
+        }).join('')}</p>
+        <div class="bb-foot">${BIBLE_TR[B.tr].copy}<br>Текст предоставлен bolls.life</div>
+      </article>`;
+    document.getElementById('bb-text').addEventListener('click', bibleTap);
+    if (flashVerse) {
+      const el = body.querySelector(`.v[data-v="${flashVerse}"]`);
+      if (el) { el.scrollIntoView({ block: 'center' }); el.classList.add('flash'); setTimeout(() => el.classList.remove('flash'), 1800); }
+    }
+    // заранее подгружаем следующую главу — для быстрого перехода и чтения без интернета
+    const nx = bibleNeighbor(1); if (nx && navigator.onLine) getChapter(B.tr, nx.book, nx.ch).catch(() => {});
+  }).catch(err => {
+    if (token !== bibleToken) return;
+    const body = document.getElementById('bb-body'); if (!body) return;
+    const off = !navigator.onLine || err.message === 'offline';
+    body.innerHTML = `<div class="bb-err">${off
+      ? 'Нет подключения к интернету.<br>Эта глава ещё не сохранена на телефоне — откройте её, когда появится связь.'
+      : 'Не получилось загрузить главу. Возможно, слабый интернет.'}<br><button class="btn btn-dark btn-small" onclick="renderBible()">Попробовать снова</button></div>`;
+    if (off) showNet('offline');
+  });
+}
+function bibleGo(book, ch, verse) {
+  const B = bible(); B.book = book; B.ch = ch; DB.save();
+  document.getElementById('community-screen').scrollTop = 0;
+  renderBible(verse);
+}
+function bibleStep(d) {
+  const n = bibleNeighbor(d); if (!n) return;
+  haptic('light');
+  bibleGo(n.book, n.ch);
+}
+
+// Выделение стихов и действия
+function bibleTap(e) {
+  const v = e.target.closest('.v'); if (!v) return;
+  const n = Number(v.dataset.v);
+  if (bibleSel.has(n)) { bibleSel.delete(n); v.classList.remove('sel'); }
+  else { bibleSel.add(n); v.classList.add('sel'); haptic('light'); }
+  renderBibleSel();
+}
+function bibleRef() {
+  const B = bible(); const nums = [...bibleSel].sort((a, b) => a - b);
+  const parts = []; let s = nums[0], p = nums[0];
+  for (let i = 1; i <= nums.length; i++) {
+    if (nums[i] === p + 1) { p = nums[i]; continue; }
+    parts.push(s === p ? String(s) : s + '–' + p); s = p = nums[i];
+  }
+  return `${bookName(B.book)} ${B.ch}:${parts.join(', ')}`;
+}
+function renderBibleSel() {
+  const box = document.getElementById('bb-sel-box'), nav = document.getElementById('bb-nav');
+  if (!bibleSel.size) { box.innerHTML = ''; nav.style.display = ''; return; }
+  nav.style.display = 'none';
+  const B = bible();
+  const cur = [...bibleSel].map(n => B.hl[B.book + '.' + B.ch + '.' + n]);
+  const same = cur.every(c => c === cur[0]) ? cur[0] : null;
+  box.innerHTML = `
+    <div class="bb-sel">
+      <div class="bb-sel-head"><span>${esc(bibleRef())}</span><button onclick="bibleClearSel()" aria-label="Снять выделение"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+      <div class="bb-colors">
+        ${HL_COLORS.map((c, i) => `<button class="${same === i + 1 ? 'on' : ''}" style="background:${c}" onclick="bibleHighlight(${i + 1})" aria-label="Выделить цветом"></button>`).join('')}
+        <button class="none" onclick="bibleHighlight(0)" aria-label="Убрать выделение"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+      </div>
+      <div class="bb-actions">
+        <button onclick="bibleCopy()"><svg viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="2.5"/><path d="M16 8V6a2 2 0 00-2-2H6a2 2 0 00-2 2v8a2 2 0 002 2h2"/></svg>Копировать</button>
+        <button onclick="bibleShare()"><svg viewBox="0 0 24 24"><path d="M4 12v7a1 1 0 001 1h14a1 1 0 001-1v-7"/><path d="M12 3v12M7 8l5-5 5 5"/></svg>Поделиться</button>
+      </div>
+    </div>`;
+}
+function bibleClearSel() {
+  bibleSel.forEach(n => { const el = document.querySelector(`#bb-text .v[data-v="${n}"]`); el && el.classList.remove('sel'); });
+  bibleSel = new Set(); renderBibleSel();
+}
+function bibleHighlight(c) {
+  const B = bible();
+  bibleSel.forEach(n => {
+    const k = B.book + '.' + B.ch + '.' + n;
+    if (c) B.hl[k] = c; else delete B.hl[k];
+    const el = document.querySelector(`#bb-text .v[data-v="${n}"]`);
+    if (el) { el.className = 'v' + (c ? ' hl-' + c : ''); }
+  });
+  DB.save(); haptic('light');
+  bibleSel = new Set(); renderBibleSel();
+}
+function bibleSelText() {
+  const B = bible(); const verses = bibleMem[B.tr + '/' + B.book + '/' + B.ch] || [];
+  const nums = [...bibleSel].sort((a, b) => a - b);
+  const text = nums.map(n => { const v = verses.find(x => x[0] === n); return v ? v[1].replace(/<[^>]+>/g, '') : ''; }).join(' ').replace(/\s+/g, ' ').trim();
+  return `«${text}»\n— ${bibleRef()} (${BIBLE_TR[B.tr].short})`;
+}
+async function bibleCopy() {
+  const t = bibleSelText();
+  try { await navigator.clipboard.writeText(t); }
+  catch (e) {
+    const ta = document.createElement('textarea'); ta.value = t; ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select(); try { document.execCommand('copy'); } catch (x) {} ta.remove();
+  }
+  toast('Скопировано'); bibleClearSel();
+}
+function bibleShare() {
+  const t = bibleSelText();
+  if (tg && tg.openTelegramLink) tg.openTelegramLink('https://t.me/share/url?url=' + encodeURIComponent(t));
+  else if (navigator.share) navigator.share({ text: t }).catch(() => {});
+  else { bibleCopy(); return; }
+  bibleClearSel();
+}
+
+// Выбор книги и главы
+let bkState = { nt: false, open: 0 };
+function biblePickBook() {
+  const B = bible(); bkState = { nt: B.book >= 40, open: B.book };
+  renderBookPicker(false);
+  setTimeout(() => { const el = document.querySelector('.bk-row.open'); el && el.scrollIntoView({ block: 'start' }); }, 30);
+}
+function renderBookPicker(keep) {
+  const B = bible();
+  const ids = bkState.nt ? Array.from({ length: 27 }, (_, i) => 40 + i) : Array.from({ length: 39 }, (_, i) => 1 + i);
+  openModal(`
+    <div style="height:30px"></div>
+    <h3 style="padding-right:44px">Книги</h3>
+    <div class="bk-seg">
+      <button class="${bkState.nt ? '' : 'active'}" onclick="bkState.nt=false;bkState.open=0;renderBookPicker()">Ветхий Завет</button>
+      <button class="${bkState.nt ? 'active' : ''}" onclick="bkState.nt=true;bkState.open=0;renderBookPicker()">Новый Завет</button>
+    </div>
+    ${ids.map(id => `
+      <button class="bk-row ${id === B.book ? 'cur' : ''} ${bkState.open === id ? 'open' : ''}" onclick="bkState.open=(bkState.open===${id}?0:${id});renderBookPicker(true)">
+        ${esc(bookName(id))}<svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button>
+      ${bkState.open === id ? `<div class="bk-grid">${Array.from({ length: chCount(B.tr, id) }, (_, i) => i + 1).map(c =>
+        `<button class="${id === B.book && c === B.ch ? 'cur' : ''}" onclick="closeModal();bibleGo(${id},${c})">${c}</button>`).join('')}</div>` : ''}
+    `).join('')}
+  `, { full: true, keepScroll: keep });
+}
+function biblePickTr() {
+  const B = bible();
+  openModal(`
+    <div class="modal-handle"></div>
+    <h3>Перевод</h3>
+    ${Object.keys(BIBLE_TR).map(k => `
+      <button class="tr-opt ${B.tr === k ? 'on' : ''}" onclick="bibleSetTr('${k}')">
+        <b>${BIBLE_TR[k].short}</b><span>${BIBLE_TR[k].name}<small>${BIBLE_TR[k].note}</small></span>
+        ${B.tr === k ? ICON.check.replace('<svg', '<svg style="width:20px;height:20px;stroke:var(--lime);stroke-width:2.4;fill:none"') : ''}
+      </button>`).join('')}
+  `);
+}
+function bibleSetTr(k) { bible().tr = k; DB.save(); closeModal(); renderBible(); }
+function bibleSettings() {
+  const B = bible();
+  openModal(`
+    <div class="modal-handle"></div>
+    <h3>Текст</h3>
+    <div class="bb-sample ${B.serif ? '' : 'sans'}" id="bb-sample" style="font-size:${B.size}px">В начале было Слово, и Слово было у Бога…</div>
+    <div class="size-row">
+      <button onclick="bibleSize(-1)" style="font-size:15px">A−</button>
+      <div class="val" id="bb-size-val">${B.size} px</div>
+      <button onclick="bibleSize(1)" style="font-size:21px">A+</button>
+    </div>
+    <div class="choice">
+      <button type="button" class="${B.serif ? 'on' : ''}" style="font-family:'PT Serif',Georgia,serif" onclick="bibleFont(true)">С засечками</button>
+      <button type="button" class="${B.serif ? '' : 'on'}" onclick="bibleFont(false)">Без засечек</button>
+    </div>
+  `);
+}
+function bibleSize(d) {
+  const B = bible(); B.size = Math.max(14, Math.min(28, B.size + d)); DB.save();
+  document.getElementById('bb-sample').style.fontSize = B.size + 'px';
+  document.getElementById('bb-size-val').textContent = B.size + ' px';
+  const t = document.getElementById('bb-text'); if (t) t.style.fontSize = B.size + 'px';
+}
+function bibleFont(serif) {
+  const B = bible(); B.serif = serif; DB.save();
+  const t = document.getElementById('bb-text'); if (t) t.classList.toggle('sans', !serif);
+  bibleSettings();
+}
+
+// Поиск
+function bibleSearch() {
+  const B = bible();
+  openModal(`
+    <div style="height:30px"></div>
+    <h3 style="padding-right:44px">Поиск · ${BIBLE_TR[B.tr].short}</h3>
+    <div class="bs-form">
+      <input class="input" id="bs-q" placeholder="Слово или фраза" enterkeyhint="search" onkeydown="if(event.key==='Enter')bibleRunSearch()">
+      <button class="btn btn-light btn-small" onclick="bibleRunSearch()">Найти</button>
+    </div>
+    <div id="bs-res"><p class="hint">Например: любовь, «Господь — Пастырь мой», благодать.</p></div>
+  `, { full: true });
+  setTimeout(() => { const q = document.getElementById('bs-q'); q && q.focus(); }, 300);
+}
+async function bibleRunSearch() {
+  const q = document.getElementById('bs-q').value.trim(); const out = document.getElementById('bs-res');
+  if (q.length < 3) { toast('Введите хотя бы 3 буквы'); return; }
+  if (!navigator.onLine) { showNet('offline'); out.innerHTML = '<p class="hint">Поиск работает только с интернетом.</p>'; return; }
+  document.getElementById('bs-q').blur();
+  out.innerHTML = '<div class="bb-skel" style="padding:10px 0">' + '<div class="shimmer" style="width:100%;height:44px;margin:0 0 12px"></div>'.repeat(5) + '</div>';
+  const B = bible();
+  try {
+    const res = await fetch(`${BIBLE_API}/v2/find/${B.tr}?search=${encodeURIComponent(q)}&match_case=false&match_whole=false&limit=60&page=1`);
+    const d = await res.json();
+    const list = (d.results || []).filter(r => r.book >= 1 && r.book <= 66);
+    if (!list.length) { out.innerHTML = '<p class="hint">Ничего не нашлось. Попробуйте другое слово.</p>'; return; }
+    out.innerHTML = `<p class="hint" style="margin-bottom:6px">Найдено: ${d.total || list.length}${(d.total || 0) > list.length ? ', показаны первые ' + list.length : ''}</p>` +
+      list.map(r => `<button class="bs-item" onclick="closeModal();bibleGo(${r.book},${r.chapter},${r.verse})"><b>${esc(bookName(r.book))} ${r.chapter}:${r.verse}</b><p>${bibleCleanText(r.text)}</p></button>`).join('');
+  } catch (e) {
+    out.innerHTML = '<p class="hint">Не получилось выполнить поиск. Проверьте интернет и попробуйте ещё раз.</p>';
+  }
+}
+
 // === СЕТЬ ===
 let netTimer;
 function showNet(kind) {
@@ -2429,6 +2810,9 @@ document.addEventListener('touchend', () => {
     settleModal(g.box, dy > 110 || (dy > 60 && fast), 'translateY(100%)');
   } else if (ctx === 'screen' && axis === 'x' && Math.abs(dx) > 70 && Math.abs(dx) > Math.abs(dy) * 1.5 && fast) {
     if (currentTab === 'admin') { if (dx > 0) { haptic(); switchTab('more', -1); } }
+    else if (currentTab === 'community' && comTab === 'bible' && !document.getElementById('com-bible').classList.contains('hidden')) {
+      bibleStep(dx < 0 ? 1 : -1);   // в Библии свайп листает главы
+    }
     else {
       const i = TAB_ORDER.indexOf(currentTab), j = i + (dx < 0 ? 1 : -1);
       if (j >= 0 && j < TAB_ORDER.length) { haptic(); switchTab(TAB_ORDER[j], dx < 0 ? 1 : -1); }
