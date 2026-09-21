@@ -55,7 +55,6 @@ img { display:block; max-width:100%; }
 .screen {
   position: absolute; inset: 0;
   overflow-y: auto; overflow-x: hidden;
-  -webkit-overflow-scrolling: touch;
   padding-bottom: calc(var(--tabbar-h) + var(--safe-bottom) + 24px);
   display: none;
 }
@@ -414,9 +413,10 @@ img.shade-3 { filter: blur(10px) brightness(.42); transform: scale(1.16); }
 /* === FORMS === */
 .form-group { margin-bottom: 16px; }
 .form-label { font-size: 13px; color: var(--text-2); margin-bottom: 8px; display:block; }
+.input, .select { height: 50px; line-height: 20px; }
 .input, .textarea, .select {
   width: 100%; padding: 14px 16px; border-radius: 14px;
-  background: var(--surface); border: 1px solid var(--line); font-size: 15px; color: var(--text);
+  background: var(--surface); border: 1px solid var(--line); font-size: 16px; color: var(--text);
   -webkit-appearance: none; appearance: none;
 }
 .input::placeholder, .textarea::placeholder { color: var(--text-3); }
@@ -475,8 +475,9 @@ body.sorting { -webkit-user-select: none; user-select: none; }
 /* === MODAL === */
 .modal-overlay { position: fixed; inset: 0; z-index: 300; background: rgba(0,0,0,.6); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); display:none; align-items:flex-end; justify-content:center; }
 .modal-overlay.show { display:flex; animation: fadeIn .2s; }
+.modal-overlay.full-open { backdrop-filter: none; -webkit-backdrop-filter: none; background: var(--bg); }
 .modal { position: relative; width: 100%; max-width: 520px; max-height: 88vh; display: flex; flex-direction: column; overflow: hidden; background: var(--surface); border-top: 1px solid var(--line); border-radius: 24px 24px 0 0; animation: slideUp .3s cubic-bezier(.2,.8,.2,1); }
-.modal-scroll { flex: 1; min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; padding: 12px 20px calc(var(--safe-bottom) + 24px); }
+.modal-scroll { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 12px 20px calc(var(--safe-bottom) + 24px); }
 .modal-foot { flex-shrink: 0; padding: 12px 20px calc(var(--safe-bottom) + 14px); border-top: 1px solid var(--line); background: var(--surface); display: flex; flex-direction: column; gap: 10px; }
 .modal-foot + .modal-scroll, .modal-scroll:has(+ .modal-foot) { padding-bottom: 24px; }
 .modal.full { max-width: none; height: 100%; max-height: none; border-radius: 0; border-top: none; }
@@ -522,8 +523,9 @@ body.sorting { -webkit-user-select: none; user-select: none; }
 .img-actions .btn { flex: 1; cursor: pointer; }
 .hint.bad { color: var(--danger); }
 .hint.good { color: var(--lime); }
-.admin-edit { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--sky); margin-bottom: 16px; }
-.admin-edit svg { width: 15px; height: 15px; stroke: currentColor; stroke-width: 2; fill: none; }
+.admin-edit { display: inline-flex; align-items: center; gap: 7px; padding: 10px 16px 10px 13px; margin: 2px 8px 18px 0; border-radius: 100px; background: rgba(90,176,232,.13); border: 1px solid rgba(90,176,232,.38); color: var(--sky); font-size: 14px; font-weight: 600; transition: transform .15s, background .15s; }
+.admin-edit:active { transform: scale(.96); background: rgba(90,176,232,.24); }
+.admin-edit svg { width: 17px; height: 17px; stroke: currentColor; stroke-width: 2; fill: none; }
 
 /* === Видеоплеер === */
 .player { margin: calc(-12px - var(--safe-top)) -20px 18px; padding-top: var(--safe-top); background: #000; }
@@ -679,7 +681,6 @@ img.ld { opacity: 0; }
 #sync-line[data-state="saved"] { color: var(--mint); }
 #sync-line[data-state="error"] { color: var(--danger); }
 #sync-line .spin { width: 12px; height: 12px; }
-.admin-edit + .admin-edit { margin-left: 14px; }
 
 /* === БИБЛИЯ === */
 .bb-bar { display: flex; align-items: center; gap: 8px; margin: 0 20px 4px; }
@@ -2004,8 +2005,8 @@ function renderRegForm(keepScroll) {
       <div class="form-group"><label class="form-label" for="rf-n${i}">ФИО</label>
         <input class="input ${er.fullName ? 'err' : ''}" id="rf-n${i}" value="${esc(p.fullName)}" placeholder="Фамилия Имя Отчество" autocomplete="${you ? 'name' : 'off'}" maxlength="120" oninput="regSet(${i},'fullName',this.value)"></div>
       <div class="form-row">
-        <div class="form-group" style="flex:0 0 96px"><label class="form-label" for="rf-a${i}">Возраст</label>
-          <input class="input ${er.age ? 'err' : ''}" id="rf-a${i}" value="${esc(p.age)}" inputmode="numeric" maxlength="3" placeholder="25" oninput="this.value=this.value.replace(/\\D/g,'');regSet(${i},'age',this.value)"></div>
+        <div class="form-group" style="flex:0 0 34%"><label class="form-label" for="rf-a${i}">Возраст</label>
+          <input class="input ${er.age ? 'err' : ''}" id="rf-a${i}" type="text" value="${esc(p.age)}" inputmode="numeric" pattern="[0-9]*" maxlength="3" placeholder="25" autocomplete="off" enterkeyhint="next" oninput="regSet(${i},'age',this.value.replace(/\\D/g,''))" onblur="if(/\\D/.test(this.value)){this.value=this.value.replace(/\\D/g,'')}"></div>
         <div class="form-group"><label class="form-label" for="rf-c${i}">Город проживания</label>
           <input class="input ${er.city ? 'err' : ''}" id="rf-c${i}" value="${esc(p.city)}" placeholder="Ташкент" maxlength="80" autocomplete="${you ? 'address-level2' : 'off'}" oninput="regSet(${i},'city',this.value)"></div>
       </div>
@@ -2515,6 +2516,7 @@ function openModal(html, opts = {}) {
   const prev = box.querySelector('.modal-scroll');
   const top = opts.keepScroll && prev ? prev.scrollTop : 0;
   box.className = 'modal' + (opts.full ? ' full' : '') + (opts.cls ? ' ' + opts.cls : '');
+  document.getElementById('modal-overlay').classList.toggle('full-open', !!opts.full);
   box.style.transform = '';
   box.innerHTML = CLOSE_BTN + `<div class="modal-scroll">${html}</div>` + (opts.foot ? `<div class="modal-foot">${opts.foot}</div>` : '');
   box.querySelector('.modal-scroll').scrollTop = top;
