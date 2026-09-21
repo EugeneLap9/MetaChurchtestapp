@@ -183,7 +183,8 @@ img { display:block; max-width:100%; }
 .splash-name label { font-size: 13px; color: var(--text-2); display:block; margin-bottom: 8px; }
 
 /* Logo lockup */
-.logo { display:flex; align-items:flex-end; gap: 4px; color: var(--text); }
+.logo { display:flex; color: var(--text); }
+.logo svg text { fill: currentColor; }
 .logo svg { fill: currentColor; }
 .logo-text { font-weight: 600; line-height: 1.02; letter-spacing: -.2px; }
 
@@ -560,7 +561,8 @@ body.sorting { -webkit-user-select: none; user-select: none; }
 .modal.settle { transition: transform .22s cubic-bezier(.2,.8,.2,1); }
 
 /* === Потяните вниз, чтобы обновить === */
-.ptr { position: fixed; left: 50%; top: calc(var(--safe-top) + 6px); z-index: 150; width: 40px; height: 40px; margin-left: -20px; border-radius: 50%; background: var(--surface-2); border: 1px solid var(--line); display: flex; align-items: center; justify-content: center; transform: translateY(-70px); opacity: 0; pointer-events: none; box-shadow: 0 6px 20px rgba(0,0,0,.5); }
+.ptr { position: fixed; left: 50%; top: calc(var(--safe-top) + 6px); z-index: 150; width: 40px; height: 40px; margin-left: -20px; border-radius: 50%; background: var(--surface-2); border: 1px solid var(--line); display: flex; align-items: center; justify-content: center; transform: translateY(-70px); opacity: 0; pointer-events: none; visibility: hidden; }
+.ptr.on { visibility: visible; }
 .ptr svg { width: 20px; height: 20px; stroke: var(--text); stroke-width: 2.4; fill: none; stroke-linecap: round; }
 .ptr.ready svg { stroke: var(--lime); }
 .ptr.back { transition: transform .25s ease, opacity .25s ease; }
@@ -584,8 +586,8 @@ img.ld { opacity: 0; }
 .player-frame .spin { position: absolute; left: 50%; top: 50%; width: 28px; height: 28px; margin: -14px 0 0 -14px; color: rgba(255,255,255,.6); }
 
 /* === Состояние сети === */
-.net { position: fixed; left: 50%; top: calc(var(--safe-top) + 10px); z-index: 900; transform: translate(-50%, -160%); display: flex; align-items: center; gap: 9px; padding: 9px 16px 9px 12px; border-radius: 100px; background: var(--surface-2); border: 1px solid var(--line); box-shadow: 0 8px 26px rgba(0,0,0,.55); font-size: 13px; font-weight: 500; white-space: nowrap; transition: transform .3s cubic-bezier(.2,.8,.2,1); max-width: calc(100vw - 32px); }
-.net.show { transform: translate(-50%, 0); }
+.net { position: fixed; left: 50%; top: calc(var(--safe-top) + 10px); z-index: 900; transform: translate(-50%, -24px); opacity: 0; visibility: hidden; display: flex; align-items: center; gap: 9px; padding: 9px 16px 9px 12px; border-radius: 100px; background: var(--surface-2); border: 1px solid var(--line); box-shadow: 0 8px 26px rgba(0,0,0,.55); font-size: 13px; font-weight: 500; white-space: nowrap; transition: transform .3s cubic-bezier(.2,.8,.2,1), opacity .25s ease, visibility 0s linear .3s; max-width: calc(100vw - 32px); }
+.net.show { transform: translate(-50%, 0); opacity: 1; visibility: visible; transition-delay: 0s; }
 .net i { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
 .net.offline i { background: var(--danger); box-shadow: 0 0 0 4px rgba(255,107,94,.2); }
 .net.online i { background: var(--mint); }
@@ -598,7 +600,7 @@ img.ld { opacity: 0; }
 </head>
 <body>
 <div class="boot" id="boot">
-  <svg width="40" height="64" viewBox="0 0 31 50" aria-hidden="true"><rect x="14.2" y="0" width="2.6" height="50"/><rect x="0" y="17.2" width="31" height="2.6"/><path d="M15.5 9.5 Q15.5 18.5 24.5 18.5 Q15.5 18.5 15.5 27.5 Q15.5 18.5 6.5 18.5 Q15.5 18.5 15.5 9.5Z"/></svg>
+  <svg width="46" height="66" viewBox="0 0 483 685" aria-hidden="true"><path d="M223 0H260V102A111 120 0 0 0 371 222H483V260H371A111 120 0 0 0 260 380V685H223V380A111 120 0 0 0 112 260H0V222H112A111 120 0 0 0 223 102Z"/></svg>
   <div class="boot-bar"></div>
   <p id="boot-msg"></p>
 </div>
@@ -1102,22 +1104,26 @@ const ICON = {
 };
 
 // Логотип: крест-звезда Meta Church
+// Знак Meta Church: крест с плавными вогнутыми переходами, как в оригинальном логотипе
+const MARK = '<path d="M223 0H260V102A111 120 0 0 0 371 222H483V260H371A111 120 0 0 0 260 380V685H223V380A111 120 0 0 0 112 260H0V222H112A111 120 0 0 0 223 102Z"/>';
 function logoMark(h) {
-  return `<svg width="${h * .62}" height="${h}" viewBox="0 0 31 50" aria-hidden="true">
-    <rect x="14.2" y="0" width="2.6" height="50"/>
-    <rect x="0" y="17.2" width="31" height="2.6"/>
-    <path d="M15.5 9.5 Q15.5 18.5 24.5 18.5 Q15.5 18.5 15.5 27.5 Q15.5 18.5 6.5 18.5 Q15.5 18.5 15.5 9.5Z"/>
+  return `<svg width="${Math.round(h * 483 / 685)}" height="${h}" viewBox="0 0 483 685" aria-hidden="true">${MARK}</svg>`;
+}
+// Полный логотип: знак + «Meta Church» справа внизу, пропорции как в оригинале
+function logoLockup(h) {
+  return `<svg width="${Math.round(h * 830 / 685)}" height="${h}" viewBox="0 0 830 685" role="img" aria-label="Meta Church">
+    ${MARK}
+    <text x="345" y="452" font-family="Onest, system-ui, sans-serif" font-weight="700" font-size="132" letter-spacing="-3">Meta</text>
+    <text x="345" y="586" font-family="Onest, system-ui, sans-serif" font-weight="700" font-size="132" letter-spacing="-3">Church</text>
   </svg>`;
 }
 function renderLogos() {
   document.querySelectorAll('[data-logo]').forEach(el => {
-    const big = el.dataset.logo === 'xl';
-    const h = big ? 96 : 60;
-    el.innerHTML = logoMark(h) + `<div class="logo-text" style="font-size:${big ? 22 : 15}px;margin-bottom:${big ? 14 : 8}px">Meta<br>Church</div>`;
+    el.innerHTML = logoLockup(el.dataset.logo === 'xl' ? 120 : 88);
   });
 }
 function sparkSvg(color) {
-  return `<svg class="spark" viewBox="0 0 31 50" fill="${color}"><rect x="14.2" y="0" width="2.6" height="50"/><rect x="0" y="17.2" width="31" height="2.6"/><path d="M15.5 9.5 Q15.5 18.5 24.5 18.5 Q15.5 18.5 15.5 27.5 Q15.5 18.5 6.5 18.5 Q15.5 18.5 15.5 9.5Z"/></svg>`;
+  return `<svg class="spark" viewBox="0 0 483 685" fill="${color}">${MARK}</svg>`;
 }
 
 // === LOOKUPS ===
@@ -2314,20 +2320,25 @@ new MutationObserver(list => {
 // === ОБНОВЛЕНИЕ (потянуть вниз) ===
 const ptr = document.getElementById('ptr');
 function ptrSet(y, ready) {
-  ptr.classList.remove('back');
+  clearTimeout(ptrHide);
+  ptr.classList.remove('back'); ptr.classList.add('on');
   ptr.style.transform = `translateY(${y - 60}px)`;
   ptr.style.opacity = Math.min(1, y / 50);
   ptr.querySelector('svg').style.transform = `rotate(${y * 4}deg)`;
   ptr.classList.toggle('ready', !!ready);
 }
+let ptrHide;
 function ptrReset() {
   ptr.classList.add('back'); ptr.classList.remove('spinning', 'ready');
   ptr.style.transform = ''; ptr.style.opacity = '';
+  clearTimeout(ptrHide);
+  ptrHide = setTimeout(() => { ptr.classList.remove('on', 'back'); ptr.querySelector('svg').style.transform = ''; }, 280);
 }
 let refreshing = false;
 async function doRefresh() {
   if (refreshing) return; refreshing = true;
-  ptr.classList.add('spinning', 'back'); ptr.querySelector('svg').style.transform = '';
+  clearTimeout(ptrHide);
+  ptr.classList.add('on', 'spinning', 'back'); ptr.querySelector('svg').style.transform = '';
   ptr.style.transform = 'translateY(14px)'; ptr.style.opacity = 1;
   haptic('light');
   const finishSoft = (msg) => { rerender(); setTimeout(() => { ptrReset(); refreshing = false; if (msg) toast(msg); }, 450); };
