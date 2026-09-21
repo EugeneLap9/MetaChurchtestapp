@@ -1,0 +1,79 @@
+rules_version = '2';
+
+// Meta Church — правила безопасности Firestore.
+// Служители (админы) — это пользователи, вошедшие по почте и паролю (Firebase → Authentication → Users).
+// Все остальные входят анонимно и могут только отмечаться, вступать в группы и оставлять молитвенные нужды.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() { return request.auth != null; }
+    function isAdmin() { return signedIn() && request.auth.token.firebase.sign_in_provider == 'password'; }
+    function isOwner(uid) { return signedIn() && request.auth.uid == uid; }
+    function shortText(v, max) { return v is string && v.size() <= max; }
+
+    // Контент приложения: читают все, меняют только служители
+    match /app/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Фото событий и групп
+    match /images/{imageId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Профили участников (имя и ник в Telegram)
+    match /users/{uid} {
+      allow read: if signedIn();
+      allow create, update: if isOwner(uid)
+        && request.resource.data.keys().hasOnly(['name', 'username', 'photoUrl', 'at'])
+        && shortText(request.resource.data.name, 60)
+        && shortText(request.resource.data.username, 64)
+        && shortText(request.resource.data.photoUrl, 500);
+      allow delete: if isOwner(uid) || isAdmin();
+    }
+
+    // «Я приду» и регистрации на события
+    match /rsvps/{id} {
+      allow read: if isAdmin() || (signedIn() && resource.data.uid == request.auth.uid);
+      allow create, update: if signedIn()
+        && request.resource.data.uid == request.auth.uid
+        && id == request.resource.data.eventId + '_' + request.auth.uid
+        && request.resource.data.keys().hasOnly(['eventId', 'uid', 'name', 'username', 'people', 'at'])
+        && shortText(request.resource.data.name, 60)
+        && request.resource.data.people is int && request.resource.data.people >= 1 && request.resource.data.people <= 50;
+      allow delete: if isAdmin() || (signedIn() && resource.data.uid == request.auth.uid);
+    }
+
+    // Участники малых групп
+    match /members/{id} {
+      allow read: if isAdmin() || (signedIn() && resource.data.uid == request.auth.uid);
+      allow create, update: if signedIn()
+        && request.resource.data.uid == request.auth.uid
+        && id == request.resource.data.groupId + '_' + request.auth.uid
+        && request.resource.data.keys().hasOnly(['groupId', 'uid', 'name', 'username', 'at'])
+        && shortText(request.resource.data.name, 60);
+      allow delete: if isAdmin() || (signedIn() && resource.data.uid == request.auth.uid);
+    }
+
+    // Молитвенные нужды
+    match /prayers/{id} {
+      allow read: if signedIn();
+      allow create: if signedIn()
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.keys().hasOnly(['text', 'anonymous', 'name', 'uid', 'at', 'praying'])
+        && shortText(request.resource.data.text, 600) && request.resource.data.text.size() > 0
+        && shortText(request.resource.data.name, 60)
+        && request.resource.data.anonymous is bool
+        && request.resource.data.praying.size() == 0;
+      // «Помолиться»: можно только добавить или убрать себя
+      allow update: if signedIn()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['praying'])
+        && request.resource.data.praying.toSet().difference(resource.data.praying.toSet())
+             .union(resource.data.praying.toSet().difference(request.resource.data.praying.toSet()))
+           == [request.auth.uid].toSet();
+      allow delete: if isAdmin() || (signedIn() && resource.data.uid == request.auth.uid);
+    }
+  }
+}

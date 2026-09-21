@@ -593,6 +593,16 @@ img.ld { opacity: 0; }
 .net.online i { background: var(--mint); }
 .net.slow i { width: 14px; height: 14px; background: none; border: 2px solid var(--amber); border-right-color: transparent; animation: spin .8s linear infinite; }
 
+/* === Общая база === */
+.cloud-box { margin: 0 20px 16px; padding: 14px 16px; border-radius: 16px; background: var(--surface); border: 1px solid var(--line); font-size: 13px; color: var(--text-2); line-height: 1.5; }
+.cloud-box b { display: block; color: var(--text); font-size: 15px; margin-bottom: 4px; }
+.cloud-box.warn { border-color: rgba(242,133,90,.45); background: rgba(242,133,90,.07); }
+#sync-line { margin: -6px 20px 12px; font-size: 12px; color: var(--text-3); min-height: 16px; }
+#sync-line[data-state="saved"] { color: var(--mint); }
+#sync-line[data-state="error"] { color: var(--danger); }
+#sync-line .spin { width: 12px; height: 12px; }
+.admin-edit + .admin-edit { margin-left: 14px; }
+
 /* === БИБЛИЯ === */
 .bb-bar { display: flex; align-items: center; gap: 8px; margin: 0 20px 4px; }
 .bb-ref { display: inline-flex; align-items: center; gap: 6px; padding: 10px 14px 10px 16px; border-radius: 100px; background: var(--surface); border: 1px solid var(--line); font-size: 15px; font-weight: 600; max-width: 60%; }
@@ -838,6 +848,10 @@ img.ld { opacity: 0; }
       <span>Пожертвования</span><svg class="chev" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg>
     </button>
     <div class="menu-gap"></div>
+    <button class="menu-item hidden" id="menu-login" onclick="showAdminLogin()">
+      <svg viewBox="0 0 24 24"><rect x="4" y="10.5" width="16" height="10.5" rx="2.5"/><path d="M8 10.5V7a4 4 0 018 0v3.5"/></svg>
+      <span>Вход для служителей</span><svg class="chev" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg>
+    </button>
     <button class="menu-item hidden" id="menu-admin" onclick="openAdmin()">
       <svg viewBox="0 0 24 24"><path d="M12 3l7 3v5c0 5-3 8.5-7 10-4-1.5-7-5-7-10V6z"/><path d="M9 12l2 2 4-4"/></svg>
       <span>Управление</span><svg class="chev" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg>
@@ -870,10 +884,12 @@ img.ld { opacity: 0; }
       <h1>Управление</h1>
     </button>
   </div>
+  <div id="sync-line"></div>
+  <div id="cloud-banner"></div>
   <div class="seg" id="admin-seg">
     <button class="active" data-atab="create">Создать</button>
     <button data-atab="content">Контент</button>
-    <button data-atab="team">Команда</button>
+    <button data-atab="team">Доступ</button>
   </div>
 
   <div id="admin-create" class="pad">
@@ -1041,10 +1057,21 @@ const DB = {
     } catch (e) {}
   },
   save() {
-    try { localStorage.setItem(STORE_KEY, JSON.stringify(state)); return true; }
-    catch (e) { console.error(e); toast('Не хватает памяти на устройстве. Уменьшите фото или используйте ссылку'); return false; }
+    const ok = saveLocalOnly(true);
+    if (typeof cloudQueuePush === 'function') cloudQueuePush();
+    return ok;
   }
 };
+
+function saveLocalOnly(warn) {
+  try { localStorage.setItem(STORE_KEY, JSON.stringify(state)); return true; }
+  catch (e) {
+    console.error(e);
+    if (typeof CLOUD !== 'undefined' && CLOUD && cloud.admin) return true;   // фото всё равно уйдут в общую базу
+    if (warn) toast('Не хватает памяти на устройстве. Уменьшите фото или используйте ссылку');
+    return false;
+  }
+}
 
 // === DATES ===
 const WD_SHORT = ['ВС','ПН','ВТ','СР','ЧТ','ПТ','СБ'];
@@ -1136,6 +1163,7 @@ function onboardNext() {
   renderAll();
   switchTab('home');
   toast('Рады вам, ' + name + '!');
+  if (CLOUD) syncUserDoc();
 }
 
 // === HELPERS ===
@@ -1145,11 +1173,11 @@ function toast(msg) {
   t.textContent = msg; t.classList.add('show');
   clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('show'), 2400);
 }
-function isAdmin() { return state.user && (state.user.role === 'admin' || state.user.role === 'owner'); }
+function isAdmin() { if (CLOUD) return cloud.admin; return state.user && (state.user.role === 'admin' || state.user.role === 'owner'); }
 function isOwner() { return state.user && state.user.role === 'owner'; }
 function genId() { return 'id_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7); }
 function esc(s) { return (s == null ? '' : String(s)).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
-function img(v) { if (!v) return ''; if (v.startsWith('img:')) return IMG[v.slice(4)] || ''; return /^(https?:|data:image\/)/.test(v) ? v : ''; }
+function img(v) { if (!v) return ''; if (v.startsWith('img:')) return IMG[v.slice(4)] || ''; if (v.startsWith('fs:')) return fsImg(v.slice(3)); return /^(https?:|data:image\/)/.test(v) ? v : ''; }
 function me() { return state.user ? state.user.tgId : null; }
 function isGoing(eid) { return state.registrations.some(r => r.eventId === eid && r.tgId === me()); }
 function isMember(gid) { return state.memberships.some(m => m.groupId === gid && m.tgId === me()); }
@@ -1528,6 +1556,20 @@ function renderGroups() {
     </div>` : `<div class="empty">${ICON.users}<p>Группы скоро появятся.</p></div>`}`;
 }
 function renderPeople() {
+  if (CLOUD) {
+    const box = document.getElementById('com-people');
+    if (!cloud.on || !cloud.uid || cloud.people === null) {
+      box.innerHTML = `<div class="pad"><div class="bb-skel" style="padding:0">${'<div class="shimmer" style="width:100%;height:52px;margin:0 0 10px;border-radius:14px"></div>'.repeat(5)}</div>${!cloud.uid ? '<p class="hint" style="text-align:center;margin-top:10px">Подключаемся к общей базе…</p>' : ''}</div>`;
+      if (cloud.on && cloud.uid) loadPeople().then(() => { if (comTab === 'people') renderPeople(); }).catch(() => { box.innerHTML = '<div class="empty"><p>Не удалось загрузить.</p></div>'; });
+      return;
+    }
+    box.innerHTML = `<div class="pad">${cloud.people.map(u => `
+      <div class="person">${avatarHtml(u)}
+        <div style="flex:1;min-width:0"><div class="person-name">${esc(u.name || 'Без имени')}${u.uid === cloud.uid ? ' <span class="person-sub">(вы)</span>' : ''}</div>
+        <div class="person-sub">${u.username ? '@' + esc(u.username) : 'Участник сообщества'}</div></div>
+      </div>`).join('')}</div>`;
+    return;
+  }
   const users = [...state.allUsers].filter(u => u._onboarded).sort((a, b) => ({ owner: 0, admin: 1, user: 2 }[a.role] - { owner: 0, admin: 1, user: 2 }[b.role]) || (a.name || '').localeCompare(b.name || ''));
   document.getElementById('com-people').innerHTML = `<div class="pad">
     ${users.map(u => `
@@ -1540,14 +1582,23 @@ function renderPeople() {
   </div>`;
 }
 function renderPrayers() {
-  const list = [...state.prayers].sort((a, b) => b.createdAt - a.createdAt);
+  const box = document.getElementById('com-prayer');
+  if (CLOUD) {
+    if (!cloud.on || !cloud.uid || cloud.prayers === null) {
+      box.innerHTML = `<div class="pad"><div class="bb-skel" style="padding:0">${'<div class="shimmer" style="width:100%;height:90px;margin:0 0 10px;border-radius:16px"></div>'.repeat(3)}</div>${!cloud.uid ? '<p class="hint" style="text-align:center;margin-top:10px">Подключаемся к общей базе… Если это длится долго, проверьте интернет.</p>' : ''}</div>`;
+      if (cloud.on && cloud.uid) loadPrayers().then(() => { if (comTab === 'prayer') renderPrayers(); }).catch(() => { box.innerHTML = '<div class="empty"><p>Не удалось загрузить. Потяните экран вниз, чтобы обновить.</p></div>'; });
+      return;
+    }
+  }
+  const list = CLOUD
+    ? cloud.prayers.map(p => ({ ...p, createdAt: p.at, mine: p.uid === cloud.uid, n: (p.praying || []).length, on: (p.praying || []).includes(cloud.uid) }))
+    : [...state.prayers].sort((a, b) => b.createdAt - a.createdAt).map(p => ({ ...p, mine: p.tgId === me(), n: state.prayed.filter(x => x.prayerId === p.id).length, on: state.prayed.some(x => x.prayerId === p.id && x.tgId === me()) }));
   document.getElementById('com-prayer').innerHTML = `
     <div class="verse"><p>«В тесноте моей я призвал Господа и к Богу моему воззвал…»</p><b>Псалтирь 17:7</b></div>
     <div class="pad">
       ${list.length ? list.map(p => {
-        const n = state.prayed.filter(x => x.prayerId === p.id).length;
-        const on = state.prayed.some(x => x.prayerId === p.id && x.tgId === me());
-        const canDel = p.tgId === me() || isAdmin();
+        const n = p.n, on = p.on;
+        const canDel = p.mine || isAdmin();
         return `<div class="prayer">
           <div class="prayer-head"><span>${p.anonymous ? 'Анонимно' : esc(p.name)}</span><span>${timeAgo(p.createdAt)}</span></div>
           <div class="prayer-text">${esc(p.text)}</div>
@@ -1564,16 +1615,17 @@ function renderPrayers() {
 // === RENDER: MORE ===
 function renderMore() {
   const u = state.user; if (!u) return;
-  const roleName = u.role === 'owner' ? 'Владелец' : u.role === 'admin' ? 'Администратор' : 'Участник';
+  const roleName = CLOUD ? (cloud.admin ? 'Служитель' : 'Участник') : (u.role === 'owner' ? 'Владелец' : u.role === 'admin' ? 'Администратор' : 'Участник');
   document.getElementById('me-card').innerHTML = `
     ${avatarHtml(u)}
     <div style="flex:1;min-width:0"><div class="me-name">${esc(u.name)}</div><div class="person-sub">${u.username ? '@' + esc(u.username) : 'Meta Church'}</div></div>
-    <span class="role ${u.role}">${roleName}</span>`;
+    <span class="role ${CLOUD ? (cloud.admin ? 'admin' : 'user') : u.role}">${roleName}</span>`;
   const myEv = state.registrations.filter(r => r.tgId === me() && state.events.some(e => e.id === r.eventId)).length;
   const myGr = state.memberships.filter(m => m.tgId === me()).length;
   document.getElementById('cnt-events').textContent = myEv || '';
   document.getElementById('cnt-groups').textContent = myGr || '';
   document.getElementById('menu-admin').classList.toggle('hidden', !isAdmin());
+  document.getElementById('menu-login').classList.toggle('hidden', !CLOUD || cloud.admin);
 }
 
 // === ADMIN ===
@@ -1584,6 +1636,8 @@ function renderAdmin() {
   if (!isAdmin()) { switchTab('home'); toast('Нет доступа'); return; }
   renderContentAdmin();
   renderTeam();
+  renderCloudBanner();
+  loadAdminCounts();
 }
 const GRIP = '<svg viewBox="0 0 24 24"><circle cx="9" cy="6" r="1.6"/><circle cx="15" cy="6" r="1.6"/><circle cx="9" cy="12" r="1.6"/><circle cx="15" cy="12" r="1.6"/><circle cx="9" cy="18" r="1.6"/><circle cx="15" cy="18" r="1.6"/></svg>';
 const PENCIL = '<svg viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg>';
@@ -1611,7 +1665,7 @@ function renderContentAdmin() {
   const ev = [...state.events].sort(byOrder);
   const evEl = document.getElementById('prio-events');
   evEl.innerHTML = ev.length ? ev.map(e => sortItem('event', e.id, e.title,
-    cat(e.category).name + ' · ' + longDate(e.date) + (isPast(e) ? ' · прошло' : '') + (e.needsForm ? ' · анкета' : ''),
+    cat(e.category).name + ' · ' + longDate(e.date) + (isPast(e) ? ' · прошло' : '') + (e.needsForm ? ' · анкета' : '') + `<span id="cnt-ev-${e.id}"></span>`,
     `<button class="prio-btn" onclick="editEvent('${e.id}')" aria-label="Изменить">${PENCIL}</button>` + formToggleBtn(e), isPast(e))).join('') : none;
   makeSortable(evEl, ids => applyOrder(state.events, ids));
 
@@ -1624,7 +1678,7 @@ function renderContentAdmin() {
   document.getElementById('list-sermons').innerHTML = se.length ? se.map(s => simpleItem('sermon', s.id, s.title, esc(s.speaker) + ' · ' + longDate(s.date, true) + (ytId(s.url) ? ' · YouTube' : s.url ? ' · ссылка' : ' · без видео'))).join('') : none;
 
   const grEl = document.getElementById('list-groups');
-  grEl.innerHTML = state.groups.length ? state.groups.map(g => sortItem('group', g.id, g.name, 'участников: ' + state.memberships.filter(m => m.groupId === g.id).length)).join('') : none;
+  grEl.innerHTML = state.groups.length ? state.groups.map(g => sortItem('group', g.id, g.name, `<span id="cnt-gr-${g.id}">${CLOUD ? 'Группа' : 'участников: ' + state.memberships.filter(m => m.groupId === g.id).length}</span>`)).join('') : none;
   makeSortable(grEl, ids => { state.groups = ids.map(id => state.groups.find(g => g.id === id)).filter(Boolean); });
 }
 
@@ -1705,6 +1759,14 @@ function makeSortable(list, onDone) {
   });
 }
 function renderTeam() {
+  if (CLOUD) {
+    document.getElementById('team-list').innerHTML = `
+      <div class="cloud-box" style="margin:0 0 14px"><b>Вы вошли как</b>${esc(cloud.email)}</div>
+      <div class="cloud-box" style="margin:0 0 14px"><b>Как добавить служителя</b>Firebase Console → Authentication → Users → Add user: почта и пароль. Передайте их служителю — он войдёт через «Ещё → Вход для служителей».<br><br><b>Как убрать доступ</b>Там же удалите пользователя или отключите его (Disable account).</div>
+      <button class="btn btn-danger btn-full" onclick="adminLogout()">Выйти из аккаунта служителя</button>`;
+    document.querySelector('#admin-team > p.hint').style.display = 'none';
+    return;
+  }
   document.getElementById('team-list').innerHTML = state.allUsers.filter(u => u._onboarded).map(u => `
     <div class="person">
       ${avatarHtml(u)}
@@ -1723,25 +1785,43 @@ function registerEvent(id) {
   if (state.registrations.filter(r => r.eventId === id).length >= ev.capacity) { toast('Свободных мест не осталось'); return; }
   state.registrations.push({ eventId: id, tgId: me(), name: state.user.name, registeredAt: Date.now() });
   DB.save(); haptic('medium');
+  if (CLOUD) cloudMark('rsvps', 'eventId', id, { people: 1 });
   toast('Ждём вас! Событие в разделе «Мои события»');
   rerender();
 }
 function unregisterEvent(id) {
   state.registrations = state.registrations.filter(r => !(r.eventId === id && r.tgId === me()));
   DB.save(); toast('Отметка снята'); rerender();
+  if (CLOUD) cloudUnmark('rsvps', id);
 }
 function toggleGroup(id) {
-  if (isMember(id)) { state.memberships = state.memberships.filter(m => !(m.groupId === id && m.tgId === me())); toast('Вы вышли из группы'); }
-  else { state.memberships.push({ groupId: id, tgId: me(), joinedAt: Date.now() }); haptic('medium'); toast('Вы в группе! Лидер свяжется с вами'); }
+  if (isMember(id)) { state.memberships = state.memberships.filter(m => !(m.groupId === id && m.tgId === me())); toast('Вы вышли из группы'); if (CLOUD) cloudUnmark('members', id); }
+  else { state.memberships.push({ groupId: id, tgId: me(), joinedAt: Date.now() }); haptic('medium'); toast('Вы в группе! Лидер свяжется с вами'); if (CLOUD) cloudMark('members', 'groupId', id); }
   DB.save(); rerender();
 }
 function togglePray(id) {
+  if (CLOUD) {
+    const p = (cloud.prayers || []).find(x => x.id === id); if (!p || !cloud.uid) return;
+    const on = (p.praying || []).includes(cloud.uid);
+    p.praying = on ? p.praying.filter(u => u !== cloud.uid) : [...(p.praying || []), cloud.uid];
+    if (!on) haptic();
+    renderPrayers();
+    const { doc, updateDoc, arrayUnion, arrayRemove } = cloud.m;
+    updateDoc(doc(cloud.fs, 'prayers', id), { praying: on ? arrayRemove(cloud.uid) : arrayUnion(cloud.uid) }).catch(e => { console.warn(e); toast('Не удалось сохранить'); });
+    return;
+  }
   const i = state.prayed.findIndex(x => x.prayerId === id && x.tgId === me());
   if (i >= 0) state.prayed.splice(i, 1); else { state.prayed.push({ prayerId: id, tgId: me() }); haptic(); }
   DB.save(); renderPrayers();
 }
 function deletePrayer(id) {
   if (!confirm('Удалить эту молитвенную нужду?')) return;
+  if (CLOUD) {
+    const { doc, deleteDoc } = cloud.m;
+    deleteDoc(doc(cloud.fs, 'prayers', id)).then(() => { cloud.prayers = cloud.prayers.filter(p => p.id !== id); renderPrayers(); toast('Удалено'); })
+      .catch(() => toast('Не удалось удалить'));
+    return;
+  }
   state.prayers = state.prayers.filter(p => p.id !== id);
   state.prayed = state.prayed.filter(x => x.prayerId !== id);
   DB.save(); renderPrayers(); toast('Удалено');
@@ -1785,7 +1865,7 @@ function showEventDetail(id) {
     ${eventCover(e)}
     <div class="post-tag" style="color:${cat(e.category).color}">${cat(e.category).name}${e.needsForm ? '<span class="form-badge">· нужна регистрация</span>' : ''}</div>
     <h3 style="font-size:26px">${esc(e.title)}</h3>
-    ${isAdmin() ? `<button class="admin-edit" onclick="editEvent('${e.id}')"><svg viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg>Изменить событие</button>` : ''}
+    ${isAdmin() ? `<button class="admin-edit" onclick="editEvent('${e.id}')"><svg viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg>Изменить событие</button>`  + (CLOUD ? `<button class="admin-edit" onclick="showPeopleOf('rsvps','eventId','${e.id}','Кто идёт')">${ICON.users}Кто идёт</button>` : '') : ''}
     <div class="meta-list">
       <div>${ICON.cal}${WD_FULL[d.getDay()]}, ${longDate(e.date)}</div>
       <div>${ICON.clock}${esc(e.time)}</div>
@@ -1929,6 +2009,7 @@ async function submitReg() {
   clearTimeout(slowTimer);
   if (regDraft.self) state.profileForm = { ...people[0] };
   state.registrations.push({ eventId: e.id, tgId: me(), name: state.user.name, registeredAt: Date.now(), people: people.length, requestId: regDraft.id });
+  if (CLOUD) cloudMark('rsvps', 'eventId', e.id, { people: myPeopleCount(e.id) });
   DB.save(); haptic('medium');
   const total = myPeopleCount(e.id);
   regDraft = null;
@@ -1976,7 +2057,8 @@ function showGroupDetail(id) {
       ${g.leader ? `<div>${ICON.hands}Лидер: ${esc(g.leader)}</div>` : ''}
     </div>
     ${g.description ? `<div class="desc">${esc(g.description)}</div>` : ''}
-    ${n ? `<div class="cap">В группе: ${n}</div>` : ''}
+    ${n && !CLOUD ? `<div class="cap">В группе: ${n}</div>` : ''}
+    ${isAdmin() && CLOUD ? `<button class="admin-edit" onclick="showPeopleOf('members','groupId','${g.id}','Участники: ${esc(g.name).replace(/'/g, '')}')">${ICON.users}Участники группы</button>` : ''}
     ${member ? `<button class="btn btn-danger btn-full" onclick="toggleGroup('${g.id}');closeModal()">Выйти из группы</button>`
              : `<button class="btn btn-light btn-full" onclick="toggleGroup('${g.id}');closeModal()">Вступить в группу</button>`}
   `);
@@ -1994,8 +2076,20 @@ function showPrayerForm() {
 function createPrayer() {
   const text = document.getElementById('pr-text').value.trim();
   if (!text) { toast('Напишите нужду'); return; }
-  state.prayers.push({ id: genId(), text, anonymous: document.getElementById('pr-anon').checked, name: state.user.name, tgId: me(), createdAt: Date.now() });
-  DB.save(); closeModal();
+  const anonymous = document.getElementById('pr-anon').checked;
+  if (CLOUD) {
+    if (!cloud.uid) { toast('Нет связи с базой. Проверьте интернет'); return; }
+    const { collection, addDoc } = cloud.m;
+    const item = { text: text.slice(0, 600), anonymous, name: anonymous ? '' : (state.user.name || '').slice(0, 60), uid: cloud.uid, at: Date.now(), praying: [] };
+    addDoc(collection(cloud.fs, 'prayers'), item).then(ref => {
+      cloud.prayers = [{ id: ref.id, ...item }, ...(cloud.prayers || [])];
+      if (comTab === 'prayer') renderPrayers();
+    }).catch(() => toast('Не удалось отправить. Проверьте интернет'));
+  } else {
+    state.prayers.push({ id: genId(), text, anonymous, name: state.user.name, tgId: me(), createdAt: Date.now() });
+    DB.save();
+  }
+  closeModal();
   if (currentTab !== 'community') switchTab('community');
   setComTab('prayer');
   toast('Молитвенная нужда опубликована');
@@ -2034,6 +2128,7 @@ function saveProfile() {
   state.user.name = name;
   const u = state.allUsers.find(x => x.tgId === me()); if (u) u.name = name;
   DB.save(); closeModal(); rerender(); toast('Сохранено');
+  if (CLOUD) syncUserDoc();
 }
 function showSettings() {
   openModal(`
@@ -2195,7 +2290,14 @@ function onImageFile(prefix, input) {
       const c = document.createElement('canvas');
       c.width = Math.round(im.width * k); c.height = Math.round(im.height * k);
       c.getContext('2d').drawImage(im, 0, 0, c.width, c.height);
-      imgState[prefix] = { data: c.toDataURL('image/jpeg', 0.8), shade: getShade(prefix) };
+      let data = c.toDataURL('image/jpeg', 0.8);
+      if (data.length > 800000) {   // запись в базе — до 1 МБ, уменьшаем крупные фото
+        const k2 = 1024 / Math.max(c.width, c.height), c2 = document.createElement('canvas');
+        c2.width = Math.round(c.width * Math.min(1, k2)); c2.height = Math.round(c.height * Math.min(1, k2));
+        c2.getContext('2d').drawImage(c, 0, 0, c2.width, c2.height);
+        data = c2.toDataURL('image/jpeg', 0.7);
+      }
+      imgState[prefix] = { data, shade: getShade(prefix) };
       document.getElementById(prefix + '-image').value = '';
       updatePreview(prefix);
     };
@@ -2661,6 +2763,244 @@ async function bibleRunSearch() {
   }
 }
 
+// === ОБЩАЯ БАЗА (Firebase) ===
+// Контент (события, объявления, проповеди, группы) хранится в одной записи app/content.
+// Фото — в коллекции images, каждое скачивается телефоном один раз и хранится в памяти устройства.
+const FIREBASE = {
+  apiKey: 'AIzaSyC4Gvodpw6y9T6dagZ-4vdnWWigkxFtQ8w',
+  authDomain: 'metachurch-e800d.firebaseapp.com',
+  projectId: 'metachurch-e800d',
+  storageBucket: 'metachurch-e800d.firebasestorage.app',
+  messagingSenderId: '896424418014',
+  appId: '1:896424418014:web:16456aa7bf29be328a004f'
+};
+const FB_VER = '12.19.0';
+const CLOUD = !!FIREBASE.apiKey;
+const cloud = { on: false, admin: false, uid: null, email: '', contentExists: null, lastPushed: '', fs: null, auth: null, m: {}, prayers: null, people: null, counts: {} };
+let cloudReadyResolve; const cloudReady = new Promise(r => { cloudReadyResolve = r; });
+
+async function cloudInit() {
+  if (!CLOUD) return;
+  try {
+    const base = `https://www.gstatic.com/firebasejs/${FB_VER}/`;
+    const [A, U, F] = await Promise.all([import(base + 'firebase-app.js'), import(base + 'firebase-auth.js'), import(base + 'firebase-firestore.js')]);
+    cloud.m = { ...U, ...F };
+    const app = A.initializeApp(FIREBASE);
+    cloud.auth = U.getAuth(app);
+    cloud.fs = F.initializeFirestore(app, { experimentalAutoDetectLongPolling: true });
+    cloud.on = true;
+    U.onAuthStateChanged(cloud.auth, async user => {
+      if (!user) {
+        cloud.uid = null; cloud.admin = false;
+        try { await U.signInAnonymously(cloud.auth); } catch (e) { console.error('Анонимный вход не удался', e); }
+        return;
+      }
+      cloud.uid = user.uid;
+      cloud.admin = !user.isAnonymous && user.providerData.some(p => p.providerId === 'password');
+      cloud.email = user.email || '';
+      cloud.prayers = null; cloud.people = null;
+      cloudReadyResolve();
+      subscribeContent();
+      syncUserDoc();
+      renderMore();
+      if (currentTab === 'admin' && !cloud.admin) switchTab('more');
+      else rerender();
+    });
+  } catch (e) {
+    console.error('Firebase недоступен', e);
+  }
+}
+
+// --- Контент ---
+let contentUnsub = null;
+const pickContent = o => JSON.parse(JSON.stringify({ events: o.events || [], posts: o.posts || [], sermons: o.sermons || [], groups: o.groups || [] }));
+function subscribeContent() {
+  if (contentUnsub) return;
+  const { doc, onSnapshot } = cloud.m;
+  contentUnsub = onSnapshot(doc(cloud.fs, 'app', 'content'), snap => {
+    if (!snap.exists()) { cloud.contentExists = false; if (currentTab === 'admin') renderCloudBanner(); return; }
+    cloud.contentExists = true;
+    if (snap.metadata.hasPendingWrites) return;
+    const c = pickContent(snap.data());
+    const js = JSON.stringify(c);
+    if (js === cloud.lastPushed) { renderCloudBanner(); return; }
+    cloud.lastPushed = js;
+    Object.assign(state, c); state.seeded = true;
+    ensureOrder(); saveLocalOnly();
+    if (currentTab !== 'admin' || !document.getElementById('modal-overlay').classList.contains('show')) rerender();
+    renderCloudBanner();
+  }, err => { console.error('Чтение базы', err); });
+}
+let pushTimer;
+function cloudQueuePush() {
+  if (!cloud.on || !cloud.admin || !cloud.contentExists) return;
+  clearTimeout(pushTimer); pushTimer = setTimeout(() => cloudPushContent(false), 700);
+}
+async function cloudPushContent(force) {
+  if (!cloud.on || !cloud.admin) return false;
+  const { doc, setDoc, serverTimestamp } = cloud.m;
+  try {
+    setSync('saving');
+    // сначала выгружаем новые фото, загруженные с телефона
+    for (const arr of [state.events, state.groups, state.sermons]) for (const it of arr) {
+      if (it.image && it.image.startsWith('data:')) {
+        const id = 'im_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+        await setDoc(doc(cloud.fs, 'images', id), { data: it.image });
+        FSIMG[id] = it.image; idbSet(id, it.image);
+        it.image = 'fs:' + id;
+      }
+    }
+    const c = pickContent(state), js = JSON.stringify(c);
+    if (!force && js === cloud.lastPushed) { setSync('saved'); return true; }
+    await setDoc(doc(cloud.fs, 'app', 'content'), { ...c, updatedAt: serverTimestamp(), by: cloud.email });
+    cloud.lastPushed = js; cloud.contentExists = true;
+    saveLocalOnly(); setSync('saved'); renderCloudBanner();
+    return true;
+  } catch (e) {
+    console.error('Сохранение в базу', e);
+    setSync('error');
+    toast(/permission/i.test(e.code || e.message) ? 'Нет прав на запись. Проверьте правила Firestore' : 'Не удалось сохранить в общую базу. Проверьте интернет');
+    return false;
+  }
+}
+function setSync(k) {
+  const el = document.getElementById('sync-line'); if (!el) return;
+  el.dataset.state = k;
+  el.innerHTML = { saving: '<span class="spin"></span> Сохраняем в общую базу…', saved: '● Всё сохранено — изменения видят все', error: '● Не сохранено. Потяните экран вниз или повторите действие' }[k] || '';
+}
+function renderCloudBanner() {
+  const el = document.getElementById('cloud-banner'); if (!el) return;
+  if (!CLOUD) { el.innerHTML = ''; return; }
+  if (!cloud.on) { el.innerHTML = '<div class="cloud-box">Подключаемся к общей базе…</div>'; return; }
+  if (cloud.contentExists === false) {
+    el.innerHTML = `<div class="cloud-box warn"><b>Общая база пока пустая</b>Загрузите события, объявления, проповеди и группы с этого телефона — вместе с фото и порядком. После этого их увидят все прихожане.
+      <button class="btn btn-light btn-full" style="margin-top:12px" onclick="cloudMigrate(this)">Загрузить мои данные в общую базу</button></div>`;
+  } else el.innerHTML = '';
+}
+async function cloudMigrate(btn) {
+  btn.disabled = true; btn.innerHTML = '<span class="spin"></span>&nbsp; Загружаем…';
+  const ok = await cloudPushContent(true);
+  if (ok) toast('Готово! Теперь это видят все'); else { btn.disabled = false; btn.textContent = 'Попробовать ещё раз'; }
+  renderContentAdmin();
+}
+
+// --- Фото из базы ---
+const FSIMG = {};
+const fsLoading = {};
+const idbP = (() => { let p; return () => p || (p = new Promise((res, rej) => { try { const r = indexedDB.open('metachurch', 1); r.onupgradeneeded = () => r.result.createObjectStore('img'); r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error); } catch (e) { rej(e); } })); })();
+async function idbGet(k) { try { const d = await idbP(); return await new Promise(res => { const q = d.transaction('img').objectStore('img').get(k); q.onsuccess = () => res(q.result); q.onerror = () => res(undefined); }); } catch (e) { return undefined; } }
+async function idbSet(k, v) { try { const d = await idbP(); await new Promise(res => { const t = d.transaction('img', 'readwrite'); t.objectStore('img').put(v, k); t.oncomplete = res; t.onerror = res; }); } catch (e) {} }
+let imgRerender;
+function fsImg(id) {
+  if (FSIMG[id]) return FSIMG[id];
+  if (!fsLoading[id]) fsLoading[id] = (async () => {
+    let data = await idbGet(id);
+    if (!data) {
+      await cloudReady;
+      const { doc, getDoc } = cloud.m;
+      const s = await getDoc(doc(cloud.fs, 'images', id)).catch(() => null);
+      data = s && s.exists() ? s.data().data : '';
+      if (data) idbSet(id, data);
+    }
+    if (data) { FSIMG[id] = data; clearTimeout(imgRerender); imgRerender = setTimeout(rerender, 60); }
+  })();
+  return '';
+}
+
+// --- Участники ---
+async function syncUserDoc() {
+  if (!cloud.uid || !state.user || !state.user._onboarded) return;
+  const { doc, setDoc } = cloud.m;
+  const tu = tgUser();
+  setDoc(doc(cloud.fs, 'users', cloud.uid), {
+    name: (state.user.name || '').slice(0, 60), username: (tu && tu.username) || state.user.username || '',
+    photoUrl: (tu && tu.photo_url) || '', at: Date.now()
+  }).catch(e => console.warn('users', e));
+}
+function cloudMark(coll, key, id, extra) {
+  if (!cloud.uid) return;
+  const { doc, setDoc } = cloud.m;
+  const tu = tgUser();
+  setDoc(doc(cloud.fs, coll, id + '_' + cloud.uid), {
+    [key]: id, uid: cloud.uid, name: (state.user && state.user.name) || '', username: (tu && tu.username) || '', at: Date.now(), ...(extra || {})
+  }).catch(e => console.warn(coll, e));
+}
+function cloudUnmark(coll, id) {
+  if (!cloud.uid) return;
+  const { doc, deleteDoc } = cloud.m;
+  deleteDoc(doc(cloud.fs, coll, id + '_' + cloud.uid)).catch(e => console.warn(coll, e));
+}
+async function cloudCount(coll, key, id) {
+  const { collection, query, where, getCountFromServer } = cloud.m;
+  const s = await getCountFromServer(query(collection(cloud.fs, coll), where(key, '==', id)));
+  return s.data().count;
+}
+async function loadAdminCounts() {
+  if (!cloud.on || !cloud.admin) return;
+  for (const e of state.events) cloudCount('rsvps', 'eventId', e.id).then(n => { const el = document.getElementById('cnt-ev-' + e.id); if (el) el.textContent = ' · идут: ' + n; }).catch(() => {});
+  for (const g of state.groups) cloudCount('members', 'groupId', g.id).then(n => { const el = document.getElementById('cnt-gr-' + g.id); if (el) el.textContent = 'участников: ' + n; }).catch(() => {});
+}
+async function showPeopleOf(coll, key, id, title) {
+  openModal(`<div class="modal-handle"></div><h3>${esc(title)}</h3><div id="pl-list"><div class="bb-skel" style="padding:0">${'<div class="shimmer" style="width:100%;height:40px;margin:0 0 10px"></div>'.repeat(4)}</div></div>`);
+  try {
+    const { collection, query, where, getDocs } = cloud.m;
+    const s = await getDocs(query(collection(cloud.fs, coll), where(key, '==', id)));
+    const list = s.docs.map(d => d.data()).sort((a, b) => (a.at || 0) - (b.at || 0));
+    const total = list.reduce((n, x) => n + (x.people || 1), 0);
+    const el = document.getElementById('pl-list'); if (!el) return;
+    el.innerHTML = list.length ? `<p class="hint" style="margin-bottom:6px">Всего: ${coll === 'rsvps' ? peopleWord(total) : list.length}</p>` + list.map(x => `
+      <div class="person">${avatarHtml({ name: x.name })}
+        <div style="flex:1;min-width:0"><div class="person-name">${esc(x.name || 'Без имени')}</div>
+        <div class="person-sub">${x.username ? '@' + esc(x.username) : ''}${x.people > 1 ? ' · записал(а) ' + peopleWord(x.people) : ''}</div></div>
+        ${x.username ? `<button class="btn btn-dark btn-small" onclick="openUrl('https://t.me/${esc(x.username)}')">Написать</button>` : ''}
+      </div>`).join('') : '<p class="hint">Пока никого.</p>';
+  } catch (e) {
+    const el = document.getElementById('pl-list'); if (el) el.innerHTML = '<p class="hint">Не удалось загрузить список.</p>';
+  }
+}
+
+// --- Молитвенные нужды и люди ---
+async function loadPrayers() {
+  const { collection, query, orderBy, limit, getDocs } = cloud.m;
+  const s = await getDocs(query(collection(cloud.fs, 'prayers'), orderBy('at', 'desc'), limit(60)));
+  cloud.prayers = s.docs.map(d => ({ id: d.id, ...d.data() }));
+}
+async function loadPeople() {
+  const { collection, query, orderBy, limit, getDocs } = cloud.m;
+  const s = await getDocs(query(collection(cloud.fs, 'users'), orderBy('at', 'desc'), limit(150)));
+  cloud.people = s.docs.map(d => ({ uid: d.id, ...d.data() }));
+}
+
+// --- Вход для служителей ---
+function showAdminLogin() {
+  if (!cloud.on) { toast('Подключаемся к базе, попробуйте через пару секунд'); return; }
+  openModal(`
+    <div class="modal-handle"></div>
+    <h3>Вход для служителей</h3>
+    <p class="hint" style="margin:-4px 0 16px">Почта и пароль из Firebase → Authentication → Users.</p>
+    <div class="form-group"><label class="form-label" for="ad-email">Почта</label><input class="input" id="ad-email" type="email" autocomplete="username" inputmode="email"></div>
+    <div class="form-group"><label class="form-label" for="ad-pass">Пароль</label><input class="input" id="ad-pass" type="password" autocomplete="current-password" onkeydown="if(event.key==='Enter')adminLogin()"></div>
+    <button class="btn btn-light btn-full" id="ad-btn" onclick="adminLogin()">Войти</button>
+  `);
+}
+async function adminLogin() {
+  const email = val('ad-email'), pass = document.getElementById('ad-pass').value;
+  if (!email || !pass) { toast('Введите почту и пароль'); return; }
+  const btn = document.getElementById('ad-btn'); btn.disabled = true; btn.innerHTML = '<span class="spin"></span>&nbsp; Входим…';
+  try {
+    await cloud.m.signInWithEmailAndPassword(cloud.auth, email, pass);
+    closeModal(); toast('Вы вошли как служитель'); haptic('medium');
+  } catch (e) {
+    btn.disabled = false; btn.textContent = 'Войти';
+    toast(/network/i.test(e.code || '') ? 'Нет интернета' : 'Неверная почта или пароль');
+  }
+}
+async function adminLogout() {
+  if (!confirm('Выйти из аккаунта служителя на этом телефоне?')) return;
+  await cloud.m.signOut(cloud.auth).catch(() => {});
+  switchTab('more'); toast('Вы вышли');
+}
+
 // === СЕТЬ ===
 let netTimer;
 function showNet(kind) {
@@ -2841,6 +3181,7 @@ function init() {
     document.getElementById('onboard').classList.remove('hidden');
   }
   if (!navigator.onLine) showNet('offline');
+  cloudInit();
   // Прячем экран загрузки, когда шрифты готовы (но не дольше 3 секунд)
   const fontsReady = document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve();
   Promise.race([fontsReady, new Promise(r => setTimeout(r, 3000))]).then(() => {
