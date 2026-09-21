@@ -21,6 +21,9 @@
   --ember: #F2855A;   /* служения, хвала */
   --sky: #5AB0E8;     /* молодёжь */
   --lime: #D9F24B;    /* молитва */
+  --violet: #A99BFF;  /* семинар */
+  --amber: #FFC24B;   /* тренинг */
+  --mint: #5ED3A5;    /* отдых */
   --danger: #FF6B5E;
   --display: 'Unbounded', 'Arial Black', system-ui, sans-serif;
   --body: 'Onest', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
@@ -299,6 +302,21 @@ img { display:block; max-width:100%; }
 .pat-service { position:absolute; inset:0; background: radial-gradient(120% 90% at 85% 10%, rgba(242,133,90,.55), transparent 55%), radial-gradient(90% 80% at 10% 100%, rgba(90,80,230,.35), transparent 60%), #120c0a; }
 .pat-prayer { position:absolute; inset:0; background: radial-gradient(90% 80% at 80% 20%, rgba(255,190,110,.35), transparent 60%), #0c0a07; }
 .pat-group { position:absolute; inset:0; background: radial-gradient(100% 80% at 90% 0%, rgba(255,255,255,.16), transparent 60%), #111113; }
+.pat-tint { position:absolute; inset:0; background: radial-gradient(110% 90% at 88% 8%, rgba(255,255,255,.14), transparent 58%), #0e0e10; background: radial-gradient(110% 90% at 88% 8%, color-mix(in srgb, var(--c) 45%, transparent), transparent 58%), radial-gradient(80% 70% at 5% 100%, color-mix(in srgb, var(--c) 18%, transparent), transparent 60%), #0e0e10; }
+.poster--seminar .poster-sub b { color: var(--violet); }
+.poster--training .poster-sub b { color: var(--amber); }
+.poster--rest .poster-sub b { color: var(--mint); }
+
+/* Затемнение и размытие фото */
+img.shade-1 { filter: blur(2px) brightness(.72); transform: scale(1.06); }
+img.shade-2 { filter: blur(5px) brightness(.56); transform: scale(1.1); }
+img.shade-3 { filter: blur(10px) brightness(.42); transform: scale(1.16); }
+.prev-text { position: absolute; left: 14px; right: 14px; bottom: 12px; z-index: 2; text-align: left; font-family: var(--display); font-weight: 800; font-size: 20px; line-height: 1; text-transform: uppercase; color: #fff; letter-spacing: -.4px; pointer-events: none; }
+.prev-text small { display: block; font-family: var(--body); font-weight: 500; font-size: 11px; letter-spacing: .06em; margin-top: 6px; opacity: .85; }
+.img-preview.has-img::after { content: ''; position: absolute; inset: 0; z-index: 1; background: linear-gradient(180deg, transparent 30%, rgba(0,0,0,.55)); }
+.shade-label { font-size: 13px; color: var(--text-2); margin: 4px 0 8px; }
+.choice.small button { padding: 10px 4px; font-size: 13px; }
+.choice.dim { opacity: .45; pointer-events: none; }
 
 /* === MEDIA === */
 .feature { margin: 0 20px 22px; }
@@ -631,6 +649,9 @@ body.sorting { -webkit-user-select: none; user-select: none; }
     <button class="chip" data-filter="youth">Молодёжь</button>
     <button class="chip" data-filter="prayer">Молитва</button>
     <button class="chip" data-filter="group">Группы</button>
+    <button class="chip" data-filter="seminar">Семинары</button>
+    <button class="chip" data-filter="training">Тренинги</button>
+    <button class="chip" data-filter="rest">Отдых</button>
   </div>
   <div id="events-list"></div>
 </section>
@@ -724,7 +745,7 @@ body.sorting { -webkit-user-select: none; user-select: none; }
     </div>
 
     <div id="form-event">
-      <div class="form-group"><label class="form-label" for="ev-title">Название</label><input class="input" id="ev-title" placeholder="Вечер хвалы"></div>
+      <div class="form-group"><label class="form-label" for="ev-title">Название</label><input class="input" id="ev-title" placeholder="Вечер хвалы" oninput="updatePreviewText('ev')"></div>
       <div class="form-group"><label class="form-label" for="ev-lead">Подзаголовок</label><input class="input" id="ev-lead" placeholder="Одна строка на афише"></div>
       <div class="form-group"><label class="form-label" for="ev-desc">Описание</label><textarea class="textarea" id="ev-desc" placeholder="Что будет, для кого, что взять с собой"></textarea></div>
       <div class="form-row">
@@ -734,7 +755,7 @@ body.sorting { -webkit-user-select: none; user-select: none; }
       <div class="form-group"><label class="form-label" for="ev-location">Место</label><input class="input" id="ev-location" placeholder="Главный зал"></div>
       <div class="form-row">
         <div class="form-group"><label class="form-label" for="ev-category">Направление</label>
-          <select class="select" id="ev-category"><option value="service">Служение</option><option value="youth">Молодёжь</option><option value="prayer">Молитва</option><option value="group">Группа</option></select>
+          <select class="select" id="ev-category"><option value="service">Служение</option><option value="youth">Молодёжь</option><option value="prayer">Молитва</option><option value="group">Группа</option><option value="seminar">Семинар</option><option value="training">Тренинг</option><option value="rest">Отдых</option></select>
         </div>
         <div class="form-group"><label class="form-label" for="ev-capacity">Мест</label><input class="input" id="ev-capacity" type="number" value="100" min="1"></div>
       </div>
@@ -1043,7 +1064,10 @@ const CAT = {
   service: { name: 'Служение', color: 'var(--ember)' },
   youth:   { name: 'Молодёжь', color: 'var(--sky)' },
   prayer:  { name: 'Молитва',  color: 'var(--lime)' },
-  group:   { name: 'Группа',   color: 'var(--text)' }
+  group:   { name: 'Группа',   color: 'var(--text)' },
+  seminar: { name: 'Семинар',  color: 'var(--violet)' },
+  training:{ name: 'Тренинг',  color: 'var(--amber)' },
+  rest:    { name: 'Отдых',    color: 'var(--mint)' }
 };
 const TOPIC = {
   announce:  { name: 'Анонс', color: 'var(--sky)' },
@@ -1081,6 +1105,7 @@ function toggleSearch(which) {
 }
 
 // === POSTER (афиша события) ===
+function shadeCls(e) { const n = Number(e.shade) || 0; return n ? 'shade-' + n : ''; }
 function titleHtml(e) {
   const t = esc(e.title);
   if (e.category === 'youth' || e.category === 'group') {
@@ -1097,8 +1122,9 @@ function youthPattern() {
 }
 function posterBg(e) {
   const src = img(e.image);
-  if (src) return `<div class="poster-bg photo grain"><img src="${src}" alt="" loading="lazy" onerror="this.style.display='none'"></div>`;
+  if (src) return `<div class="poster-bg photo grain"><img src="${src}" alt="" loading="lazy" class="${shadeCls(e)}" onerror="this.style.display='none'"></div>`;
   if (e.category === 'youth') return `<div class="poster-bg">${youthPattern()}</div>`;
+  if (['seminar', 'training', 'rest'].includes(e.category)) return `<div class="poster-bg grain"><div class="pat-tint" style="--c:${cat(e.category).color}"></div></div>`;
   return `<div class="poster-bg grain"><div class="pat-${e.category === 'prayer' ? 'prayer' : e.category === 'group' ? 'group' : 'service'}"></div></div>`;
 }
 function posterHtml(e) {
@@ -1132,7 +1158,7 @@ function eventRowHtml(e) {
   const src = img(e.image);
   return `
     <div class="ev-row" onclick="showEventDetail('${e.id}')">
-      <div class="ev-row-img">${src ? `<img src="${src}" alt="" loading="lazy" onerror="this.style.display='none'">` : (e.category === 'youth' ? youthPattern() : '')}</div>
+      <div class="ev-row-img">${src ? `<img src="${src}" alt="" loading="lazy" class="${shadeCls(e)}" onerror="this.style.display='none'">` : (e.category === 'youth' ? youthPattern() : '')}</div>
       <div class="datebox"><small>${WD_SHORT[d.getDay()]}</small><b>${d.getDate()}</b><small>${MON_SHORT[d.getMonth()]}</small></div>
       <div class="ev-row-info">
         <div class="ev-row-title">${esc(e.title)}</div>
@@ -1585,7 +1611,7 @@ function myPeopleCount(eid) {
 }
 function eventCover(e) {
   const src = img(e.image);
-  return `<div class="modal-cover grain">${src ? `<img src="${src}" alt="" onerror="this.style.display='none'">` : posterBg(e)}</div>`;
+  return `<div class="modal-cover grain">${src ? `<img src="${src}" alt="" class="${shadeCls(e)}" onerror="this.style.display='none'">` : posterBg(e)}</div>`;
 }
 function showEventDetail(id) {
   const e = state.events.find(x => x.id === id); if (!e) return;
@@ -1886,7 +1912,7 @@ function createNewEvent() {
     id: genId(), title, lead: val('ev-lead'), description: val('ev-desc'),
     date, time: val('ev-time') || '19:00', location: val('ev-location') || 'Главный зал',
     category: val('ev-category'), capacity: parseInt(val('ev-capacity')) || 100,
-    image: getImageValue('ev'), order: topOrder(state.events), createdBy: me(),
+    image: getImageValue('ev'), shade: getShade('ev'), order: topOrder(state.events), createdBy: me(),
     needsForm: document.getElementById('ev-form').checked
   });
   if (!DB.save()) { state.events.pop(); return; }
@@ -1906,7 +1932,11 @@ function imageFieldHtml(prefix) {
       <button type="button" class="btn btn-dark btn-small" onclick="clearImage('${prefix}')">Убрать фото</button>
     </div>
     <input class="input" id="${prefix}-image" placeholder="или вставьте ссылку на картинку" inputmode="url" oninput="imgUrlChanged('${prefix}')">
-    <div class="hint" id="${prefix}-imgmsg">Подойдёт прямая ссылка на картинку или ссылка Google Диска с открытым доступом.</div>`;
+    <div class="hint" id="${prefix}-imgmsg">Подойдёт прямая ссылка на картинку или ссылка Google Диска с открытым доступом.</div>
+    <div class="shade-label" style="margin-top:14px">Затемнение и размытие фото — чтобы текст читался на светлом фото</div>
+    <div class="choice small dim" id="${prefix}-shade">
+      ${['Нет', 'Слабое', 'Среднее', 'Сильное'].map((t, n) => `<button type="button" data-n="${n}" onclick="setShade('${prefix}', ${n})">${t}</button>`).join('')}
+    </div>`;
 }
 function normalizeImageUrl(u) {
   u = (u || '').trim();
@@ -1918,26 +1948,48 @@ function normalizeImageUrl(u) {
   if (m) return `https://i.imgur.com/${m[1]}.jpg`;
   return u;
 }
+function getShade(prefix) { return (imgState[prefix] && imgState[prefix].shade) || 0; }
+function setShade(prefix, n) {
+  imgState[prefix] = imgState[prefix] || { data: '' };
+  imgState[prefix].shade = n;
+  const im = document.querySelector('#' + prefix + '-prev img');
+  if (im) im.className = n ? 'shade-' + n : '';
+  syncShadeButtons(prefix);
+}
+function syncShadeButtons(prefix) {
+  const box = document.getElementById(prefix + '-shade'); if (!box) return;
+  const n = getShade(prefix);
+  box.querySelectorAll('button').forEach(b => b.classList.toggle('on', Number(b.dataset.n) === n));
+  box.classList.toggle('dim', !img(getImageValue(prefix)));
+}
+function previewTextHtml(prefix) {
+  const t = document.getElementById(prefix + '-title');
+  return `<div class="prev-text">${esc((t && t.value.trim()) || 'Название события')}<small>так будет видно текст</small></div>`;
+}
+function updatePreviewText(prefix) {
+  const el = document.querySelector('#' + prefix + '-prev .prev-text');
+  if (el) el.outerHTML = previewTextHtml(prefix);
+}
 function getImageValue(prefix) {
   const st = imgState[prefix];
   if (st && st.data) return st.data;
   const el = document.getElementById(prefix + '-image');
   return el ? normalizeImageUrl(el.value) : '';
 }
-function setImageField(prefix, value) {
-  imgState[prefix] = { data: '' };
+function setImageField(prefix, value, shade) {
+  imgState[prefix] = { data: '', shade: Number(shade) || 0 };
   const input = document.getElementById(prefix + '-image');
   if (value && (value.startsWith('data:') || value.startsWith('img:'))) { imgState[prefix].data = value; input.value = ''; }
   else input.value = value || '';
   updatePreview(prefix);
 }
 function clearImage(prefix) {
-  imgState[prefix] = { data: '' };
+  imgState[prefix] = { data: '', shade: 0 };
   const input = document.getElementById(prefix + '-image'); if (input) input.value = '';
   updatePreview(prefix);
 }
 function imgUrlChanged(prefix) {
-  imgState[prefix] = { data: '' };
+  imgState[prefix] = { data: '', shade: getShade(prefix) };
   clearTimeout(imgUrlChanged.t);
   imgUrlChanged.t = setTimeout(() => updatePreview(prefix), 400);
 }
@@ -1947,6 +1999,8 @@ function updatePreview(prefix) {
   const raw = getImageValue(prefix);
   const src = img(raw);
   const typed = (document.getElementById(prefix + '-image').value || '').trim();
+  box.classList.remove('has-img');
+  syncShadeButtons(prefix);
   if (!src) {
     box.innerHTML = 'Фото не выбрано — афиша оформится в цвете направления';
     if (typed) { msg.className = 'hint bad'; msg.textContent = 'Ссылка должна начинаться с https://'; }
@@ -1956,7 +2010,9 @@ function updatePreview(prefix) {
   box.innerHTML = 'Загружаем…';
   const im = new Image();
   im.onload = () => {
-    box.innerHTML = ''; box.appendChild(im);
+    box.innerHTML = ''; im.className = getShade(prefix) ? 'shade-' + getShade(prefix) : '';
+    box.appendChild(im); box.insertAdjacentHTML('beforeend', previewTextHtml(prefix)); box.classList.add('has-img');
+    syncShadeButtons(prefix);
     msg.className = 'hint good';
     msg.textContent = raw.startsWith('data:') ? 'Фото загружено с телефона' : raw.startsWith('img:') ? 'Стандартное фото' : 'Картинка найдена';
   };
@@ -1980,7 +2036,7 @@ function onImageFile(prefix, input) {
       const c = document.createElement('canvas');
       c.width = Math.round(im.width * k); c.height = Math.round(im.height * k);
       c.getContext('2d').drawImage(im, 0, 0, c.width, c.height);
-      imgState[prefix] = { data: c.toDataURL('image/jpeg', 0.8) };
+      imgState[prefix] = { data: c.toDataURL('image/jpeg', 0.8), shade: getShade(prefix) };
       document.getElementById(prefix + '-image').value = '';
       updatePreview(prefix);
     };
@@ -1998,7 +2054,7 @@ function editEvent(id) {
   openModal(`
     <div style="height:30px"></div>
     <h3 style="padding-right:44px">Изменить событие</h3>
-    <div class="form-group"><label class="form-label" for="ee-title">Название</label><input class="input" id="ee-title" value="${esc(e.title)}"></div>
+    <div class="form-group"><label class="form-label" for="ee-title">Название</label><input class="input" id="ee-title" value="${esc(e.title)}" oninput="updatePreviewText('ee')"></div>
     <div class="form-group"><label class="form-label" for="ee-lead">Подзаголовок</label><input class="input" id="ee-lead" value="${esc(e.lead)}" placeholder="Одна строка на афише"></div>
     <div class="form-group"><label class="form-label" for="ee-desc">Описание</label><textarea class="textarea" id="ee-desc" style="min-height:140px">${esc(e.description)}</textarea></div>
     <div class="form-row">
@@ -2008,14 +2064,14 @@ function editEvent(id) {
     <div class="form-group"><label class="form-label" for="ee-location">Место</label><input class="input" id="ee-location" value="${esc(e.location)}"></div>
     <div class="form-row">
       <div class="form-group"><label class="form-label" for="ee-category">Направление</label>
-        <select class="select" id="ee-category">${opt('service', 'Служение')}${opt('youth', 'Молодёжь')}${opt('prayer', 'Молитва')}${opt('group', 'Группа')}</select></div>
+        <select class="select" id="ee-category">${opt('service', 'Служение')}${opt('youth', 'Молодёжь')}${opt('prayer', 'Молитва')}${opt('group', 'Группа')}${opt('seminar', 'Семинар')}${opt('training', 'Тренинг')}${opt('rest', 'Отдых')}</select></div>
       <div class="form-group"><label class="form-label" for="ee-capacity">Мест</label><input class="input" id="ee-capacity" type="number" min="1" value="${esc(e.capacity)}"></div>
     </div>
     <div class="form-group"><label class="form-label">Фото</label>${imageFieldHtml('ee')}</div>
     <label class="toggle-row" style="margin-bottom:16px"><div><span>Регистрация с анкетой</span><small>ФИО, возраст, город, церковь</small></div>
       <span class="switch"><input type="checkbox" id="ee-form" ${e.needsForm ? 'checked' : ''}><i></i></span></label>
   `, { full: true, foot: `<button class="btn btn-light btn-full" onclick="saveEvent('${e.id}')">Сохранить изменения</button>` });
-  setImageField('ee', e.image);
+  setImageField('ee', e.image, e.shade);
 }
 function saveEvent(id) {
   const e = state.events.find(x => x.id === id); if (!e) return;
@@ -2026,7 +2082,7 @@ function saveEvent(id) {
     title, lead: val('ee-lead'), description: val('ee-desc'), date,
     time: val('ee-time') || e.time, location: val('ee-location') || e.location,
     category: val('ee-category'), capacity: parseInt(val('ee-capacity')) || e.capacity,
-    image: getImageValue('ee'), needsForm: document.getElementById('ee-form').checked
+    image: getImageValue('ee'), shade: getShade('ee'), needsForm: document.getElementById('ee-form').checked
   });
   if (!DB.save()) { Object.assign(e, backup); return; }
   closeModal();
@@ -2152,7 +2208,7 @@ function init() {
   ensureOrder(); DB.save();
   renderLogos();
   document.getElementById('ev-imgbox').innerHTML = imageFieldHtml('ev');
-  imgState.ev = { data: '' };
+  imgState.ev = { data: '', shade: 0 }; syncShadeButtons('ev');
   document.getElementById('splash-img').src = IMG.prayer;
   if (initAuth()) {
     renderAll();
