@@ -723,7 +723,7 @@ img { display:block; max-width:100%; }
       <label class="toggle-row" style="margin-bottom:16px"><div><span>Регистрация с анкетой</span><small>ФИО, возраст, город, церковь. Заявки попадут в Google Таблицу</small></div>
         <span class="switch"><input type="checkbox" id="ev-form"><i></i></span></label>
       <div class="form-group"><label class="form-label">Приоритет</label><div class="slider-val" id="ev-prio-val">5</div><input class="slider" id="ev-prio" type="range" min="1" max="10" value="5" oninput="document.getElementById('ev-prio-val').textContent=this.value"></div>
-      <button class="btn btn-light btn-full" onclick="createEvent()">Создать событие</button>
+      <button class="btn btn-light btn-full" onclick="createNewEvent()">Создать событие</button>
     </div>
 
     <div id="form-post" class="hidden">
@@ -1775,7 +1775,7 @@ function resetData() {
 // === ADMIN: CREATE ===
 const val = id => document.getElementById(id).value.trim();
 const clear = (...ids) => ids.forEach(id => document.getElementById(id).value = '');
-function createEvent() {
+function createNewEvent() {
   const title = val('ev-title'); if (!title) { toast('Введите название'); return; }
   const date = val('ev-date'); if (!date) { toast('Выберите дату'); return; }
   state.events.push({
