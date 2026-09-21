@@ -323,7 +323,14 @@ img.shade-3 { filter: blur(10px) brightness(.42); transform: scale(1.16); }
 .feature-img { position:relative; border-radius: 18px; overflow:hidden; aspect-ratio: 21/9; background: var(--surface); }
 .feature-img img { width:100%; height:100%; object-fit: cover; }
 .dur { position:absolute; right: 8px; bottom: 8px; background: rgba(0,0,0,.72); font-size: 11px; font-weight: 600; padding: 3px 7px; border-radius: 6px; }
-.feature-title { font-size: 15px; font-weight: 600; margin-top: 12px; }
+.feature-row { display: flex; align-items: center; gap: 12px; margin-top: 12px; }
+.feature-text { flex: 1; min-width: 0; }
+.feature-title { font-size: 15px; font-weight: 600; }
+.play-btn { width: 42px; height: 42px; border-radius: 50%; background: var(--text); flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+.play-btn svg { width: 15px; height: 15px; fill: var(--bg); margin-left: 3px; }
+.play-btn.sm { width: 36px; height: 36px; background: transparent; border: 1px solid var(--line); }
+.play-btn.sm svg { width: 12px; height: 12px; fill: var(--text); margin-left: 2px; }
+.s-info { flex: 1; }
 .feature-meta { font-size: 12px; color: var(--text-2); margin-top: 3px; }
 .s-row { display:flex; gap: 14px; margin: 0 20px 16px; align-items: center; }
 .s-row:active { opacity: .7; }
@@ -1187,7 +1194,7 @@ function renderHome() {
     const src = sermonImg(s, true);
     hero.innerHTML = `
       <div class="sermon-hero" onclick="openSermon('${s.id}')">
-        <div class="sermon-hero-img grain">${src ? `<img src="${src}" alt="">` : genThumb(s, true)}${playBadge(s)}</div>
+        <div class="sermon-hero-img grain">${src ? `<img src="${src}" alt="">` : genThumb(s, true)}</div>
         <div class="sermon-hero-body">
           <div class="eyebrow"><span>${esc(s.series || 'Проповедь')}</span><span>${longDate(s.date).toUpperCase()}</span></div>
           <div class="sermon-hero-title">${esc(s.title)}</div>
@@ -1252,19 +1259,25 @@ function renderMedia() {
   const src1 = sermonImg(first, true);
   el.innerHTML = `
     <div class="feature" onclick="openSermon('${first.id}')">
-      <div class="feature-img grain">${src1 ? `<img src="${src1}" alt="">` : genThumb(first, true)}${playBadge(first)}${first.duration ? `<span class="dur">${esc(first.duration)}</span>` : ''}</div>
-      <div class="feature-title">${esc(first.title)}</div>
-      <div class="feature-meta">${esc(first.speaker)} · ${longDate(first.date, true)}</div>
+      <div class="feature-img grain">${src1 ? `<img src="${src1}" alt="">` : genThumb(first, true)}${first.duration ? `<span class="dur">${esc(first.duration)}</span>` : ''}</div>
+      <div class="feature-row">
+        <div class="feature-text">
+          <div class="feature-title">${esc(first.title)}</div>
+          <div class="feature-meta">${esc(first.speaker)} · ${longDate(first.date, true)}</div>
+        </div>
+        ${playBtn(first)}
+      </div>
     </div>
     ${rest.map(s => {
       const src = sermonImg(s);
       return `
       <div class="s-row" onclick="openSermon('${s.id}')">
-        <div class="s-thumb">${src ? `<img src="${src}" alt="" loading="lazy">` : genThumb(s)}${playBadge(s)}${s.duration ? `<span class="dur">${esc(s.duration)}</span>` : ''}</div>
+        <div class="s-thumb">${src ? `<img src="${src}" alt="" loading="lazy">` : genThumb(s)}${s.duration ? `<span class="dur">${esc(s.duration)}</span>` : ''}</div>
         <div class="s-info">
           <div class="s-title">${esc(s.title)}</div>
           <div class="s-meta">${esc(s.speaker)}<br>${longDate(s.date, true)}</div>
         </div>
+        ${playBtn(s, true)}
       </div>`;
     }).join('')}`;
 }
@@ -1280,7 +1293,7 @@ function sermonImg(s, large) {
   const id = ytId(s.url);
   return id ? `https://i.ytimg.com/vi/${id}/${large ? 'hqdefault' : 'mqdefault'}.jpg` : '';
 }
-function playBadge(s) { return ytId(s.url) ? `<span class="play-badge">${ICON.play}</span>` : ''; }
+function playBtn(s, small) { return (s.url || CONFIG.channelUrl) ? `<span class="play-btn ${small ? 'sm' : ''}" aria-hidden="true">${ICON.play}</span>` : ''; }
 function showPlayer(s, id) {
   const origin = /^https?:/.test(location.origin) ? '&origin=' + encodeURIComponent(location.origin) : '';
   const src = `https://www.youtube.com/embed/${id}?autoplay=1&playsinline=1&rel=0&modestbranding=1${origin}`;
@@ -1611,7 +1624,7 @@ function myPeopleCount(eid) {
 }
 function eventCover(e) {
   const src = img(e.image);
-  return `<div class="modal-cover grain">${src ? `<img src="${src}" alt="" class="${shadeCls(e)}" onerror="this.style.display='none'">` : posterBg(e)}</div>`;
+  return `<div class="modal-cover grain">${src ? `<img src="${src}" alt="" onerror="this.style.display='none'">` : posterBg(e)}</div>`;
 }
 function showEventDetail(id) {
   const e = state.events.find(x => x.id === id); if (!e) return;
