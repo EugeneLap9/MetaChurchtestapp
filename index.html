@@ -26,8 +26,8 @@
   --body: 'Onest', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   --r: 18px;
   --r-sm: 12px;
-  --safe-top: max(env(safe-area-inset-top, 0px), var(--tg-content-safe-area-inset-top, 0px));
-  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-top: calc(var(--tg-safe-area-inset-top, env(safe-area-inset-top, 0px)) + var(--tg-content-safe-area-inset-top, 0px));
+  --safe-bottom: var(--tg-safe-area-inset-bottom, env(safe-area-inset-bottom, 0px));
   --tabbar-h: 64px;
 }
 
@@ -440,11 +440,57 @@ img { display:block; max-width:100%; }
 /* === MODAL === */
 .modal-overlay { position: fixed; inset: 0; z-index: 300; background: rgba(0,0,0,.6); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); display:none; align-items:flex-end; justify-content:center; }
 .modal-overlay.show { display:flex; animation: fadeIn .2s; }
-.modal { width: 100%; max-width: 520px; max-height: 88vh; overflow-y: auto; background: var(--surface); border-top: 1px solid var(--line); border-radius: 24px 24px 0 0; padding: 12px 20px calc(var(--safe-bottom) + 24px); animation: slideUp .3s cubic-bezier(.2,.8,.2,1); }
+.modal { position: relative; width: 100%; max-width: 520px; max-height: 88vh; display: flex; flex-direction: column; overflow: hidden; background: var(--surface); border-top: 1px solid var(--line); border-radius: 24px 24px 0 0; animation: slideUp .3s cubic-bezier(.2,.8,.2,1); }
+.modal-scroll { flex: 1; min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; padding: 12px 20px calc(var(--safe-bottom) + 24px); }
+.modal-foot { flex-shrink: 0; padding: 12px 20px calc(var(--safe-bottom) + 14px); border-top: 1px solid var(--line); background: var(--surface); display: flex; flex-direction: column; gap: 10px; }
+.modal-foot + .modal-scroll, .modal-scroll:has(+ .modal-foot) { padding-bottom: 24px; }
+.modal.full { max-width: none; height: 100%; max-height: none; border-radius: 0; border-top: none; }
+.modal.full .modal-scroll { padding-top: calc(var(--safe-top) + 12px); }
+.modal.full .modal-cover { margin-top: calc(-12px - var(--safe-top)); border-radius: 0; aspect-ratio: 16/10; }
+.modal.full .modal-cover::before { content:''; position:absolute; inset:0; z-index:2; background: linear-gradient(180deg, rgba(0,0,0,.45), transparent 35%, transparent 70%, var(--surface)); }
+.modal-x { position: absolute; top: 12px; right: 12px; z-index: 10; width: 38px; height: 38px; border-radius: 50%; background: rgba(20,20,22,.72); border: 1px solid rgba(255,255,255,.16); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); display: flex; align-items: center; justify-content: center; }
+.modal-x svg { width: 18px; height: 18px; stroke: #fff; stroke-width: 2.2; fill: none; }
+.modal-x:active { transform: scale(.92); }
+.modal.full .modal-x { top: calc(var(--safe-top) + 12px); right: 16px; }
+.modal:not(.full) h3 { padding-right: 40px; }
 .modal-handle { width: 40px; height: 4px; border-radius: 100px; background: var(--line); margin: 0 auto 18px; }
 .modal h3 { font-family: var(--display); font-size: 20px; font-weight: 700; line-height: 1.15; margin-bottom: 14px; letter-spacing: -.3px; }
 .modal-cover { margin: -12px -20px 18px; aspect-ratio: 21/9; position: relative; overflow: hidden; border-radius: 24px 24px 0 0; }
 .modal-cover img { width:100%; height:100%; object-fit: cover; }
+.modal-cover .poster-bg { z-index: 0; }
+
+/* === Анкета регистрации === */
+.modal .input, .modal .textarea, .modal .select { background-color: var(--bg); }
+.reg-event { font-size: 14px; color: var(--text-2); margin: -6px 0 20px; line-height: 1.45; }
+.person-form { border: 1px solid var(--line); border-radius: 18px; padding: 16px 14px 4px; margin-bottom: 12px; }
+.pf-head { display: flex; justify-content: space-between; align-items: center; font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--text-2); margin-bottom: 14px; }
+.choice { display: flex; gap: 8px; }
+.choice button { flex: 1; padding: 13px; border-radius: 14px; background: var(--bg); border: 1px solid var(--line); font-size: 15px; color: var(--text-2); }
+.choice button.on { background: var(--text); color: var(--bg); border-color: var(--text); font-weight: 600; }
+.add-person { width: 100%; padding: 14px; border-radius: 16px; border: 1px dashed var(--text-3); color: var(--text); font-size: 14px; font-weight: 500; display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 8px; }
+.add-person svg { width: 18px; height: 18px; stroke: currentColor; stroke-width: 2; fill: none; }
+.input.err, .select.err, .choice.err button { border-color: var(--danger); }
+.reg-done { display: flex; align-items: center; justify-content: center; gap: 8px; color: var(--lime); font-weight: 600; font-size: 14px; }
+.reg-done svg { width: 16px; height: 16px; stroke: currentColor; stroke-width: 2.6; fill: none; }
+.success { min-height: 62vh; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px; }
+.success-ic { width: 76px; height: 76px; border-radius: 50%; background: var(--lime); display: flex; align-items: center; justify-content: center; margin-bottom: 22px; }
+.success-ic svg { width: 36px; height: 36px; stroke: #111; stroke-width: 2.6; fill: none; }
+.success h3 { padding-right: 0 !important; }
+.success p { font-size: 15px; color: var(--text-2); line-height: 1.5; max-width: 300px; }
+.form-badge { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 600; color: var(--sky); margin-left: 8px; }
+.prio-btn.on { background: rgba(90,176,232,.16); color: var(--sky); border-color: transparent; }
+
+/* === Видеоплеер === */
+.player { margin: calc(-12px - var(--safe-top)) -20px 18px; padding-top: var(--safe-top); background: #000; }
+.player-frame { position: relative; aspect-ratio: 16/9; background: #000; }
+.player-frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+.modal.full.video .modal-x { top: calc(var(--safe-top) + 10px); }
+.play-badge { position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%); width: 52px; height: 52px; border-radius: 50%; background: rgba(0,0,0,.55); border: 1px solid rgba(255,255,255,.3); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); display: flex; align-items: center; justify-content: center; z-index: 2; }
+.play-badge svg { width: 20px; height: 20px; fill: #fff; margin-left: 3px; }
+.s-thumb .play-badge { width: 32px; height: 32px; }
+.s-thumb .play-badge svg { width: 13px; height: 13px; margin-left: 2px; }
+.yt-mark { display: inline-flex; align-items: center; gap: 6px; }
+.yt-mark svg { width: 20px; height: 20px; }
 .meta-list { display:flex; flex-direction:column; gap: 10px; margin: 4px 0 16px; }
 .meta-list div { display:flex; align-items:center; gap: 10px; font-size: 14px; color: var(--text-2); }
 .meta-list svg { width: 18px; height: 18px; stroke: var(--text); stroke-width: 1.7; fill:none; flex-shrink: 0; }
@@ -674,6 +720,8 @@ img { display:block; max-width:100%; }
         <div class="form-group"><label class="form-label" for="ev-capacity">Мест</label><input class="input" id="ev-capacity" type="number" value="100" min="1"></div>
       </div>
       <div class="form-group"><label class="form-label" for="ev-image">Ссылка на фото</label><input class="input" id="ev-image" placeholder="https://…"><div class="hint">Без фото афиша оформится в цвете направления.</div></div>
+      <label class="toggle-row" style="margin-bottom:16px"><div><span>Регистрация с анкетой</span><small>ФИО, возраст, город, церковь. Заявки попадут в Google Таблицу</small></div>
+        <span class="switch"><input type="checkbox" id="ev-form"><i></i></span></label>
       <div class="form-group"><label class="form-label">Приоритет</label><div class="slider-val" id="ev-prio-val">5</div><input class="slider" id="ev-prio" type="range" min="1" max="10" value="5" oninput="document.getElementById('ev-prio-val').textContent=this.value"></div>
       <button class="btn btn-light btn-full" onclick="createEvent()">Создать событие</button>
     </div>
@@ -700,7 +748,7 @@ img { display:block; max-width:100%; }
         <div class="form-group"><label class="form-label" for="se-date">Дата</label><input class="input" id="se-date" type="date"></div>
         <div class="form-group"><label class="form-label" for="se-duration">Длительность</label><input class="input" id="se-duration" placeholder="45:12"></div>
       </div>
-      <div class="form-group"><label class="form-label" for="se-url">Ссылка на запись</label><input class="input" id="se-url" placeholder="YouTube или пост в Telegram"></div>
+      <div class="form-group"><label class="form-label" for="se-url">Ссылка на запись</label><input class="input" id="se-url" placeholder="https://youtu.be/…" inputmode="url"><div class="hint">Видео с YouTube откроется прямо в приложении, обложка подтянется сама. Другие ссылки откроются в браузере.</div></div>
       <div class="form-group"><label class="form-label" for="se-image">Ссылка на обложку</label><input class="input" id="se-image" placeholder="https://…"></div>
       <button class="btn btn-light btn-full" onclick="createSermon()">Добавить проповедь</button>
     </div>
@@ -770,17 +818,21 @@ if (tg) {
     tg.setHeaderColor('#0B0B0C');
     tg.setBackgroundColor('#0B0B0C');
     if (tg.setBottomBarColor) tg.setBottomBarColor('#0B0B0C');
+    if (tg.disableVerticalSwipes) tg.disableVerticalSwipes();
   } catch (e) {}
 }
 const haptic = (t = 'light') => { try { tg && tg.HapticFeedback && tg.HapticFeedback.impactOccurred(t); } catch (e) {} };
 
 // === CONFIG ===
 const CONFIG = {
-  ownerTgId:147451579,      // Telegram ID владельца (например 123456789) — гарантированно получает роль «Владелец»
+  ownerTgId: null,      // Telegram ID владельца (например 123456789) — гарантированно получает роль «Владелец»
   appName: 'Meta Church',
   donateUrl: '',        // ссылка на страницу пожертвований
   donateText: 'Реквизиты для пожертвований скоро появятся здесь. Пока их можно уточнить у служителей церкви.',
-  channelUrl: 'https://t.me/metachurchnews',       // канал церкви в Telegram — открывается, если у проповеди нет своей ссылки
+  channelUrl: '',       // канал церкви в Telegram — открывается, если у проповеди нет своей ссылки
+  sheetsUrl: '',        // ссылка на веб-приложение Google Apps Script (…/exec) — сюда уходят анкеты
+  churches: ['Meta Church'],  // список церквей в анкете; последним пунктом всегда будет «Другая — вписать»
+  maxPeople: 10,        // сколько человек можно записать одной анкетой
   version: '2.0'
 };
 const STORE_KEY = 'metachurch_v1';
@@ -1088,10 +1140,10 @@ function renderHome() {
   const s = sermons[0];
   const hero = document.getElementById('home-hero');
   if (s) {
-    const src = img(s.image);
+    const src = sermonImg(s, true);
     hero.innerHTML = `
       <div class="sermon-hero" onclick="openSermon('${s.id}')">
-        <div class="sermon-hero-img grain">${src ? `<img src="${src}" alt="">` : genThumb(s, true)}</div>
+        <div class="sermon-hero-img grain">${src ? `<img src="${src}" alt="">` : genThumb(s, true)}${playBadge(s)}</div>
         <div class="sermon-hero-body">
           <div class="eyebrow"><span>${esc(s.series || 'Проповедь')}</span><span>${longDate(s.date).toUpperCase()}</span></div>
           <div class="sermon-hero-title">${esc(s.title)}</div>
@@ -1153,18 +1205,18 @@ function renderMedia() {
     return;
   }
   const [first, ...rest] = list;
-  const src1 = img(first.image);
+  const src1 = sermonImg(first, true);
   el.innerHTML = `
     <div class="feature" onclick="openSermon('${first.id}')">
-      <div class="feature-img grain">${src1 ? `<img src="${src1}" alt="">` : genThumb(first, true)}${first.duration ? `<span class="dur">${esc(first.duration)}</span>` : ''}</div>
+      <div class="feature-img grain">${src1 ? `<img src="${src1}" alt="">` : genThumb(first, true)}${playBadge(first)}${first.duration ? `<span class="dur">${esc(first.duration)}</span>` : ''}</div>
       <div class="feature-title">${esc(first.title)}</div>
       <div class="feature-meta">${esc(first.speaker)} · ${longDate(first.date, true)}</div>
     </div>
     ${rest.map(s => {
-      const src = img(s.image);
+      const src = sermonImg(s);
       return `
       <div class="s-row" onclick="openSermon('${s.id}')">
-        <div class="s-thumb">${src ? `<img src="${src}" alt="" loading="lazy">` : genThumb(s)}${s.duration ? `<span class="dur">${esc(s.duration)}</span>` : ''}</div>
+        <div class="s-thumb">${src ? `<img src="${src}" alt="" loading="lazy">` : genThumb(s)}${playBadge(s)}${s.duration ? `<span class="dur">${esc(s.duration)}</span>` : ''}</div>
         <div class="s-info">
           <div class="s-title">${esc(s.title)}</div>
           <div class="s-meta">${esc(s.speaker)}<br>${longDate(s.date, true)}</div>
@@ -1172,10 +1224,43 @@ function renderMedia() {
       </div>`;
     }).join('')}`;
 }
+// === YOUTUBE ===
+function ytId(url) {
+  if (!url) return null;
+  const m = String(url).match(/(?:youtu\.be\/|youtube(?:-nocookie)?\.com\/(?:watch\?(?:.*&)?v=|embed\/|shorts\/|live\/|v\/))([\w-]{11})/);
+  return m ? m[1] : null;
+}
+function sermonImg(s, large) {
+  const own = img(s.image);
+  if (own) return own;
+  const id = ytId(s.url);
+  return id ? `https://i.ytimg.com/vi/${id}/${large ? 'hqdefault' : 'mqdefault'}.jpg` : '';
+}
+function playBadge(s) { return ytId(s.url) ? `<span class="play-badge">${ICON.play}</span>` : ''; }
+function showPlayer(s, id) {
+  const origin = /^https?:/.test(location.origin) ? '&origin=' + encodeURIComponent(location.origin) : '';
+  const src = `https://www.youtube.com/embed/${id}?autoplay=1&playsinline=1&rel=0&modestbranding=1${origin}`;
+  const watch = `https://www.youtube.com/watch?v=${id}`;
+  openModal(`
+    <div class="player"><div class="player-frame">
+      <iframe src="${src}" title="${esc(s.title)}" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>
+    </div></div>
+    <div class="post-tag" style="color:var(--ember)">${esc(s.series || 'Проповедь')}</div>
+    <h3 style="font-size:24px">${esc(s.title)}</h3>
+    <div class="meta-list">
+      <div>${ICON.users}${esc(s.speaker)}</div>
+      <div>${ICON.cal}${longDate(s.date, true)}</div>
+      ${s.duration ? `<div>${ICON.clock}${esc(s.duration)}</div>` : ''}
+    </div>
+    <p class="hint">Если видео не запускается, откройте его в YouTube — кнопка внизу.</p>
+  `, { full: true, cls: 'video', foot: `<button class="btn btn-dark btn-full" onclick="openUrl('${watch}')"><span class="yt-mark"><svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="4" fill="#FF0033"/><path d="M10 9l5 3-5 3z" fill="#fff"/></svg>Открыть в YouTube</span></button>` });
+}
 function openSermon(id) {
   const s = state.sermons.find(x => x.id === id);
   if (!s) return;
   haptic();
+  const yt = ytId(s.url);
+  if (yt) { showPlayer(s, yt); return; }
   if (openUrl(s.url || CONFIG.channelUrl)) return;
   toast('Запись этой проповеди скоро появится');
 }
@@ -1307,6 +1392,7 @@ function prioItem(kind, x, meta) {
     <div class="prio-badge ${cls}">${x.priority}</div>
     <div class="prio-info"><div class="prio-title">${esc(x.title)}</div><div class="prio-meta">${meta}</div></div>
     <div class="prio-ctrls">
+      ${kind === 'event' ? formToggleBtn(x) : ''}
       <button class="prio-btn" onclick="changePriority('${kind}','${x.id}',1)" aria-label="Выше">${ICON.up}</button>
       <button class="prio-btn" onclick="changePriority('${kind}','${x.id}',-1)" aria-label="Ниже">${ICON.down}</button>
       <button class="prio-btn del" onclick="deleteContent('${kind}','${x.id}')" aria-label="Удалить">${ICON.x}</button>
@@ -1314,7 +1400,15 @@ function prioItem(kind, x, meta) {
 }
 function simpleItem(kind, id, title, meta) {
   return `<div class="prio-item"><div class="prio-info"><div class="prio-title">${esc(title)}</div><div class="prio-meta">${meta}</div></div>
-    <div class="prio-ctrls"><button class="prio-btn del" onclick="deleteContent('${kind}','${id}')" aria-label="Удалить">${ICON.x}</button></div></div>`;
+    <div class="prio-ctrls">${kind === 'sermon' ? `<button class="prio-btn" onclick="editSermon('${id}')" aria-label="Изменить"><svg viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg></button>` : ''}<button class="prio-btn del" onclick="deleteContent('${kind}','${id}')" aria-label="Удалить">${ICON.x}</button></div></div>`;
+}
+function formToggleBtn(e) {
+  return `<button class="prio-btn ${e.needsForm ? 'on' : ''}" onclick="toggleEventForm('${e.id}')" aria-label="Анкета" title="Регистрация с анкетой"><svg viewBox="0 0 24 24"><rect x="5" y="3.5" width="14" height="18" rx="2.5"/><path d="M9 9h6M9 13h6M9 17h3"/></svg></button>`;
+}
+function toggleEventForm(id) {
+  const e = state.events.find(x => x.id === id); if (!e) return;
+  e.needsForm = !e.needsForm; DB.save(); renderContentAdmin();
+  toast(e.needsForm ? (CONFIG.sheetsUrl ? 'Анкета включена' : 'Анкета включена. Подключите Google Таблицу') : 'Анкета выключена');
 }
 function renderContentAdmin() {
   const none = '<p class="hint">Пусто</p>';
@@ -1323,7 +1417,7 @@ function renderContentAdmin() {
   const po = [...state.posts].sort((a, b) => b.priority - a.priority);
   document.getElementById('prio-posts').innerHTML = po.length ? po.map(p => prioItem('post', p, topic(p.topic).name + ' · ' + timeAgo(p.createdAt))).join('') : none;
   const se = [...state.sermons].sort((a, b) => parseDate(b.date) - parseDate(a.date));
-  document.getElementById('list-sermons').innerHTML = se.length ? se.map(s => simpleItem('sermon', s.id, s.title, esc(s.speaker) + ' · ' + longDate(s.date, true))).join('') : none;
+  document.getElementById('list-sermons').innerHTML = se.length ? se.map(s => simpleItem('sermon', s.id, s.title, esc(s.speaker) + ' · ' + longDate(s.date, true) + (ytId(s.url) ? ' · YouTube' : s.url ? ' · ссылка' : ' · без видео'))).join('') : none;
   document.getElementById('list-groups').innerHTML = state.groups.length ? state.groups.map(g => simpleItem('group', g.id, g.name, 'участников: ' + state.memberships.filter(m => m.groupId === g.id).length)).join('') : none;
 }
 function renderTeam() {
@@ -1377,27 +1471,187 @@ function rerender() {
 }
 
 // === MODALS ===
+function peopleWord(n) {
+  const a = n % 10, b = n % 100;
+  if (a === 1 && b !== 11) return n + ' участник';
+  if (a >= 2 && a <= 4 && (b < 12 || b > 14)) return n + ' участника';
+  return n + ' участников';
+}
+function myPeopleCount(eid) {
+  return state.registrations.filter(r => r.eventId === eid && r.tgId === me()).reduce((sum, r) => sum + (r.people || 1), 0);
+}
+function eventCover(e) {
+  const src = img(e.image);
+  return `<div class="modal-cover grain">${src ? `<img src="${src}" alt="">` : posterBg(e)}</div>`;
+}
 function showEventDetail(id) {
   const e = state.events.find(x => x.id === id); if (!e) return;
   const going = isGoing(id), past = isPast(e);
   const n = state.registrations.filter(r => r.eventId === id).length;
-  const src = img(e.image);
   const d = parseDate(e.date);
+  let foot;
+  if (past) foot = '<button class="btn btn-dark btn-full" onclick="closeModal()">Событие прошло</button>';
+  else if (e.needsForm) foot = going
+    ? `<div class="reg-done">${ICON.check}Вы зарегистрировали: ${peopleWord(myPeopleCount(id))}</div><button class="btn btn-dark btn-full" onclick="showRegForm('${e.id}')">Зарегистрировать ещё людей</button>`
+    : `<button class="btn btn-light btn-full" onclick="showRegForm('${e.id}')">Зарегистрироваться ${ICON.arrow}</button>`;
+  else foot = going
+    ? `<div class="reg-done">${ICON.check}Вы идёте</div><button class="btn btn-danger btn-full" onclick="unregisterEvent('${e.id}');closeModal()">Не смогу прийти</button>`
+    : `<button class="btn btn-light btn-full" onclick="registerEvent('${e.id}');closeModal()">Я приду</button>`;
   openModal(`
-    ${src ? `<div class="modal-cover grain"><img src="${src}" alt=""></div>` : '<div class="modal-handle"></div>'}
-    <div class="post-tag" style="color:${cat(e.category).color}">${cat(e.category).name}</div>
-    <h3>${esc(e.title)}</h3>
+    ${eventCover(e)}
+    <div class="post-tag" style="color:${cat(e.category).color}">${cat(e.category).name}${e.needsForm ? '<span class="form-badge">· нужна регистрация</span>' : ''}</div>
+    <h3 style="font-size:26px">${esc(e.title)}</h3>
     <div class="meta-list">
       <div>${ICON.cal}${WD_FULL[d.getDay()]}, ${longDate(e.date)}</div>
       <div>${ICON.clock}${esc(e.time)}</div>
       <div>${ICON.pin}${esc(e.location)}</div>
     </div>
+    ${e.lead ? `<div class="desc" style="color:var(--text)">${esc(e.lead)}</div>` : ''}
     ${e.description ? `<div class="desc">${esc(e.description)}</div>` : ''}
-    <div class="cap">${n ? 'Идут: ' + n + ' из ' + e.capacity : 'Мест: ' + e.capacity}</div>
-    ${past ? '<button class="btn btn-dark btn-full" onclick="closeModal()">Событие прошло</button>'
-      : going ? `<div class="stack"><button class="btn btn-dark btn-full" style="color:var(--lime)" disabled>${ICON.check}Вы идёте</button><button class="btn btn-danger btn-full" onclick="unregisterEvent('${e.id}');closeModal()">Не смогу прийти</button></div>`
-      : `<button class="btn btn-light btn-full" onclick="registerEvent('${e.id}');closeModal()">Я приду</button>`}
-  `);
+    ${e.needsForm ? '' : `<div class="cap">${n ? 'Идут: ' + n + ' из ' + e.capacity : 'Мест: ' + e.capacity}</div>`}
+  `, { full: true, foot });
+}
+
+// === АНКЕТА РЕГИСТРАЦИИ ===
+let regDraft = null;
+function blankPerson(pre) {
+  pre = pre || {};
+  return { fullName: pre.fullName || '', age: pre.age || '', city: pre.city || '', attends: pre.attends === true || pre.attends === false ? pre.attends : null, church: pre.church || '', churchOther: pre.churchOther || '' };
+}
+function showRegForm(id) {
+  const e = state.events.find(x => x.id === id); if (!e) return;
+  const self = !isGoing(id);   // первый участник — сам человек, если он ещё не записан
+  regDraft = { eventId: id, id: null, self, people: [blankPerson(self ? state.profileForm : null)], showErrors: false };
+  renderRegForm(false);
+  if (tg && tg.enableClosingConfirmation) try { tg.enableClosingConfirmation(); } catch (x) {}
+}
+function regSet(i, key, value) { if (regDraft && regDraft.people[i]) regDraft.people[i][key] = value; }
+function regChoose(i, key, value) { regSet(i, key, value); renderRegForm(true); }
+function regAdd() {
+  if (regDraft.people.length >= CONFIG.maxPeople) { toast('Одной анкетой можно записать до ' + CONFIG.maxPeople + ' человек'); return; }
+  regDraft.people.push(blankPerson());
+  renderRegForm(true);
+  setTimeout(() => {
+    const blocks = document.querySelectorAll('.person-form');
+    const last = blocks[blocks.length - 1];
+    if (last) { last.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+  }, 30);
+}
+function regRemove(i) { regDraft.people.splice(i, 1); renderRegForm(true); }
+function personErrors(p) {
+  const e = {};
+  if (p.fullName.trim().split(/\s+/).filter(Boolean).length < 2) e.fullName = 'Укажите фамилию и имя';
+  const age = Number(p.age);
+  if (!/^\d{1,3}$/.test(String(p.age).trim()) || age < 1 || age > 120) e.age = 'Укажите возраст';
+  if (!p.city.trim()) e.city = 'Укажите город';
+  if (p.attends === null) e.attends = 'Ответьте, посещает ли церковь';
+  else if (p.attends && !p.church) e.church = 'Выберите церковь';
+  else if (p.attends && p.church === '__other' && !p.churchOther.trim()) e.churchOther = 'Впишите название церкви';
+  return e;
+}
+function renderRegForm(keepScroll) {
+  const e = state.events.find(x => x.id === regDraft.eventId); if (!e) return;
+  const d = parseDate(e.date);
+  const show = regDraft.showErrors;
+  const blocks = regDraft.people.map((p, i) => {
+    const er = show ? personErrors(p) : {};
+    const you = i === 0 && regDraft.self;
+    const churchOpts = CONFIG.churches.map(c => `<option value="${esc(c)}" ${p.church === c ? 'selected' : ''}>${esc(c)}</option>`).join('');
+    return `
+    <div class="person-form">
+      <div class="pf-head"><span>${you ? 'Вы' : 'Участник ' + (i + 1)}</span>${i > 0 ? `<button class="link-danger" onclick="regRemove(${i})">Убрать</button>` : ''}</div>
+      <div class="form-group"><label class="form-label" for="rf-n${i}">ФИО</label>
+        <input class="input ${er.fullName ? 'err' : ''}" id="rf-n${i}" value="${esc(p.fullName)}" placeholder="Фамилия Имя Отчество" autocomplete="${you ? 'name' : 'off'}" maxlength="120" oninput="regSet(${i},'fullName',this.value)"></div>
+      <div class="form-row">
+        <div class="form-group" style="flex:0 0 96px"><label class="form-label" for="rf-a${i}">Возраст</label>
+          <input class="input ${er.age ? 'err' : ''}" id="rf-a${i}" value="${esc(p.age)}" inputmode="numeric" maxlength="3" placeholder="25" oninput="this.value=this.value.replace(/\\D/g,'');regSet(${i},'age',this.value)"></div>
+        <div class="form-group"><label class="form-label" for="rf-c${i}">Город проживания</label>
+          <input class="input ${er.city ? 'err' : ''}" id="rf-c${i}" value="${esc(p.city)}" placeholder="Ташкент" maxlength="80" autocomplete="${you ? 'address-level2' : 'off'}" oninput="regSet(${i},'city',this.value)"></div>
+      </div>
+      <div class="form-group"><label class="form-label">${you ? 'Посещаете' : 'Посещает'} ли церковь?</label>
+        <div class="choice ${er.attends ? 'err' : ''}">
+          <button type="button" class="${p.attends === true ? 'on' : ''}" onclick="regChoose(${i},'attends',true)">Да</button>
+          <button type="button" class="${p.attends === false ? 'on' : ''}" onclick="regChoose(${i},'attends',false)">Нет</button>
+        </div></div>
+      ${p.attends ? `
+      <div class="form-group"><label class="form-label" for="rf-ch${i}">Какую?</label>
+        <select class="select ${er.church ? 'err' : ''}" id="rf-ch${i}" onchange="regChoose(${i},'church',this.value)">
+          <option value="" ${!p.church ? 'selected' : ''} disabled>Выберите из списка</option>
+          ${churchOpts}
+          <option value="__other" ${p.church === '__other' ? 'selected' : ''}>Другая — вписать название</option>
+        </select></div>` : ''}
+      ${p.attends && p.church === '__other' ? `
+      <div class="form-group"><label class="form-label" for="rf-o${i}">Название церкви</label>
+        <input class="input ${er.churchOther ? 'err' : ''}" id="rf-o${i}" value="${esc(p.churchOther)}" maxlength="120" oninput="regSet(${i},'churchOther',this.value)"></div>` : ''}
+    </div>`;
+  }).join('');
+  const count = regDraft.people.length;
+  openModal(`
+    <div style="height:30px"></div>
+    <h3 style="padding-right:44px">Регистрация</h3>
+    <div class="reg-event">«${esc(e.title)}» · ${WD_FULL[d.getDay()].toLowerCase()}, ${longDate(e.date)}, ${esc(e.time)}</div>
+    ${blocks}
+    ${count < CONFIG.maxPeople ? `<button class="add-person" onclick="regAdd()"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Добавить ещё человека</button>` : ''}
+    <p class="hint" style="text-align:center;margin-top:10px">Можно записать членов семьи и друзей — у каждого своя анкета.</p>
+  `, { full: true, keepScroll, foot: `<button class="btn btn-light btn-full" id="reg-submit" onclick="submitReg()">Отправить · ${peopleWord(count)}</button>` });
+}
+async function submitReg() {
+  const e = state.events.find(x => x.id === regDraft.eventId); if (!e) return;
+  const people = regDraft.people;
+  const badIdx = people.findIndex(p => Object.keys(personErrors(p)).length);
+  if (badIdx >= 0) {
+    regDraft.showErrors = true;
+    renderRegForm(true);
+    const first = Object.values(personErrors(people[badIdx]))[0];
+    toast((people.length > 1 ? (badIdx === 0 && regDraft.self ? 'Вы: ' : 'Участник ' + (badIdx + 1) + ': ') : '') + first);
+    const blk = document.querySelectorAll('.person-form')[badIdx];
+    if (blk) blk.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    return;
+  }
+  if (!CONFIG.sheetsUrl) {
+    toast(isAdmin() ? 'Не подключена Google Таблица: заполните sheetsUrl в CONFIG' : 'Регистрация временно недоступна. Попробуйте позже');
+    return;
+  }
+  if (!regDraft.id) regDraft.id = genId();   // один ID на заявку — повторная отправка не создаст дубли
+  const tu = tgUser();
+  const payload = {
+    id: regDraft.id,
+    event: { id: e.id, title: e.title, date: e.date, time: e.time, location: e.location },
+    submitter: { name: state.user.name, username: (tu && tu.username) || state.user.username || '', tgId: tu ? tu.id : '' },
+    people: people.map(p => ({
+      fullName: p.fullName.trim().replace(/\s+/g, ' '),
+      age: Number(p.age),
+      city: p.city.trim(),
+      attends: p.attends,
+      church: p.attends ? (p.church === '__other' ? p.churchOther.trim() : p.church) : ''
+    }))
+  };
+  const btn = document.getElementById('reg-submit');
+  btn.disabled = true; btn.style.opacity = '.6'; btn.textContent = 'Отправляем…';
+  try {
+    const res = await fetch(CONFIG.sheetsUrl, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(payload) });
+    const j = await res.json().catch(() => null);
+    if (!res.ok || (j && j.ok === false)) throw new Error((j && j.error) || ('HTTP ' + res.status));
+  } catch (err) {
+    console.error('Ошибка отправки анкеты:', err);
+    btn.disabled = false; btn.style.opacity = ''; btn.textContent = 'Отправить ещё раз';
+    toast('Не получилось отправить. Проверьте интернет и попробуйте ещё раз');
+    return;
+  }
+  if (regDraft.self) state.profileForm = { ...people[0] };
+  state.registrations.push({ eventId: e.id, tgId: me(), name: state.user.name, registeredAt: Date.now(), people: people.length, requestId: regDraft.id });
+  DB.save(); haptic('medium');
+  const total = myPeopleCount(e.id);
+  regDraft = null;
+  if (tg && tg.disableClosingConfirmation) try { tg.disableClosingConfirmation(); } catch (x) {}
+  openModal(`
+    <div class="success">
+      <div class="success-ic">${ICON.check}</div>
+      <h3>Вы зарегистрированы</h3>
+      <p>Записали ${peopleWord(people.length)} на «${esc(e.title)}». ${total > people.length ? 'Всего от вас: ' + peopleWord(total) + '.' : ''} Ждём вас ${WD_ACC[parseDate(e.date).getDay()]}, ${longDate(e.date)} в ${esc(e.time)}.</p>
+    </div>
+  `, { full: true, foot: '<button class="btn btn-light btn-full" onclick="closeModal()">Готово</button>' });
+  rerender();
 }
 function showNewsDetail(id) {
   const p = state.posts.find(x => x.id === id); if (!p) return;
@@ -1528,9 +1782,12 @@ function createEvent() {
     id: genId(), title, lead: val('ev-lead'), description: val('ev-desc'),
     date, time: val('ev-time') || '19:00', location: val('ev-location') || 'Главный зал',
     category: val('ev-category'), capacity: parseInt(val('ev-capacity')) || 100,
-    image: val('ev-image'), priority: parseInt(val('ev-prio')), createdBy: me()
+    image: val('ev-image'), priority: parseInt(val('ev-prio')), createdBy: me(),
+    needsForm: document.getElementById('ev-form').checked
   });
+  if (document.getElementById('ev-form').checked && !CONFIG.sheetsUrl) toast('Событие создано. Подключите Google Таблицу, чтобы принимать анкеты');
   DB.save(); clear('ev-title', 'ev-lead', 'ev-desc', 'ev-location', 'ev-image');
+  document.getElementById('ev-form').checked = false;
   toast('Событие создано'); renderContentAdmin();
 }
 function createPost() {
@@ -1544,6 +1801,34 @@ function createSermon() {
   state.sermons.push({ id: genId(), title, speaker: val('se-speaker') || 'Пастор Артем Магай', series: val('se-series') || 'Воскресное слово', date: val('se-date') || isoDate(new Date()), duration: val('se-duration'), url: val('se-url'), image: val('se-image') });
   DB.save(); clear('se-title', 'se-duration', 'se-url', 'se-image');
   toast('Проповедь добавлена'); renderContentAdmin();
+}
+function editSermon(id) {
+  const s = state.sermons.find(x => x.id === id); if (!s) return;
+  openModal(`
+    <div class="modal-handle"></div>
+    <h3>Изменить проповедь</h3>
+    <div class="form-group"><label class="form-label" for="es-title">Название</label><input class="input" id="es-title" value="${esc(s.title)}"></div>
+    <div class="form-group"><label class="form-label" for="es-url">Ссылка на YouTube</label><input class="input" id="es-url" value="${esc(s.url)}" placeholder="https://youtu.be/…" inputmode="url"></div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label" for="es-duration">Длительность</label><input class="input" id="es-duration" value="${esc(s.duration)}" placeholder="45:12"></div>
+      <div class="form-group"><label class="form-label" for="es-date">Дата</label><input class="input" id="es-date" type="date" value="${esc(s.date)}"></div>
+    </div>
+    <div class="form-group"><label class="form-label" for="es-image">Своя обложка</label><input class="input" id="es-image" value="${esc(s.image && s.image.startsWith('img:') ? '' : s.image)}" placeholder="Необязательно — возьмём из YouTube"></div>
+    <button class="btn btn-light btn-full" onclick="saveSermon('${s.id}')">Сохранить</button>
+  `);
+}
+function saveSermon(id) {
+  const s = state.sermons.find(x => x.id === id); if (!s) return;
+  const url = val('es-url');
+  if (url && !/^https?:\/\//.test(url)) { toast('Ссылка должна начинаться с https://'); return; }
+  s.title = val('es-title') || s.title;
+  s.url = url;
+  s.duration = val('es-duration');
+  s.date = val('es-date') || s.date;
+  const im = val('es-image');
+  if (im) s.image = im; else if (!(s.image || '').startsWith('img:') || ytId(url)) s.image = '';
+  DB.save(); closeModal(); renderContentAdmin();
+  toast(ytId(url) ? 'Сохранено — видео будет открываться в приложении' : 'Сохранено');
 }
 function createGroup() {
   const name = val('gr-name'); if (!name) { toast('Введите название'); return; }
@@ -1574,15 +1859,24 @@ function toggleRole(tgId) {
 }
 
 // === MODAL ===
-function openModal(html) {
-  document.getElementById('modal-content').innerHTML = html;
+const CLOSE_BTN = '<button class="modal-x" onclick="closeModal()" aria-label="Закрыть"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>';
+function openModal(html, opts = {}) {
+  const box = document.getElementById('modal-content');
+  const prev = box.querySelector('.modal-scroll');
+  const top = opts.keepScroll && prev ? prev.scrollTop : 0;
+  box.className = 'modal' + (opts.full ? ' full' : '') + (opts.cls ? ' ' + opts.cls : '');
+  box.innerHTML = CLOSE_BTN + `<div class="modal-scroll">${html}</div>` + (opts.foot ? `<div class="modal-foot">${opts.foot}</div>` : '');
+  box.querySelector('.modal-scroll').scrollTop = top;
   document.getElementById('modal-overlay').classList.add('show');
-  document.getElementById('modal-content').scrollTop = 0;
   syncBackButton();
 }
 function closeModal(e) {
   if (e && e.target.id !== 'modal-overlay') return;
+  if (regDraft && regDraft.people.some(p => p.fullName || p.age || p.city) && !confirm('Закрыть анкету? Введённые данные не сохранятся.')) return;
+  regDraft = null;
+  if (tg && tg.disableClosingConfirmation) try { tg.disableClosingConfirmation(); } catch (x) {}
   document.getElementById('modal-overlay').classList.remove('show');
+  document.getElementById('modal-content').innerHTML = '';   // останавливает видео
   syncBackButton();
 }
 
