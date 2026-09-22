@@ -805,6 +805,19 @@ body.touring .toast { z-index: 900; }
 .bb-tabs button { display: flex; align-items: center; justify-content: center; gap: 6px; }
 .bb-tabs button svg { width: 16px; height: 16px; stroke: currentColor; stroke-width: 2; fill: none; }
 
+/* Цветные кнопки разделов */
+.chip.tint { background: var(--surface-2); background: color-mix(in srgb, var(--c) 13%, var(--surface-2)); border-color: color-mix(in srgb, var(--c) 42%, transparent); color: var(--text); }
+.chip.tint svg { stroke: var(--c); }
+.chip.tint.dot::before { content: ''; display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--c); margin-right: 8px; vertical-align: 1px; }
+.chip.tint.active { background: var(--c); border-color: var(--c); color: #111; box-shadow: 0 8px 22px color-mix(in srgb, var(--c) 38%, transparent); }
+.chip.tint.active svg { stroke: #111; }
+.chip.tint.active.dot::before { background: #111; }
+.seg button.tint, .bb-tabs button.tint { color: var(--text); }
+.bb-tabs button.tint svg { stroke: var(--c); }
+.seg button.tint:not(.active) { background: transparent; }
+.seg button.tint.active, .bb-tabs button.tint.active { background: var(--c); color: #111; box-shadow: 0 6px 18px color-mix(in srgb, var(--c) 38%, transparent); }
+.bb-tabs button.tint.active svg { stroke: #111; }
+
 /* === Онбординг === */
 .splash .ob { display: none; }
 .splash.flow .splash-top, .splash.flow .splash-bottom { display: none; }
@@ -873,6 +886,15 @@ body.touring .toast { z-index: 900; }
 .ob-faces img { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 3px solid var(--bg); margin-right: -12px; filter: grayscale(.2); animation: obPop .4s both; }
 .ob-faces img:nth-child(2) { animation-delay: .1s; } .ob-faces img:nth-child(3) { animation-delay: .2s; }
 .ob-faces span { margin-left: 22px; font-size: 13px; color: var(--text-2); }
+.ob-sects { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.ob-sects span { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 12px 4px; border-radius: 16px; font-size: 12px; font-weight: 600; background: var(--surface-2); background: color-mix(in srgb, var(--c) 13%, var(--surface-2)); border: 1px solid color-mix(in srgb, var(--c) 42%, transparent); animation: obPop .4s both; }
+.ob-sects span:nth-child(2) { animation-delay: .1s; } .ob-sects span:nth-child(3) { animation-delay: .2s; }
+.ob-sects svg { width: 20px; height: 20px; stroke: var(--c); stroke-width: 1.8; fill: none; }
+.ob-sects span.on { background: var(--c); color: #111; box-shadow: 0 8px 22px color-mix(in srgb, var(--c) 40%, transparent); }
+.ob-sects span.on svg { stroke: #111; }
+.ob-bplans { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; animation: obInR .5s .3s both; }
+.ob-bplans i { font-style: normal; font-size: 12px; font-weight: 600; padding: 6px 11px; border-radius: 100px; color: var(--c); background: rgba(255,255,255,.04); background: color-mix(in srgb, var(--c) 14%, transparent); }
+.ob-bplans small { font-size: 12px; color: var(--text-3); margin-left: 2px; }
 .ob-prayer { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 16px; }
 .ob-prayer .prayer-text { font-size: 15px; margin-bottom: 14px; }
 .ob-amen.pop { animation: obPop .35s cubic-bezier(.2,.9,.3,1.6); }
@@ -1035,13 +1057,13 @@ body.touring .toast { z-index: 900; }
   <div class="search-box" id="events-search"><input placeholder="Название события" oninput="eventQuery=this.value; renderEvents()"></div>
   <div class="chips" id="event-chips">
     <button class="chip active" data-filter="all">Все</button>
-    <button class="chip" data-filter="service">Служения</button>
-    <button class="chip" data-filter="youth">Молодёжь</button>
-    <button class="chip" data-filter="prayer">Молитва</button>
-    <button class="chip" data-filter="group">Группы</button>
-    <button class="chip" data-filter="seminar">Семинары</button>
-    <button class="chip" data-filter="training">Тренинги</button>
-    <button class="chip" data-filter="rest">Отдых</button>
+    <button class="chip tint dot" style="--c:var(--ember)" data-filter="service">Служения</button>
+    <button class="chip tint dot" style="--c:var(--sky)" data-filter="youth">Молодёжь</button>
+    <button class="chip tint dot" style="--c:var(--lime)" data-filter="prayer">Молитва</button>
+    <button class="chip tint dot" style="--c:#E6E6E3" data-filter="group">Группы</button>
+    <button class="chip tint dot" style="--c:var(--violet)" data-filter="seminar">Семинары</button>
+    <button class="chip tint dot" style="--c:var(--amber)" data-filter="training">Тренинги</button>
+    <button class="chip tint dot" style="--c:var(--mint)" data-filter="rest">Отдых</button>
   </div>
   <div id="events-list"></div>
 </section>
@@ -1053,9 +1075,9 @@ body.touring .toast { z-index: 900; }
     <button class="icon-btn" onclick="showPrayerForm()" aria-label="Попросить молитву"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button>
   </div>
   <div class="chips sect" id="com-chips">
-    <button class="chip active" data-com="groups"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6"/><path d="M16 4.6a3.5 3.5 0 010 6.8M18 14.3c2 .8 3.5 2.8 3.5 5.7"/></svg>Группы</button>
-    <button class="chip" data-com="bible"><svg viewBox="0 0 24 24"><path d="M2 5.5A1.5 1.5 0 013.5 4H9a3 3 0 013 3v13a2.5 2.5 0 00-2.5-2.5h-6A1.5 1.5 0 012 16z"/><path d="M22 5.5A1.5 1.5 0 0020.5 4H15a3 3 0 00-3 3v13a2.5 2.5 0 012.5-2.5h6A1.5 1.5 0 0022 16z"/></svg>Библия</button>
-    <button class="chip" data-com="prayer"><svg viewBox="0 0 24 24"><path d="M12 20.5s-8.5-5-8.5-11A4.5 4.5 0 0112 7a4.5 4.5 0 018.5 2.5c0 6-8.5 11-8.5 11z"/></svg>Молитва</button>
+    <button class="chip tint active" style="--c:var(--sky)" data-com="groups"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6"/><path d="M16 4.6a3.5 3.5 0 010 6.8M18 14.3c2 .8 3.5 2.8 3.5 5.7"/></svg>Группы</button>
+    <button class="chip tint" style="--c:var(--violet)" data-com="bible"><svg viewBox="0 0 24 24"><path d="M2 5.5A1.5 1.5 0 013.5 4H9a3 3 0 013 3v13a2.5 2.5 0 00-2.5-2.5h-6A1.5 1.5 0 012 16z"/><path d="M22 5.5A1.5 1.5 0 0020.5 4H15a3 3 0 00-3 3v13a2.5 2.5 0 012.5-2.5h6A1.5 1.5 0 0022 16z"/></svg>Библия</button>
+    <button class="chip tint" style="--c:var(--lime)" data-com="prayer"><svg viewBox="0 0 24 24"><path d="M12 20.5s-8.5-5-8.5-11A4.5 4.5 0 0112 7a4.5 4.5 0 018.5 2.5c0 6-8.5 11-8.5 11z"/></svg>Молитва</button>
   </div>
   <div id="com-groups"></div>
   <div id="com-bible" class="hidden"></div>
@@ -1127,9 +1149,9 @@ body.touring .toast { z-index: 900; }
   <div id="sync-line"></div>
   <div id="cloud-banner"></div>
   <div class="seg" id="admin-seg">
-    <button class="active" data-atab="content">Контент</button>
-    <button data-atab="create">Создание</button>
-    <button data-atab="team">Доступы</button>
+    <button class="tint active" style="--c:var(--sky)" data-atab="content">Контент</button>
+    <button class="tint" style="--c:var(--lime)" data-atab="create">Создание</button>
+    <button class="tint" style="--c:var(--ember)" data-atab="team">Доступы</button>
   </div>
 
   <div id="admin-create" class="pad hidden">
@@ -1650,7 +1672,7 @@ function renderMedia() {
   if (mediaFilter !== 'all' && !series.includes(mediaFilter)) mediaFilter = 'all';
   const chips = document.getElementById('media-chips');
   chips.innerHTML = ['all', ...series].map(v =>
-    `<button class="chip ${mediaFilter === v ? 'active' : ''}" onclick="mediaFilter='${esc(v).replace(/'/g, '')}'; renderMedia()">${v === 'all' ? 'Все' : esc(v)}</button>`
+    `<button class="chip ${v === 'all' ? '' : 'tint dot'} ${mediaFilter === v ? 'active' : ''}" style="--c:var(--ember)" onclick="mediaFilter='${esc(v).replace(/'/g, '')}'; renderMedia()">${v === 'all' ? 'Все' : esc(v)}</button>`
   ).join('');
 
   let list = [...state.sermons].sort((a, b) => parseDate(b.date) - parseDate(a.date));
@@ -2885,16 +2907,21 @@ function obSlide(step) {
         <p>Два перевода, планы чтения, выделение цветом, примечания и поиск. Приложение помнит, где вы остановились.</p></div>`;
     case 'community': return `
       <div class="ob-visual ob-v-com">
-        <div class="ob-faces">${['g3', 'g1', 'g2'].map(k => `<img src="${IMG[k]}" alt="">`).join('')}<span>+ малые группы</span></div>
+        <div class="ob-sects">
+          <span style="--c:var(--sky)"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6"/><path d="M16 4.6a3.5 3.5 0 010 6.8M18 14.3c2 .8 3.5 2.8 3.5 5.7"/></svg>Группы</span>
+          <span style="--c:var(--violet)" class="on"><svg viewBox="0 0 24 24"><path d="M2 5.5A1.5 1.5 0 013.5 4H9a3 3 0 013 3v13a2.5 2.5 0 00-2.5-2.5h-6A1.5 1.5 0 012 16z"/><path d="M22 5.5A1.5 1.5 0 0020.5 4H15a3 3 0 00-3 3v13a2.5 2.5 0 012.5-2.5h6A1.5 1.5 0 0022 16z"/></svg>Библия</span>
+          <span style="--c:var(--lime)"><svg viewBox="0 0 24 24"><path d="M12 20.5s-8.5-5-8.5-11A4.5 4.5 0 0112 7a4.5 4.5 0 018.5 2.5c0 6-8.5 11-8.5 11z"/></svg>Молитва</span>
+        </div>
+        <div class="ob-bplans">${[['Чтение', 'var(--violet)'], ['Планы', 'var(--mint)'], ['Мысли', 'var(--amber)']].map(([t, c]) => `<i style="--c:${c}">${t}</i>`).join('')}<small>в разделе «Библия»</small></div>
         <div class="ob-prayer">
           <div class="prayer-head"><span>Анна</span><span>2 ч назад</span></div>
           <div class="prayer-text">Помолитесь, пожалуйста, за маму — у неё операция в пятницу.</div>
           <button class="pray-btn ob-amen" onclick="obAmen(this)">${ICON.hands}<span>Помолиться · ${ob.amen}</span></button>
         </div>
-        <div class="ob-quote">«Сегодня Бог напомнил мне, что Он ведёт меня даже в трудные дни»<small>Размышление · анонимно</small></div>
+        <div class="ob-quote">«Сегодня Бог напомнил мне, что Он ведёт меня даже в трудные дни»<small>Размышление к Псалму 22 · анонимно</small></div>
       </div>
       <div class="ob-text"><small style="color:var(--sky)">Сообщество</small><h2>Вы не одни</h2>
-        <p>Найдите свою малую группу, поддержите других в молитве и делитесь тем, что Бог открыл вам в Слове.</p></div>`;
+        <p>Малые группы, Библия с планами чтения и размышлениями, молитвенные нужды. Поддерживайте друг друга и делитесь тем, что Бог открыл вам в Слове.</p></div>`;
     case 'about': return `
       <div class="ob-form">
         <small style="color:var(--lime)">Знакомство</small>
@@ -3323,7 +3350,7 @@ function bibleTabsHtml() {
     refl: '<svg viewBox="0 0 24 24"><path d="M4 5.5A1.5 1.5 0 015.5 4h13A1.5 1.5 0 0120 5.5v9a1.5 1.5 0 01-1.5 1.5H10l-4 4v-4H5.5A1.5 1.5 0 014 14.5z"/></svg>'
   };
   return `<div class="bb-tabs">${[['read', 'Чтение'], ['plans', 'Планы'], ['refl', 'Мысли']]
-    .map(([k, t]) => `<button class="${v === k ? 'active' : ''}" onclick="bibleView('${k}')">${ic[k]}${t}</button>`).join('')}</div>`;
+    .map(([k, t]) => `<button class="tint ${v === k ? 'active' : ''}" style="--c:${{ read: 'var(--violet)', plans: 'var(--mint)', refl: 'var(--amber)' }[k]}" onclick="bibleView('${k}')">${ic[k]}${t}</button>`).join('')}</div>`;
 }
 
 // --- Примечания переводчика ---
