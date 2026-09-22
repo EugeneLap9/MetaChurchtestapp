@@ -759,6 +759,37 @@ img.ld { opacity: 0; }
 .bs-item p { font-family: 'PT Serif', Georgia, serif; font-size: 15px; line-height: 1.55; color: #ECEAE4; }
 .bs-item mark { background: rgba(217,242,75,.25); color: inherit; border-radius: 3px; padding: 0 1px; }
 
+/* === Тур-подсказки === */
+#tour { position: fixed; inset: 0; z-index: 850; animation: fadeIn .25s ease; }
+#tour.out { opacity: 0; transition: opacity .25s ease; }
+.tour-hole { position: fixed; border-radius: 22px; box-shadow: 0 0 0 9999px rgba(0,0,0,.74); transition: left .4s cubic-bezier(.2,.8,.2,1), top .4s cubic-bezier(.2,.8,.2,1), width .4s cubic-bezier(.2,.8,.2,1), height .4s cubic-bezier(.2,.8,.2,1), border-radius .4s; pointer-events: none; }
+.tour-hole::after { content: ''; position: absolute; inset: -4px; border-radius: inherit; border: 2.5px solid var(--lime); animation: tourRing 1.4s ease-out infinite; }
+.tour-hole.none { left: 50% !important; top: 50% !important; width: 0 !important; height: 0 !important; }
+.tour-hole.none::after { display: none; }
+@keyframes tourRing { 0% { transform: scale(1); opacity: 1; } 100% { transform: scale(1.12); opacity: 0; } }
+.tour-arrow { position: fixed; width: 32px; height: 50px; fill: none; stroke: var(--lime); stroke-width: 4.5; stroke-linecap: round; stroke-linejoin: round; opacity: 0; filter: drop-shadow(0 4px 10px rgba(217,242,75,.45)); pointer-events: none; }
+.tour-arrow.show { opacity: 1; animation: tourBounce .9s ease-in-out infinite; }
+.tour-arrow.up { transform: rotate(180deg); }
+.tour-arrow.up.show { animation-name: tourBounceUp; }
+@keyframes tourBounce { 0%, 100% { transform: translateY(-4px); } 50% { transform: translateY(8px); } }
+@keyframes tourBounceUp { 0%, 100% { transform: rotate(180deg) translateY(-4px); } 50% { transform: rotate(180deg) translateY(8px); } }
+.tour-tip { position: fixed; background: var(--text); color: #111; border-radius: 22px; padding: 16px 16px 14px; box-shadow: 0 20px 50px rgba(0,0,0,.6); opacity: 0; transform: translateY(10px) scale(.96); transition: opacity .3s ease, transform .35s cubic-bezier(.2,.9,.3,1.3); }
+.tour-tip.show { opacity: 1; transform: none; }
+.tour-tip small { font-size: 11px; font-weight: 700; letter-spacing: .08em; color: rgba(0,0,0,.45); }
+.tour-tip b { display: block; font-family: var(--display); font-size: 19px; font-weight: 800; line-height: 1.1; margin: 4px 0 6px; letter-spacing: -.3px; }
+.tour-tip p { font-size: 14px; line-height: 1.45; color: rgba(0,0,0,.72); }
+.tour-btns { display: flex; justify-content: space-between; align-items: center; margin-top: 14px; }
+.tour-skip { font-size: 13px; color: rgba(0,0,0,.5); padding: 8px 2px; }
+.tour-next { display: inline-flex; align-items: center; gap: 8px; background: #111; color: var(--text); padding: 11px 18px; border-radius: 100px; font-size: 14px; font-weight: 600; }
+.tour-next svg { width: 17px; height: 17px; stroke: currentColor; stroke-width: 2; fill: none; }
+.tour-tip.center { left: 24px !important; right: 24px; top: 50%; width: auto !important; transform: translateY(-50%) scale(.96); text-align: center; }
+.tour-tip.center.show { transform: translateY(-50%); }
+.tour-tip.center .tour-btns { justify-content: center; gap: 16px; }
+.tour-hand { width: 70px; height: 70px; margin: 0 auto 10px; border-radius: 50%; background: #111; display: flex; align-items: center; justify-content: center; }
+.tour-hand svg { width: 36px; height: 36px; stroke: var(--lime); stroke-width: 1.8; fill: none; stroke-linecap: round; stroke-linejoin: round; animation: tourSwipe 1.8s ease-in-out infinite; }
+@keyframes tourSwipe { 0%, 100% { transform: translateX(-12px) rotate(-8deg); } 50% { transform: translateX(12px) rotate(8deg); } }
+body.touring .toast { z-index: 900; }
+
 /* === Кнопки разделов === */
 .chips { gap: 8px; }
 .chip { padding: 10px 18px; font-size: 14px; font-weight: 500; background: var(--surface-2); color: var(--text); border: 1px solid #303035; transition: background .2s, color .2s, transform .15s, box-shadow .2s; }
@@ -2365,6 +2396,7 @@ function showSettings() {
     <label class="toggle-row"><div><span>Прошедшие события</span><small>Показывать их в разделе «События»</small></div>
       <span class="switch"><input type="checkbox" ${state.settings.showPast ? 'checked' : ''} onchange="state.settings.showPast=this.checked; DB.save(); rerender()"><i></i></span></label>
     <div style="height:22px"></div>
+    <button class="btn btn-dark btn-full" style="margin-bottom:10px" onclick="closeModal();setTimeout(startTour,250)">Показать подсказки по приложению</button>
     <button class="btn btn-danger btn-full" onclick="resetData()">Сбросить данные на этом устройстве</button>
   `);
 }
@@ -2690,6 +2722,99 @@ if (tg && tg.BackButton) {
   });
 }
 
+// === ПОДСКАЗКИ ПО ПРИЛОЖЕНИЮ (тур со стрелками) ===
+const TOUR = [
+  { sel: '#home-hero .sermon-hero', title: 'Последняя проповедь', text: 'Нажмите, чтобы посмотреть воскресное слово прямо в приложении.' },
+  { sel: '#home-screen .quick', title: 'Быстрый доступ', text: 'Проповеди, события, группы и пожертвования — в одно касание.' },
+  { sel: '#home-events', title: 'Ближайшие события', text: 'Откройте событие, чтобы нажать «Я приду» или зарегистрироваться.' },
+  { sel: '#home-screen .header .icon-btn', title: 'Объявления', text: 'Новости церкви. Оранжевая точка — есть что-то новое.' },
+  { sel: '.tab[data-tab="events"]', title: 'Все события', text: 'Полная афиша с фильтрами: служения, молодёжь, семинары, отдых.' },
+  { sel: '.tab[data-tab="community"]', title: 'Сообщество', text: 'Малые группы, Библия с планами чтения и молитвенные нужды.' },
+  { sel: '.tab[data-tab="more"]', title: 'Профиль', text: 'Мои события, мои группы, пожертвования и настройки.' },
+  { gesture: true, title: 'Жесты', text: 'Листайте разделы свайпом влево и вправо. Потяните экран вниз — приложение обновится.' }
+];
+let tourI = -1, tourSteps = [];
+function startTour() {
+  if (document.getElementById('tour')) return;
+  switchTab('home');
+  tourSteps = TOUR.filter(s => s.gesture || document.querySelector(s.sel));
+  if (!tourSteps.length) return;
+  const el = document.createElement('div');
+  el.id = 'tour';
+  el.innerHTML = `<div class="tour-hole" id="tour-hole"></div>
+    <svg class="tour-arrow" id="tour-arrow" viewBox="0 0 40 56"><path d="M20 2v44M6 32l14 16 14-16"/></svg>
+    <div class="tour-tip" id="tour-tip"></div>`;
+  el.addEventListener('click', e => { if (!e.target.closest('button')) tourNext(); });   // кнопки внутри подсказки обрабатывают нажатие сами
+  document.body.appendChild(el);
+  document.body.classList.add('touring');
+  tourI = -1; tourNext();
+}
+function tourNext() {
+  tourI++;
+  if (tourI >= tourSteps.length) { endTour(); return; }
+  haptic('light');
+  const st = tourSteps[tourI];
+  const tip = document.getElementById('tour-tip'), hole = document.getElementById('tour-hole'), arrow = document.getElementById('tour-arrow');
+  tip.classList.remove('show'); arrow.classList.remove('show');
+  const last = tourI === tourSteps.length - 1;
+  const btns = `<div class="tour-btns"><button class="tour-skip" onclick="endTour()">${last ? '' : 'Пропустить'}</button>
+    <button class="tour-next" onclick="tourNext()">${last ? 'Понятно' : 'Далее'} ${ICON.arrow}</button></div>`;
+  if (st.gesture) {
+    hole.className = 'tour-hole none';
+    hole.removeAttribute('style');
+    tip.className = 'tour-tip center';
+    tip.innerHTML = `<div class="tour-hand"><svg viewBox="0 0 24 24"><path d="M9 11V5.5a1.5 1.5 0 013 0V10m0-1.5a1.5 1.5 0 013 0V11m0-1a1.5 1.5 0 013 0v4.5a6.5 6.5 0 01-6.5 6.5h-.8a6 6 0 01-4.6-2.2L4 15.5a1.6 1.6 0 012.4-2.1L9 16"/></svg></div>
+      <small>${tourI + 1} / ${tourSteps.length}</small><b>${st.title}</b><p>${st.text}</p>${btns}`;
+    requestAnimationFrame(() => tip.classList.add('show'));
+    return;
+  }
+  const target = document.querySelector(st.sel);
+  const screen = target.closest('.screen');
+  if (screen) {
+    const r0 = target.getBoundingClientRect();
+    const want = screen.scrollTop + r0.top - (innerHeight * 0.32);
+    screen.scrollTo({ top: Math.max(0, want), behavior: 'smooth' });
+  }
+  setTimeout(() => tourPlace(st, target, btns), screen ? 380 : 30);
+}
+function tourPlace(st, target, btns) {
+  const tip = document.getElementById('tour-tip'), hole = document.getElementById('tour-hole'), arrow = document.getElementById('tour-arrow');
+  if (!tip) return;
+  const r = target.getBoundingClientRect(), pad = 8;
+  const isTab = target.classList.contains('tab');
+  const radius = isTab || target.classList.contains('icon-btn') ? 22 : 22;
+  hole.className = 'tour-hole';
+  Object.assign(hole.style, { left: (r.left - pad) + 'px', top: (r.top - pad) + 'px', width: (r.width + pad * 2) + 'px', height: (r.height + pad * 2) + 'px', borderRadius: radius + 'px' });
+  const W = Math.min(330, innerWidth - 32);
+  const cx = r.left + r.width / 2;
+  const above = r.top + r.height / 2 > innerHeight * 0.52;
+  tip.className = 'tour-tip ' + (above ? 'above' : 'below');
+  tip.style.width = W + 'px';
+  tip.style.left = Math.max(16, Math.min(innerWidth - W - 16, cx - W / 2)) + 'px';
+  tip.innerHTML = `<small>${tourI + 1} / ${tourSteps.length}</small><b>${st.title}</b><p>${st.text}</p>${btns}`;
+  const gap = 64;
+  if (above) { tip.style.top = ''; tip.style.bottom = (innerHeight - (r.top - pad) + gap) + 'px'; }
+  else { tip.style.bottom = ''; tip.style.top = (r.bottom + pad + gap) + 'px'; }
+  arrow.style.left = (Math.max(24, Math.min(innerWidth - 24, cx)) - 16) + 'px';
+  arrow.style.top = above ? (r.top - pad - gap + 6) + 'px' : (r.bottom + pad + 6) + 'px';
+  arrow.classList.toggle('up', !above);
+  requestAnimationFrame(() => { tip.classList.add('show'); arrow.classList.add('show'); });
+}
+function endTour() {
+  const el = document.getElementById('tour'); if (!el) return;
+  el.classList.add('out'); document.body.classList.remove('touring');
+  setTimeout(() => el.remove(), 250);
+  state.tourDone = true; saveLocalOnly();
+  document.querySelectorAll('.screen').forEach(s => s.scrollTo({ top: 0, behavior: 'smooth' }));
+}
+window.addEventListener('resize', () => {
+  if (!document.getElementById('tour') || tourI < 0 || tourI >= tourSteps.length) return;
+  const st = tourSteps[tourI]; if (st.gesture) return;
+  const t = document.querySelector(st.sel); if (!t) return;
+  const btns = document.querySelector('#tour-tip .tour-btns');
+  tourPlace(st, t, btns ? btns.outerHTML : '');
+});
+
 // === ОНБОРДИНГ ===
 const OB_STEPS = ['events', 'bible', 'community', 'about', 'reading', 'done'];
 let ob = { i: 0, name: '', interests: [], tr: 'SYNOD', plan: true, amen: 12, hl: false };
@@ -2851,6 +2976,7 @@ function obFinish() {
   renderAll();
   switchTab('home');
   if (CLOUD) syncUserDoc();
+  if (!state.tourDone) setTimeout(startTour, 900);
 }
 // интересы — первыми в фильтрах событий
 function sortEventChips() {
@@ -3897,7 +4023,7 @@ const NO_SWIPE = '.chips, .hscroll, .drag-handle, input, textarea, select, .slid
 let g = null;
 document.addEventListener('touchstart', e => {
   if (e.touches.length !== 1 || document.body.classList.contains('sorting')) { g = null; return; }
-  if (!document.getElementById('onboard').classList.contains('hidden')) { g = null; return; }
+  if (!document.getElementById('onboard').classList.contains('hidden') || document.body.classList.contains('touring')) { g = null; return; }
   const t = e.touches[0], target = e.target;
   const overlay = document.getElementById('modal-overlay');
   const modalOpen = overlay.classList.contains('show');
