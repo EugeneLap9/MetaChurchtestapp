@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-F6b4Q6KamFe/QvSH24gbfrKzeW8XEAzyItlzN84Lj+I=' 'sha256-D+J6J6nzY7V67opr6TkOj0GWgCZx+l+aOhLwHGDvvus=' https://telegram.org https://www.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com data:; img-src 'self' data: blob: https:; media-src 'self' blob: https:; connect-src 'self' https://*.googleapis.com https://*.cloudfunctions.net https://*.run.app https://bolls.life https://script.google.com https://script.googleusercontent.com; frame-src https://www.youtube.com https://www.youtube-nocookie.com https://metachurch-e800d.firebaseapp.com; script-src-attr 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-F6b4Q6KamFe/QvSH24gbfrKzeW8XEAzyItlzN84Lj+I=' 'sha256-MLdW9ijJDm8flnKaY/x5JT4w9nO3jP4fr6QT6kQGOCM=' https://telegram.org https://www.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com data:; img-src 'self' data: blob: https:; media-src 'self' blob: https:; connect-src 'self' https://*.googleapis.com https://*.cloudfunctions.net https://*.run.app https://bolls.life https://script.google.com https://script.googleusercontent.com; frame-src https://www.youtube.com https://www.youtube-nocookie.com https://metachurch-e800d.firebaseapp.com; script-src-attr 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
 <!-- НАСТРОЙКИ ПРИЛОЖЕНИЯ: меняйте только значения внутри content (формат JSON). Код ниже не трогайте —
      он защищён хешами в Content-Security-Policy; после правок кода запустите: node update-csp.mjs файл.html -->
 <meta name="mc-config" content='{
@@ -3883,7 +3883,9 @@ async function cloudInit() {
     const [A, U, F] = await Promise.all([import(base + 'firebase-app.js'), import(base + 'firebase-auth.js'), import(base + 'firebase-firestore.js')]);
     cloud.m = { ...U, ...F };
     const app = A.initializeApp(FIREBASE);
-    cloud.auth = U.getAuth(app);
+    // initializeAuth без popupRedirectResolver: вход через всплывающие окна Google не нужен,
+    // а он подгружает apis.google.com (с eval), что блокирует CSP
+    cloud.auth = U.initializeAuth(app, { persistence: [U.indexedDBLocalPersistence, U.browserLocalPersistence] });
     cloud.fs = F.initializeFirestore(app, { experimentalAutoDetectLongPolling: true });
     cloud.on = true;
     U.onAuthStateChanged(cloud.auth, user => { onAuth(user).catch(e => console.error('auth', e)); });
