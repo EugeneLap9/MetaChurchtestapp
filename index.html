@@ -759,6 +759,134 @@ img.ld { opacity: 0; }
 .bs-item p { font-family: 'PT Serif', Georgia, serif; font-size: 15px; line-height: 1.55; color: #ECEAE4; }
 .bs-item mark { background: rgba(217,242,75,.25); color: inherit; border-radius: 3px; padding: 0 1px; }
 
+/* === Кнопки разделов === */
+.chips { gap: 8px; }
+.chip { padding: 10px 18px; font-size: 14px; font-weight: 500; background: var(--surface-2); color: var(--text); border: 1px solid #303035; transition: background .2s, color .2s, transform .15s, box-shadow .2s; }
+.chip:active { transform: scale(.96); }
+.chip.active { background: var(--text); color: var(--bg); border-color: var(--text); font-weight: 700; box-shadow: 0 6px 18px rgba(255,255,255,.14); }
+.chips.sect { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; overflow: visible; }
+.chips.sect .chip { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; padding: 12px 6px 11px; border-radius: 18px; font-size: 13px; font-weight: 600; white-space: normal; text-align: center; line-height: 1.15; min-height: 70px; }
+.chips.sect .chip svg { width: 22px; height: 22px; stroke: currentColor; stroke-width: 1.8; fill: none; }
+.chips.sect .chip.active { box-shadow: 0 8px 22px rgba(255,255,255,.16); }
+.seg, .bb-tabs { background: var(--surface-2); border-color: #303035; padding: 5px; }
+.seg button, .bb-tabs button { padding: 11px 4px; font-size: 14px; font-weight: 600; color: rgba(244,244,242,.72); transition: background .2s, color .2s; }
+.seg button.active, .bb-tabs button.active { background: var(--text); color: var(--bg); font-weight: 700; box-shadow: 0 4px 14px rgba(255,255,255,.14); }
+.bb-tabs button { display: flex; align-items: center; justify-content: center; gap: 6px; }
+.bb-tabs button svg { width: 16px; height: 16px; stroke: currentColor; stroke-width: 2; fill: none; }
+
+/* === Онбординг === */
+.splash .ob { display: none; }
+.splash.flow .splash-top, .splash.flow .splash-bottom { display: none; }
+.splash.flow .ob { display: flex; }
+.splash.flow .splash-photo { opacity: .22; filter: blur(18px); transform: scale(1.1); transition: opacity .5s, filter .5s; }
+.splash.leaving { opacity: 0; transform: scale(1.03); transition: opacity .38s ease, transform .38s ease; }
+.ob { position: relative; z-index: 3; flex: 1; flex-direction: column; min-height: 0; padding: calc(var(--safe-top) + 14px) 0 calc(var(--safe-bottom) + 18px); }
+.ob-top { display: flex; align-items: center; gap: 14px; padding: 0 20px; }
+.ob-prog { flex: 1; display: flex; gap: 5px; }
+.ob-prog i { flex: 1; height: 3px; border-radius: 3px; background: rgba(255,255,255,.18); overflow: hidden; position: relative; }
+.ob-prog i.done { background: var(--text); }
+.ob-prog i.cur::after { content: ''; position: absolute; inset: 0; background: var(--text); animation: obFill .5s ease forwards; transform-origin: left; }
+@keyframes obFill { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+.ob-skip { font-size: 14px; color: var(--text-2); padding: 6px 2px; }
+.ob-stage { flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; padding: 18px 24px 10px; }
+.ob-stage.in-r > * { animation: obInR .45s cubic-bezier(.2,.8,.2,1) both; }
+.ob-stage.in-l > * { animation: obInL .45s cubic-bezier(.2,.8,.2,1) both; }
+.ob-stage > *:nth-child(2) { animation-delay: .07s; }
+@keyframes obInR { from { opacity: 0; transform: translateX(40px); } to { opacity: 1; transform: none; } }
+@keyframes obInL { from { opacity: 0; transform: translateX(-40px); } to { opacity: 1; transform: none; } }
+.ob-visual { flex: 1; min-height: 340px; position: relative; display: flex; align-items: center; justify-content: center; }
+.ob-text > small, .ob-form > small { display: block; font-size: 12px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; margin-bottom: 10px; }
+.ob-text h2, .ob-form h2, .ob-done h2 { font-family: var(--display); font-size: clamp(26px, 7.6vw, 32px); font-weight: 800; line-height: 1.05; letter-spacing: -.6px; }
+.ob-text p, .ob-done p { font-size: 16px; line-height: 1.5; color: var(--text-2); margin-top: 12px; }
+.ob-foot { display: flex; gap: 10px; padding: 12px 20px 0; }
+.ob-foot .btn-light { flex: 1; }
+.ob-back { width: 54px; height: 54px; border-radius: 50%; background: var(--surface-2); border: 1px solid var(--line); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.ob-back svg { width: 22px; height: 22px; stroke: var(--text); stroke-width: 2; fill: none; }
+/* слайд «События» */
+.ob-v-events { perspective: 900px; }
+.ob-card { position: absolute; width: 74%; aspect-ratio: 1.55; border-radius: 22px; overflow: hidden; background-size: cover; background-position: center; border: 1px solid rgba(255,255,255,.12); box-shadow: 0 24px 50px rgba(0,0,0,.6); display: flex; align-items: flex-end; padding: 16px; }
+.ob-card::before { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, transparent 30%, rgba(0,0,0,.75)); }
+.ob-card b { position: relative; font-family: var(--display); font-weight: 800; font-size: 20px; line-height: 1; text-transform: uppercase; }
+.ob-card.youth b { text-transform: none; font-weight: 700; }
+.ob-card.youth em { font-style: normal; color: var(--sky); display: block; }
+.ob-card.youth .pat-youth { position: absolute; inset: 0; }
+.ob-card.c1 { transform: translate(-5%, 34%) rotate(-4deg); z-index: 3; animation: obDeal .7s .15s cubic-bezier(.2,.9,.25,1.2) both; }
+.ob-card.c2 { transform: translate(14%, -8%) rotate(6deg); z-index: 2; animation: obDeal .7s .05s cubic-bezier(.2,.9,.25,1.2) both; }
+.ob-card.c3 { transform: translate(-12%, -50%) rotate(-8deg); z-index: 1; opacity: .85; animation: obDeal .7s 0s cubic-bezier(.2,.9,.25,1.2) both; }
+@keyframes obDeal { from { opacity: 0; translate: 0 60px; scale: .9; } to { opacity: 1; translate: 0 0; scale: 1; } }
+.ob-going { position: absolute; top: 12px; left: 12px; display: flex; align-items: center; gap: 4px; background: var(--lime); color: #111; font-size: 11px; font-weight: 700; padding: 5px 10px; border-radius: 100px; animation: obPop .45s .9s cubic-bezier(.2,.9,.3,1.5) both; }
+.ob-going svg { width: 12px; height: 12px; stroke: currentColor; stroke-width: 3; fill: none; }
+@keyframes obPop { from { opacity: 0; transform: scale(.4); } to { opacity: 1; transform: scale(1); } }
+/* слайд «Библия» */
+.ob-v-bible { flex-direction: column; gap: 14px; }
+.ob-bible { width: 100%; padding: 22px 20px; border-radius: 22px; background: var(--surface); border: 1px solid var(--line); position: relative; }
+.ob-bible-ref { font-size: 11px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--text-2); text-align: center; margin-bottom: 12px; }
+.ob-bible p { font-family: 'PT Serif', Georgia, serif; font-size: 19px; line-height: 1.7; color: #ECEAE4; }
+.ob-bible sup { font-family: var(--body); font-size: 11px; color: var(--text-3); font-weight: 700; margin-right: 4px; }
+.ob-verse { cursor: pointer; border-radius: 4px; background-image: linear-gradient(rgba(248,227,107,.3), rgba(248,227,107,.3)); background-repeat: no-repeat; background-size: 0% 100%; transition: background-size .7s ease; -webkit-box-decoration-break: clone; box-decoration-break: clone; text-decoration: underline dotted rgba(255,255,255,.35); text-underline-offset: 6px; }
+.ob-verse.lit { background-size: 100% 100%; text-decoration-color: transparent; }
+.ob-tip { position: absolute; right: 14px; bottom: -14px; background: var(--lime); color: #111; font-size: 12px; font-weight: 700; padding: 6px 12px; border-radius: 100px; transition: opacity .3s; animation: obBob 1.6s ease-in-out infinite; }
+@keyframes obBob { 50% { transform: translateY(-4px); } }
+.ob-planchip { width: 100%; display: flex; align-items: center; gap: 12px; padding: 14px; border-radius: 18px; background: var(--surface); border: 1px solid var(--line); animation: obInR .5s .35s both; }
+.ob-planchip > i { width: 40px; height: 40px; border-radius: 12px; background: radial-gradient(circle at 70% 30%, var(--c), #1a1a1d 75%); flex-shrink: 0; }
+.ob-planchip div:not(.ob-ring) { flex: 1; }
+.ob-planchip b { display: block; font-size: 14px; }
+.ob-planchip span { font-size: 12px; color: var(--text-2); }
+.ob-ring svg { width: 38px; height: 38px; transform: rotate(-90deg); }
+.ob-ring circle { fill: none; stroke: var(--line); stroke-width: 4; }
+.ob-ring circle.p { stroke: var(--violet); stroke-linecap: round; stroke-dasharray: 94.2; stroke-dashoffset: 94.2; animation: obRing 1.2s .6s ease forwards; }
+@keyframes obRing { to { stroke-dashoffset: 80.7; } }
+/* слайд «Сообщество» */
+.ob-v-com { flex-direction: column; gap: 12px; align-items: stretch; }
+.ob-faces { display: flex; align-items: center; }
+.ob-faces img { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 3px solid var(--bg); margin-right: -12px; filter: grayscale(.2); animation: obPop .4s both; }
+.ob-faces img:nth-child(2) { animation-delay: .1s; } .ob-faces img:nth-child(3) { animation-delay: .2s; }
+.ob-faces span { margin-left: 22px; font-size: 13px; color: var(--text-2); }
+.ob-prayer { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 16px; }
+.ob-prayer .prayer-text { font-size: 15px; margin-bottom: 14px; }
+.ob-amen.pop { animation: obPop .35s cubic-bezier(.2,.9,.3,1.6); }
+.ob-quote { font-family: 'PT Serif', Georgia, serif; font-size: 15px; line-height: 1.5; color: var(--text-2); padding: 14px 16px; border-left: 2px solid var(--violet); background: rgba(169,155,255,.07); border-radius: 0 14px 14px 0; }
+.ob-quote small { display: block; font-family: var(--body); font-size: 12px; color: var(--violet); margin-top: 6px; }
+/* формы */
+.ob-form { padding-top: 10px; }
+.ob-form h2 { margin-bottom: 18px; }
+.ob-form h3 { font-size: 17px; font-weight: 600; margin: 28px 0 8px; }
+.ob-name { height: 58px !important; font-size: 19px !important; border-radius: 16px !important; background: var(--surface) !important; }
+.ob-int { display: flex; flex-wrap: wrap; gap: 8px; }
+.ob-int button { display: inline-flex; align-items: center; gap: 8px; padding: 11px 16px; border-radius: 100px; background: var(--surface-2); border: 1px solid #303035; font-size: 15px; font-weight: 500; transition: all .2s; }
+.ob-int button i { width: 9px; height: 9px; border-radius: 50%; background: var(--c); }
+.ob-int button.on { background: color-mix(in srgb, var(--c) 20%, transparent); border-color: var(--c); font-weight: 600; }
+.ob-int button:active { transform: scale(.95); }
+.ob-tr { display: flex; align-items: center; gap: 14px; width: 100%; text-align: left; padding: 16px; border-radius: 18px; background: var(--surface); border: 1.5px solid var(--line); margin-bottom: 10px; transition: border-color .2s, background .2s; }
+.ob-tr b { width: 48px; height: 48px; border-radius: 14px; background: var(--surface-2); display: flex; align-items: center; justify-content: center; font-size: 13px; letter-spacing: .04em; flex-shrink: 0; }
+.ob-tr span { flex: 1; font-size: 16px; font-weight: 600; }
+.ob-tr small { display: block; font-size: 13px; font-weight: 400; color: var(--text-2); margin-top: 3px; }
+.ob-tr em { width: 26px; height: 26px; border-radius: 50%; border: 1.5px solid var(--text-3); display: flex; align-items: center; justify-content: center; }
+.ob-tr em svg { width: 14px; height: 14px; stroke: transparent; stroke-width: 3; fill: none; }
+.ob-tr.on { border-color: var(--violet); background: rgba(169,155,255,.08); }
+.ob-tr.on b { background: var(--violet); color: #111; }
+.ob-tr.on em { background: var(--violet); border-color: var(--violet); }
+.ob-tr.on em svg { stroke: #111; }
+.ob-plan { display: flex; align-items: center; gap: 14px; width: 100%; text-align: left; padding: 12px; border-radius: 18px; background: var(--surface); border: 1.5px solid var(--line); }
+.ob-plan .pl-tile { width: 56px; padding: 0; border-radius: 14px; flex-shrink: 0; }
+.ob-plan .pl-tile .pl-mark { width: 36%; right: 10px; top: 10px; }
+.ob-plan-t { flex: 1; }
+.ob-plan-t b { display: block; font-size: 15px; font-weight: 600; line-height: 1.3; }
+.ob-plan-t small { font-size: 13px; color: var(--text-2); }
+.ob-plan .switch i { pointer-events: none; }
+.ob-plan.on { border-color: var(--lime); }
+.ob-plan.on .switch i { background: var(--lime); border-color: var(--lime); }
+.ob-plan.on .switch i::after { transform: translateX(20px); background: #111; }
+/* финал */
+.ob-done { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px 6px; }
+.ob-glow { position: relative; width: 150px; height: 190px; display: flex; align-items: center; justify-content: center; margin-bottom: 30px; }
+.ob-glow::before { content: ''; position: absolute; inset: -30px; border-radius: 50%; background: radial-gradient(circle, rgba(242,133,90,.45), rgba(169,155,255,.18) 45%, transparent 70%); animation: obPulse 2.4s ease-in-out infinite; }
+.ob-glow svg { position: relative; width: 100px; height: auto; fill: var(--text); animation: obRise .9s cubic-bezier(.2,.9,.25,1.2) both; }
+@keyframes obPulse { 50% { transform: scale(1.12); opacity: .75; } }
+@keyframes obRise { from { opacity: 0; transform: translateY(30px) scale(.8); } to { opacity: 1; transform: none; } }
+.ob-done h2 { animation: obInR .5s .25s both; }
+.ob-done p { max-width: 300px; animation: obInR .5s .35s both; }
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
 }
@@ -788,14 +916,18 @@ img.ld { opacity: 0; }
   <div class="splash-bottom">
     <h2>Больше<br>чем<span>церковь</span></h2>
     <p>Слово, которое оживляет. Общение, которое наполняет.</p>
-    <div class="splash-name" id="splash-name">
-      <label for="ob-name">Как к вам обращаться?</label>
-      <input class="input" id="ob-name" placeholder="Ваше имя" maxlength="40" autocomplete="given-name">
-    </div>
-    <button class="btn btn-light btn-full" id="ob-btn" onclick="onboardNext()">
+    <button class="btn btn-light btn-full" id="ob-btn" onclick="obStart()">
       <span id="ob-btn-text">Начать</span>
       <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
     </button>
+  </div>
+  <div class="ob">
+    <div class="ob-top"><div class="ob-prog" id="ob-prog"></div><button class="ob-skip" id="ob-skip" onclick="obSkip()">Пропустить</button></div>
+    <div class="ob-stage" id="ob-stage"></div>
+    <div class="ob-foot">
+      <button class="ob-back" id="ob-back" onclick="obBack()" aria-label="Назад"><svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg></button>
+      <button class="btn btn-light" id="ob-next" onclick="obNext()">Далее</button>
+    </div>
   </div>
 </div>
 
@@ -889,10 +1021,10 @@ img.ld { opacity: 0; }
     <h1>Сообщество</h1>
     <button class="icon-btn" onclick="showPrayerForm()" aria-label="Попросить молитву"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button>
   </div>
-  <div class="chips" id="com-chips">
-    <button class="chip active" data-com="groups">Группы</button>
-    <button class="chip" data-com="bible">Библия</button>
-    <button class="chip" data-com="prayer">Молитвенные нужды</button>
+  <div class="chips sect" id="com-chips">
+    <button class="chip active" data-com="groups"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6"/><path d="M16 4.6a3.5 3.5 0 010 6.8M18 14.3c2 .8 3.5 2.8 3.5 5.7"/></svg>Группы</button>
+    <button class="chip" data-com="bible"><svg viewBox="0 0 24 24"><path d="M2 5.5A1.5 1.5 0 013.5 4H9a3 3 0 013 3v13a2.5 2.5 0 00-2.5-2.5h-6A1.5 1.5 0 012 16z"/><path d="M22 5.5A1.5 1.5 0 0020.5 4H15a3 3 0 00-3 3v13a2.5 2.5 0 012.5-2.5h6A1.5 1.5 0 0022 16z"/></svg>Библия</button>
+    <button class="chip" data-com="prayer"><svg viewBox="0 0 24 24"><path d="M12 20.5s-8.5-5-8.5-11A4.5 4.5 0 0112 7a4.5 4.5 0 018.5 2.5c0 6-8.5 11-8.5 11z"/></svg>Молитва</button>
   </div>
   <div id="com-groups"></div>
   <div id="com-bible" class="hidden"></div>
@@ -2549,7 +2681,6 @@ document.querySelectorAll('#ctype-chips .chip').forEach(chip => chip.addEventLis
   this.classList.add('active'); contentType = this.dataset.ctype;
   ['event', 'post', 'sermon', 'group'].forEach(k => document.getElementById('form-' + k).classList.toggle('hidden', k !== contentType));
 }));
-document.getElementById('ob-name').addEventListener('keydown', e => { if (e.key === 'Enter') onboardNext(); });
 
 if (tg && tg.BackButton) {
   tg.BackButton.onClick(() => {
@@ -2557,6 +2688,181 @@ if (tg && tg.BackButton) {
     else if (currentTab === 'admin') closeAdmin();
     else switchTab('home');
   });
+}
+
+// === ОНБОРДИНГ ===
+const OB_STEPS = ['events', 'bible', 'community', 'about', 'reading', 'done'];
+let ob = { i: 0, name: '', interests: [], tr: 'SYNOD', plan: true, amen: 12, hl: false };
+function obStart() {
+  const tu = tgUser();
+  ob = { i: 0, name: (tu && tu.first_name) || '', interests: [], tr: 'SYNOD', plan: true, amen: 12, hl: false };
+  document.getElementById('onboard').classList.add('flow');
+  haptic('light');
+  renderOb(1);
+}
+function obGo(i, dir) {
+  if (i < 0 || i >= OB_STEPS.length) return;
+  if (OB_STEPS[ob.i] === 'about' && i > ob.i && !obSaveAbout()) return;
+  ob.i = i; haptic('light'); renderOb(dir || 1);
+}
+function obNext() { if (OB_STEPS[ob.i] === 'done') { obFinish(); return; } obGo(ob.i + 1, 1); }
+function obBack() { if (ob.i === 0) { document.getElementById('onboard').classList.remove('flow'); return; } obGo(ob.i - 1, -1); }
+function obSkip() { obGo(OB_STEPS.indexOf('about'), 1); }
+function obSaveAbout() {
+  const el = document.getElementById('ob-name-in');
+  if (el) ob.name = el.value.trim();
+  if (!ob.name) { toast('Напишите, как к вам обращаться'); el && el.focus(); return false; }
+  return true;
+}
+function obToggleInterest(k) {
+  const el = document.getElementById('ob-name-in'); if (el) ob.name = el.value;
+  ob.interests = ob.interests.includes(k) ? ob.interests.filter(x => x !== k) : [...ob.interests, k];
+  haptic('light');
+  document.querySelectorAll('.ob-int button').forEach(b => b.classList.toggle('on', ob.interests.includes(b.dataset.k)));
+}
+function obPick(k, v) {
+  ob[k] = v; haptic('light');
+  if (k === 'tr') document.querySelectorAll('.ob-tr').forEach(b => b.classList.toggle('on', b.dataset.v === v));
+  if (k === 'plan') document.getElementById('ob-plan').classList.toggle('on', v);
+}
+function obAmen(btn) {
+  ob.amen++; haptic('medium');
+  btn.classList.add('on'); btn.querySelector('span').textContent = 'Молюсь · ' + ob.amen;
+  btn.classList.remove('pop'); void btn.offsetWidth; btn.classList.add('pop');
+}
+function obHighlight(el) {
+  ob.hl = !ob.hl; haptic('light');
+  el.classList.toggle('lit', ob.hl);
+  const tip = document.getElementById('ob-tip'); if (tip) tip.style.opacity = ob.hl ? 0 : 1;
+}
+
+function obSlide(step) {
+  const n = esc(ob.name);
+  switch (step) {
+    case 'events': return `
+      <div class="ob-visual ob-v-events">
+        <div class="ob-card c3" style="background-image:url('${IMG.prayer}')"><b>Молитвенное<br>собрание</b></div>
+        <div class="ob-card c2 youth">${youthPattern()}<b>Молодёжное <em>собрание</em></b></div>
+        <div class="ob-card c1" style="background-image:url('${IMG.worship}')"><b>Вечер<br>хвалы</b><span class="ob-going">${ICON.check}Вы идёте</span></div>
+      </div>
+      <div class="ob-text"><small style="color:var(--ember)">События</small><h2>Вся жизнь церкви — в одном месте</h2>
+        <p>Служения, молодёжь, семинары и отдых. Отмечайте «Я приду» и регистрируйтесь в пару касаний.</p></div>`;
+    case 'bible': return `
+      <div class="ob-visual ob-v-bible">
+        <div class="ob-bible">
+          <div class="ob-bible-ref">Иоанна 3</div>
+          <p><sup>16</sup><span class="ob-verse" onclick="obHighlight(this)">Ибо так возлюбил Бог мир, что отдал Сына Своего Единородного, дабы всякий верующий в Него не погиб, но имел жизнь вечную.</span></p>
+          <div class="ob-tip" id="ob-tip">Нажмите на стих</div>
+        </div>
+        <div class="ob-planchip"><i style="--c:#A99BFF"></i><div><b>Евангелие от Иоанна</b><span>День 3 из 21</span></div><div class="ob-ring"><svg viewBox="0 0 36 36"><circle cx="18" cy="18" r="15" /><circle cx="18" cy="18" r="15" class="p"/></svg></div></div>
+      </div>
+      <div class="ob-text"><small style="color:var(--violet)">Библия</small><h2>Читайте Слово каждый день</h2>
+        <p>Два перевода, планы чтения, выделение цветом, примечания и поиск. Приложение помнит, где вы остановились.</p></div>`;
+    case 'community': return `
+      <div class="ob-visual ob-v-com">
+        <div class="ob-faces">${['g3', 'g1', 'g2'].map(k => `<img src="${IMG[k]}" alt="">`).join('')}<span>+ малые группы</span></div>
+        <div class="ob-prayer">
+          <div class="prayer-head"><span>Анна</span><span>2 ч назад</span></div>
+          <div class="prayer-text">Помолитесь, пожалуйста, за маму — у неё операция в пятницу.</div>
+          <button class="pray-btn ob-amen" onclick="obAmen(this)">${ICON.hands}<span>Помолиться · ${ob.amen}</span></button>
+        </div>
+        <div class="ob-quote">«Сегодня Бог напомнил мне, что Он ведёт меня даже в трудные дни»<small>Размышление · анонимно</small></div>
+      </div>
+      <div class="ob-text"><small style="color:var(--sky)">Сообщество</small><h2>Вы не одни</h2>
+        <p>Найдите свою малую группу, поддержите других в молитве и делитесь тем, что Бог открыл вам в Слове.</p></div>`;
+    case 'about': return `
+      <div class="ob-form">
+        <small style="color:var(--lime)">Знакомство</small>
+        <h2>Как к вам обращаться?</h2>
+        <input class="input ob-name" id="ob-name-in" value="${n}" placeholder="Ваше имя" maxlength="40" autocomplete="given-name" enterkeyhint="next" onkeydown="if(event.key==='Enter'){this.blur();}">
+        <h3>Что вам ближе?</h3>
+        <p class="hint" style="margin:-4px 0 14px">Можно выбрать несколько — эти направления будут первыми в фильтрах событий.</p>
+        <div class="ob-int">${[['service', 'Служения'], ['youth', 'Молодёжь'], ['prayer', 'Молитва'], ['group', 'Группы'], ['seminar', 'Семинары'], ['training', 'Тренинги'], ['rest', 'Отдых']]
+          .map(([k, t]) => `<button data-k="${k}" class="${ob.interests.includes(k) ? 'on' : ''}" style="--c:${cat(k).color}" onclick="obToggleInterest('${k}')"><i></i>${t}</button>`).join('')}</div>
+      </div>`;
+    case 'reading': return `
+      <div class="ob-form">
+        <small style="color:var(--violet)">Библия</small>
+        <h2>${n ? n + ', к' : 'К'}ак вам удобнее читать?</h2>
+        ${Object.keys(BIBLE_TR).map(k => `<button class="ob-tr ${ob.tr === k ? 'on' : ''}" data-v="${k}" onclick="obPick('tr','${k}')">
+          <b>${BIBLE_TR[k].short}</b><span>${BIBLE_TR[k].name}<small>${BIBLE_TR[k].note}</small></span><em>${ICON.check}</em></button>`).join('')}
+        <p class="hint" style="margin:6px 0 18px">Перевод можно сменить в любой момент.</p>
+        <button class="ob-plan ${ob.plan ? 'on' : ''}" id="ob-plan" onclick="obPick('plan', !ob.plan)">
+          <span class="pl-tile" style="--c:#A99BFF"><svg class="pl-mark" viewBox="0 0 483 685" fill="#A99BFF">${MARK}</svg></span>
+          <span class="ob-plan-t"><b>Начать план «Евангелие от Иоанна»</b><small>21 день · по одной главе</small></span>
+          <span class="switch"><i></i></span>
+        </button>
+      </div>`;
+    case 'done': return `
+      <div class="ob-done">
+        <div class="ob-glow"><svg viewBox="0 0 483 685">${MARK}</svg></div>
+        <h2>Добро пожаловать${n ? ',<br>' + n : ''}!</h2>
+        <p>Рады, что вы с нами. Загляните в «События» — там уже есть ближайшие встречи.</p>
+      </div>`;
+  }
+}
+function renderOb(dir) {
+  const step = OB_STEPS[ob.i];
+  const stage = document.getElementById('ob-stage');
+  stage.className = 'ob-stage ' + (dir < 0 ? 'in-l' : 'in-r') + ' s-' + step;
+  stage.innerHTML = obSlide(step);
+  document.getElementById('ob-prog').innerHTML = OB_STEPS.slice(0, -1).map((_, k) => `<i class="${k < ob.i ? 'done' : k === ob.i ? 'cur' : ''}"></i>`).join('');
+  document.getElementById('ob-skip').style.visibility = ob.i < 3 ? 'visible' : 'hidden';
+  document.getElementById('ob-next').innerHTML = step === 'done' ? `Открыть приложение ${ICON.arrow}` : step === 'reading' ? `Готово ${ICON.arrow}` : `Далее ${ICON.arrow}`;
+  document.getElementById('ob-back').style.visibility = step === 'done' ? 'hidden' : 'visible';
+  if (step === 'done') { haptic('medium'); try { tg && tg.HapticFeedback && tg.HapticFeedback.notificationOccurred('success'); } catch (e) {} }
+}
+// свайпы между слайдами
+(function () {
+  let sx = 0, sy = 0, st = 0;
+  document.addEventListener('touchstart', e => {
+    const f = document.getElementById('onboard');
+    if (!f || f.classList.contains('hidden') || !f.classList.contains('flow')) return;
+    sx = e.touches[0].clientX; sy = e.touches[0].clientY; st = Date.now();
+  }, { passive: true });
+  document.addEventListener('touchend', e => {
+    const f = document.getElementById('onboard');
+    if (!f || f.classList.contains('hidden') || !f.classList.contains('flow') || !st) return;
+    const t = e.changedTouches[0], dx = t.clientX - sx, dy = t.clientY - sy; st = 0;
+    if (e.target.closest('input')) return;
+    if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5) { dx < 0 ? obNext() : obBack(); }
+  }, { passive: true });
+})();
+
+function obFinish() {
+  const name = ob.name.trim();
+  const tu = tgUser();
+  const tgId = tu ? tu.id : Date.now();
+  let u = state.allUsers.find(x => x.tgId === tgId);
+  if (!u) {
+    const noOwnerYet = !state.allUsers.some(x => x.role === 'owner');
+    u = { tgId, username: (tu && tu.username) || '', photoUrl: (tu && tu.photo_url) || '', role: (isOwnerTg(tgId) || (!tu && noOwnerYet)) ? 'owner' : 'user', joinedAt: Date.now() };
+    state.allUsers.push(u);
+  }
+  u.name = name; u._onboarded = true; u.interests = ob.interests;
+  state.user = { ...u };
+  bible().tr = ob.tr;
+  if (ob.plan && !plansState().john21) plansState().john21 = { started: Date.now(), done: {} };
+  DB.save();
+  sortEventChips();
+  const f = document.getElementById('onboard');
+  f.classList.add('leaving');
+  setTimeout(() => { f.classList.add('hidden'); f.classList.remove('leaving', 'flow'); }, 380);
+  renderAll();
+  switchTab('home');
+  if (CLOUD) syncUserDoc();
+}
+// интересы — первыми в фильтрах событий
+function sortEventChips() {
+  const box = document.getElementById('event-chips'); if (!box) return;
+  const ints = (state.user && state.user.interests) || [];
+  const chips = [...box.querySelectorAll('.chip')];
+  const all = chips.find(c => c.dataset.filter === 'all');
+  const rest = chips.filter(c => c !== all).sort((a, b) => {
+    const ia = ints.indexOf(a.dataset.filter), ib = ints.indexOf(b.dataset.filter);
+    return (ia < 0 ? 99 : ia) - (ib < 0 ? 99 : ib);
+  });
+  [all, ...rest].forEach(c => box.appendChild(c));
 }
 
 // === БИБЛИЯ ===
@@ -2885,8 +3191,13 @@ function bibleView(k) {
 }
 function bibleTabsHtml() {
   const v = bible().view || 'read';
-  return `<div class="bb-tabs">${[['read', 'Чтение'], ['plans', 'Планы'], ['refl', 'Размышления']]
-    .map(([k, t]) => `<button class="${v === k ? 'active' : ''}" onclick="bibleView('${k}')">${t}</button>`).join('')}</div>`;
+  const ic = {
+    read: '<svg viewBox="0 0 24 24"><path d="M4 5h12a4 4 0 014 4v11H8a4 4 0 01-4-4z"/><path d="M8 9h8M8 13h6"/></svg>',
+    plans: '<svg viewBox="0 0 24 24"><rect x="3" y="4.5" width="18" height="16" rx="3"/><path d="M8 13l2.5 2.5L16 10"/></svg>',
+    refl: '<svg viewBox="0 0 24 24"><path d="M4 5.5A1.5 1.5 0 015.5 4h13A1.5 1.5 0 0120 5.5v9a1.5 1.5 0 01-1.5 1.5H10l-4 4v-4H5.5A1.5 1.5 0 014 14.5z"/></svg>'
+  };
+  return `<div class="bb-tabs">${[['read', 'Чтение'], ['plans', 'Планы'], ['refl', 'Мысли']]
+    .map(([k, t]) => `<button class="${v === k ? 'active' : ''}" onclick="bibleView('${k}')">${ic[k]}${t}</button>`).join('')}</div>`;
 }
 
 // --- Примечания переводчика ---
@@ -3673,6 +3984,7 @@ function init() {
   imgState.ev = { data: '', shade: 0 }; syncShadeButtons('ev');
   document.getElementById('splash-img').src = IMG.prayer;
   if (initAuth()) {
+    sortEventChips();
     renderAll();
     let tab = 'home';
     try { tab = sessionStorage.getItem('mc_tab') || 'home'; sessionStorage.removeItem('mc_tab'); } catch (e) {}
