@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-+pzHxBs/XaFUVYxbsKGioS19TnTdR5jkais6867/URc=' 'sha256-F6b4Q6KamFe/QvSH24gbfrKzeW8XEAzyItlzN84Lj+I=' 'sha256-N1okj9h5gep0HYTDgEOlMPpiZ+KFgxccCs6aGUSHs94=' https://telegram.org https://www.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com data:; img-src 'self' data: blob: https:; media-src 'self' blob: https:; connect-src 'self' https://*.googleapis.com https://*.cloudfunctions.net https://*.run.app https://bolls.life https://script.google.com https://script.googleusercontent.com; frame-src https://www.youtube.com https://www.youtube-nocookie.com https://metachurch-e800d.firebaseapp.com; script-src-attr 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-+pzHxBs/XaFUVYxbsKGioS19TnTdR5jkais6867/URc=' 'sha256-F6b4Q6KamFe/QvSH24gbfrKzeW8XEAzyItlzN84Lj+I=' 'sha256-ICD9SiP8m+qsO/GBPpULppbhy3Q7gQTgNNTmqmXCFmM=' https://telegram.org https://www.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com data:; img-src 'self' data: blob: https:; media-src 'self' blob: https:; connect-src 'self' https://*.googleapis.com https://*.cloudfunctions.net https://*.run.app https://bolls.life https://script.google.com https://script.googleusercontent.com; frame-src https://www.youtube.com https://www.youtube-nocookie.com https://metachurch-e800d.firebaseapp.com; script-src-attr 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
 <!-- НАСТРОЙКИ ПРИЛОЖЕНИЯ: меняйте только значения внутри content (формат JSON). Код ниже не трогайте —
      он защищён хешами в Content-Security-Policy; после правок кода запустите: node update-csp.mjs файл.html -->
 <meta name="mc-config" content='{
@@ -312,6 +312,7 @@ img { display:block; max-width:100%; }
 .ev-row-title { font-size: 16px; font-weight: 600; }
 .ev-row-meta { font-size: 12px; color: var(--text-2); margin-top: 4px; }
 .going { display:inline-flex; align-items:center; gap: 4px; font-size: 11px; font-weight: 600; color: var(--lime-fg); margin-top: 6px; }
+.ev-done { display:inline-flex; align-items:center; gap: 4px; font-size: 11px; font-weight: 600; color: var(--text-3); margin-top: 6px; }
 .going svg { width: 13px; height: 13px; stroke: currentColor; stroke-width: 2.6; fill:none; }
 
 /* Announcement */
@@ -1092,7 +1093,8 @@ html[data-theme="light"] .chip.active { background: var(--ink); color: #fff; bor
 /* цветные разделы: лёгкая заливка цветом, у активной — сплошной цвет (как в тёмной теме) */
 html[data-theme="light"] .chip.tint {
   background: color-mix(in srgb, var(--c) 16%, #fff);
-  border-color: color-mix(in srgb, var(--c) 55%, #fff);
+  /* было var(--c) — обводка была светлее иконки внутри (та берёт затемнённый --cf) */
+  border-color: color-mix(in srgb, var(--cf, var(--c)) 55%, #fff);
   color: var(--text);
 }
 html[data-theme="light"] .chip.tint svg { stroke: var(--cf, var(--c)); }
@@ -1170,6 +1172,9 @@ html[data-theme="light"] .pat-youth {
   background-image:
     linear-gradient(180deg, #5C8BE0 0%, #E9A48B 62%, #F3C6A0 100%),
     url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='22' height='22'%3E%3Cpath d='M11 7v8M7 11h8' stroke='rgba(255,255,255,.10)' stroke-width='1'/%3E%3C/svg%3E");
+  /* без этого background-size наследуется от тёмной темы (22px 22px) и градиент
+     замащивается крошечными плитками вместо одной плавной заливки */
+  background-size: cover, 22px 22px;
   background-blend-mode: normal, overlay;
 }
 html[data-theme="light"] .pat-youth svg { opacity: .35; }
@@ -1383,6 +1388,7 @@ html[data-theme="light"] .header .icon-btn svg, html[data-theme="light"] .tab sv
     <button class="chip tint dot" style="--c:var(--sky)" data-filter="youth">Молодёжь</button>
     <button class="chip tint dot" style="--c:var(--teal)" data-filter="youth1735">Молодёжь 17-35</button>
     <button class="chip tint dot" style="--c:var(--rose)" data-filter="teens">Подростки</button>
+    <span id="custom-cat-chips"></span>
     <button class="chip tint dot" style="--c:var(--lime)" data-filter="prayer">Молитва</button>
     <button class="chip tint dot" style="--c:#E6E6E3" data-filter="group">Группы</button>
     <button class="chip tint dot" style="--c:var(--violet)" data-filter="seminar">Семинары</button>
@@ -1506,11 +1512,13 @@ html[data-theme="light"] .header .icon-btn svg, html[data-theme="light"] .tab sv
         <div class="form-group"><label class="form-label" for="ev-date">Дата</label><input class="input" id="ev-date" type="date"></div>
         <div class="form-group"><label class="form-label" for="ev-time">Время</label><input class="input" id="ev-time" type="time"></div>
       </div>
+      <div class="form-group"><label class="check"><input type="checkbox" id="ev-permanent" data-on-change="[[&quot;togglePermanent&quot;,[&quot;ev&quot;,{&quot;$&quot;: &quot;checked&quot;}]]]"> Постоянное событие (без даты окончания)</label></div>
+      <div class="form-group" id="ev-enddate-row"><label class="form-label" for="ev-enddate">Длится по (необязательно)</label><input class="input" id="ev-enddate" type="date"><div class="hint">Заполните, если событие идёт несколько дней подряд — например, лагерь или выставка.</div></div>
       <div class="form-group"><label class="form-label" for="ev-location">Место</label><input class="input" id="ev-location" placeholder="Главный зал"></div>
       <div class="form-group"><label class="form-label" for="ev-link">Ссылка (необязательно)</label><input class="input" id="ev-link" placeholder="https://…" inputmode="url"><div class="hint">Покажется кнопкой в карточке события — например, ссылка на трансляцию или форму.</div></div>
       <div class="form-row">
         <div class="form-group"><label class="form-label" for="ev-category">Направление</label>
-          <select class="select" id="ev-category"><option value="service">Служение</option><option value="youth">Молодёжь</option><option value="youth1735">Молодёжь 17-35</option><option value="teens">Подростки</option><option value="prayer">Молитва</option><option value="group">Группа</option><option value="seminar">Семинар</option><option value="training">Тренинг</option><option value="rest">Отдых</option></select>
+          <select class="select" id="ev-category"><option value="service">Служение</option><option value="youth">Молодёжь</option><option value="youth1735">Молодёжь 17-35</option><option value="teens">Подростки</option><option value="prayer">Молитва</option><option value="group">Группа</option><option value="seminar">Семинар</option><option value="training">Тренинг</option><option value="rest">Отдых</option>${categoryOptionsHtml()}</select>
         </div>
         <div class="form-group"><label class="form-label" for="ev-capacity">Мест</label><input class="input" id="ev-capacity" type="number" value="100" min="1"></div>
       </div>
@@ -1558,6 +1566,7 @@ html[data-theme="light"] .header .icon-btn svg, html[data-theme="light"] .tab sv
       <div class="form-group"><label class="form-label" for="gr-image">Ссылка на фото</label><input class="input" id="gr-image" placeholder="https://…"></div>
       <button class="btn btn-light btn-full" data-on-click="[[&quot;createGroup&quot;,[]]]">Создать группу</button>
     </div>
+    <div id="cat-box"></div>
   </div>
 
   <div id="admin-content" class="pad">
@@ -1577,6 +1586,8 @@ html[data-theme="light"] .header .icon-btn svg, html[data-theme="light"] .tab sv
     <div id="admin-connect"></div>
     <div class="sub-title" id="questions-title" style="display:none">Вопросы пастору</div>
     <div id="admin-questions"></div>
+    <div class="sub-title" id="logs-title" style="display:none">Журнал действий</div>
+    <div id="admin-logs"></div>
   </div>
 </section>
 
@@ -1646,7 +1657,7 @@ const CONFIG = {
     if (Number.isInteger(o.maxPeople)) CONFIG.maxPeople = Math.min(10, Math.max(1, o.maxPeople));
   } catch (e) { console.warn('mc-config: ошибка в настройках', e); }
 })();
-const STORE_KEY = 'metachurch_v1'; // ФИЧИ v1 === молитва-адресат/паблик, заявки на общение, роли админов UI-FIX v1 PUBLISH v1 SECURITY v1 SECURITY v2 ARCH v3
+const STORE_KEY = 'metachurch_v1'; // ФИЧИ v1 === молитва-адресат/паблик, заявки на общение, роли админов UI-FIX v1 PUBLISH v1 SECURITY v1 SECURITY v2 ARCH v3 ФИЧИ v4
 // ФИЧИ v2 === консультация пастора (анонимно/с именем, переписка, Telegram-уведомление), категории 17-35/подростки, ссылка в событии
 
 // === STATE ===
@@ -1747,7 +1758,21 @@ function isoDate(d) { return d.getFullYear() + '-' + String(d.getMonth()+1).padS
 function nextWeekday(wd, extraWeeks = 0) { const d = new Date(); d.setHours(0,0,0,0); d.setDate(d.getDate() + ((wd - d.getDay() + 7) % 7) + extraWeeks * 7); return isoDate(d); }
 function daysAgo(n) { const d = new Date(); d.setDate(d.getDate() - n); return isoDate(d); }
 function longDate(s, withYear) { const d = parseDate(s); return d.getDate() + (LANG === 'uz' ? '-' : ' ') + MON_GEN[d.getMonth()] + (withYear ? ' ' + d.getFullYear() : ''); }
-function isPast(e) { const d = parseDate(e.date); const [h, m] = (e.time || '23:59').split(':').map(Number); d.setHours(h || 0, m || 0); return d.getTime() + 3 * 3600000 < Date.now(); }
+function isPast(e) {
+  if (e.permanent) return false;
+  const d = parseDate(e.endDate || e.date);
+  const [h, m] = (e.time || '23:59').split(':').map(Number);
+  d.setHours(h || 0, m || 0);
+  return d.getTime() + 3 * 3600000 < Date.now();
+}
+// Короткая подпись дат для афиши/строки события: диапазон, «Постоянно» или обычная дата
+function eventDateLabel(e) {
+  if (e.permanent) return 'Постоянно';
+  if (!e.endDate || e.endDate === e.date) return null;
+  const d1 = parseDate(e.date), d2 = parseDate(e.endDate);
+  const sameMonth = d1.getMonth() === d2.getMonth();
+  return `${d1.getDate()} ${sameMonth ? '' : MON_SHORT[d1.getMonth()] + ' '}– ${d2.getDate()} ${MON_SHORT[d2.getMonth()]}`.replace(/\s+/g, ' ').trim();
+}
 // Черновик не виден никому, кроме администратора. «Отложенное» становится видно всем само,
 // как только текущее время проходит отметку publishAt — пересчитывается при каждом рендере.
 function isEffectivelyPublished(e) {
@@ -2146,7 +2171,67 @@ const TOPIC = {
   // старые темы
   update: { name: 'Обновление', color: 'var(--text-2)' }, partner: { name: 'Партнёры', color: 'var(--text-2)' }
 };
-const cat = c => CAT[c] || CAT.service;
+const cat = c => (cloud.categories && cloud.categories[c]) || CAT[c] || CAT.service;
+const CUSTOM_CAT_PALETTE = [
+  ['var(--ember)', 'Оранжевый'], ['var(--sky)', 'Голубой'], ['var(--lime)', 'Лайм'],
+  ['var(--violet)', 'Фиолетовый'], ['var(--amber)', 'Жёлтый'], ['var(--mint)', 'Мятный'],
+  ['var(--teal)', 'Бирюзовый'], ['var(--rose)', 'Розовый'],
+];
+function categoryOptionsHtml(selected) {
+  const custom = Object.entries(cloud.categories || {}).map(([k, v]) => `<option value="${esc(k)}" ${selected === k ? 'selected' : ''}>${esc(v.name)}</option>`).join('');
+  return custom;
+}
+async function loadCategories() {
+  try {
+    const { collection, getDocs } = cloud.m;
+    const snap = await getDocs(collection(cloud.fs, 'categories'));
+    const m = {};
+    snap.forEach(d => { m[d.id] = d.data(); });
+    cloud.categories = m;
+  } catch (e) { cloud.categories = cloud.categories || {}; }
+}
+async function saveCategory() {
+  if (!hasSection('create')) { toast('Нет доступа'); return; }
+  const name = document.getElementById('cat-name').value.trim();
+  if (!name) { toast('Введите название'); return; }
+  const color = document.querySelector('#cat-palette .on')?.dataset.color || CUSTOM_CAT_PALETTE[0][0];
+  try {
+    const { collection, doc, setDoc } = cloud.m;
+    const id = 'c_' + genId();
+    await setDoc(doc(cloud.fs, 'categories', id), { name: name.slice(0, 40), color });
+    toast('Направление добавлено'); document.getElementById('cat-name').value = '';
+    await loadCategories(); renderCategoriesBox(); logAction('category.create', { id, name });
+  } catch (e) { toast('Не удалось сохранить'); }
+}
+async function deleteCategoryCustom(id) {
+  if (!hasSection('create')) { toast('Нет доступа'); return; }
+  if (!(await ask('Удалить это направление? У событий с ним направление останется как есть в данных, просто пропадёт из списка.'))) return;
+  try {
+    await cloud.m.deleteDoc(cloud.m.doc(cloud.fs, 'categories', id));
+    await loadCategories(); renderCategoriesBox(); logAction('category.delete', { id });
+  } catch (e) { toast('Не удалось удалить'); }
+}
+function pickCatColor(el) {
+  document.querySelectorAll('#cat-palette button').forEach(b => b.classList.remove('on'));
+  el.classList.add('on');
+}
+function renderCategoriesBox() {
+  const box = document.getElementById('cat-box'); if (!box) return;
+  const rows = Object.entries(cloud.categories || {}).map(([id, v]) => `<div class="cloud-box" style="display:flex;align-items:center;gap:10px;margin:0 0 8px">
+    <span style="width:14px;height:14px;border-radius:50%;background:${v.color};flex-shrink:0"></span>
+    <b style="flex:1">${esc(v.name)}</b>
+    <button class="link-danger" data-on-click="[[&quot;deleteCategoryCustom&quot;,[${js(id)}]]]">Удалить</button>
+  </div>`).join('');
+  const swatches = CUSTOM_CAT_PALETTE.map(([c], i) => `<button type="button" class="${i === 0 ? 'on' : ''}" data-color="${c}" style="width:28px;height:28px;border-radius:50%;background:${c};border:2px solid transparent" data-on-click="[[&quot;pickCatColor&quot;,[{&quot;$&quot;: &quot;el&quot;}]]]"></button>`).join('');
+  box.innerHTML = `<div class="sub-title">Направления событий</div>
+    <p class="hint" style="margin:0 0 10px">«Служение», «Молодёжь» и другие встроенные направления всегда на месте — здесь можно добавить свои.</p>
+    ${rows}
+    <div class="cloud-box">
+      <div class="form-group"><label class="form-label" for="cat-name">Новое направление</label><input class="input" id="cat-name" placeholder="Например, «Служение прославления»"></div>
+      <div class="form-group"><label class="form-label">Цвет</label><div id="cat-palette" style="display:flex;gap:8px;flex-wrap:wrap">${swatches}</div></div>
+      <button class="btn btn-light btn-full" data-on-click="[[&quot;saveCategory&quot;,[]]]">Добавить направление</button>
+    </div>`;
+}
 const topic = t => TOPIC[t] || TOPIC.life;
 
 // === TABS ===
@@ -2230,11 +2315,11 @@ function eventRowHtml(e) {
   return `
     <div class="ev-row" data-on-click="[[&quot;showEventDetail&quot;,[${js(e.id)}]]]">
       <div class="ev-row-img">${src ? `<img src="${esc(src)}" alt="" loading="lazy" class="${shadeCls(e)}" data-on-error="[[&quot;hideEl&quot;,[{&quot;$&quot;: &quot;el&quot;}]]]">` : (e.category === 'youth' ? youthPattern() : '')}</div>
-      <div class="datebox"><small>${WD_SHORT[d.getDay()]}</small><b>${d.getDate()}</b><small>${MON_SHORT[d.getMonth()]}</small></div>
+      <div class="datebox">${e.permanent ? '<small>∞</small>' : `<small>${WD_SHORT[d.getDay()]}</small><b>${d.getDate()}</b><small>${MON_SHORT[d.getMonth()]}</small>`}</div>
       <div class="ev-row-info">
         <div class="ev-row-title">${esc(e.title)}</div>
         <div class="ev-row-meta">${esc(e.time)} · ${esc(e.location)}</div>
-        ${isGoing(e.id) ? `<div class="going">${ICON.check}Вы идёте</div>` : ''}
+        ${isPast(e) ? `<div class="ev-done">${ICON.check}Завершено</div>` : (isGoing(e.id) ? `<div class="going">${ICON.check}Вы идёте</div>` : '')}
       </div>
     </div>`;
 }
@@ -2390,7 +2475,11 @@ function openSermon(id) {
 
 // === RENDER: EVENTS ===
 let eventFilter = 'all', eventQuery = '';
+function customCatChipsHtml() {
+  return Object.entries(cloud.categories || {}).map(([id, v]) => `<button class="chip tint dot" style="--c:${v.color}" data-filter="${esc(id)}">${esc(v.name)}</button>`).join('');
+}
 function renderEvents() {
+  const ccEl = document.getElementById('custom-cat-chips'); if (ccEl && !ccEl.dataset.filled) { ccEl.outerHTML = customCatChipsHtml() + '<span id="custom-cat-chips" data-filled="1" style="display:none"></span>'; }
   let list = state.events.filter(isEffectivelyPublished);
   if (eventFilter !== 'all') list = list.filter(e => e.category === eventFilter);
   if (!state.settings.showPast) list = list.filter(e => !isPast(e));
@@ -2640,7 +2729,34 @@ function makeSortable(list, onDone, kind, arr) {
     });
   });
 }
-const ALL_SECTIONS = [['content', 'Контент'], ['create', 'Создание'], ['team', 'Доступы'], ['connect', 'Заявки «Ищу общение»'], ['questions', 'Вопросы пастору']];
+const ALL_SECTIONS = [['content', 'Контент'], ['create', 'Создание'], ['team', 'Доступы'], ['connect', 'Заявки «Ищу общение»'], ['questions', 'Вопросы пастору'], ['logs', 'Журнал действий']];
+// Пишет одну запись в журнал — сами события не блокируют работу (ошибка записи журнала
+// не должна мешать основному действию), поэтому не await'ится и ошибки проглатываются.
+function logAction(action, details) {
+  if (!cloud.on || !isAdmin()) return;
+  try {
+    const { collection, doc, setDoc, serverTimestamp } = cloud.m;
+    setDoc(doc(collection(cloud.fs, 'logs')), {
+      at: serverTimestamp(), uid: cloud.uid, who: cloud.email || cloud.tgUsername || 'админ',
+      action, details: JSON.stringify(details || {}).slice(0, 2000)
+    }).catch(() => {});
+  } catch (e) {}
+}
+async function loadLogs() {
+  try {
+    const { collection, getDocs, orderBy, query, limit } = cloud.m;
+    const snap = await getDocs(query(collection(cloud.fs, 'logs'), orderBy('at', 'desc'), limit(100)));
+    cloud.logs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  } catch (e) { cloud.logs = []; }
+}
+function renderLogs() {
+  const box = document.getElementById('admin-logs'); if (!box) return;
+  const list = cloud.logs || [];
+  box.innerHTML = !list.length ? '<p class="hint">Журнал пуст.</p>' : list.map(l => `<div class="cloud-box" style="margin:0 0 8px">
+    <b>${esc(l.action)}</b> · <span class="hint">${esc(l.who)} · ${timeAgo(l.at)}</span><br>
+    <span class="hint">${esc(l.details)}</span>
+  </div>`).join('');
+}
 async function loadRoles() {
   try {
     const { collection, getDocs } = cloud.m;
@@ -2682,6 +2798,7 @@ async function deleteRole(id) {
 }
 async function assignRole(uid, roleId) {
   if (!cloud.master) { toast('Нет доступа'); return; }
+  logAction('admin.assignRole', { uid, roleId });
   try { await cloud.m.setDoc(cloud.m.doc(cloud.fs, 'admins', uid), { roleId: roleId || '' }, { merge: true }); toast('Роль назначена'); await loadTeam(); renderTeam(); }
   catch (e) { toast('Не удалось сохранить'); }
 }
@@ -2737,6 +2854,10 @@ function renderTeam() {
   const qTitle = document.getElementById('questions-title');
   if (hasSection('questions')) { qTitle.style.display = ''; renderPastorQuestions(); if (cloud.pastorQuestions === null) loadPastorQuestions().then(renderPastorQuestions); }
   else { qTitle.style.display = 'none'; document.getElementById('admin-questions').innerHTML = ''; }
+  const lTitle = document.getElementById('logs-title');
+  if (hasSection('logs')) { lTitle.style.display = ''; renderLogs(); if (cloud.logs === null) loadLogs().then(renderLogs); }
+  else { lTitle.style.display = 'none'; document.getElementById('admin-logs').innerHTML = ''; }
+  if (hasSection('create')) { renderCategoriesBox(); if (cloud.categories === null) loadCategories().then(renderCategoriesBox); }
   if (cloud.roles === null) loadRoles().then(() => renderTeam());
   if (cloud.team === null) loadTeam().then(() => renderTeam());
 }
@@ -2900,7 +3021,7 @@ function showEventDetail(id) {
       ? `<button class="admin-edit" data-on-click="[[&quot;showForms&quot;,[${eid}]]]">${ICON.users}Анкеты</button>`
       : `<button class="admin-edit" data-on-click="[[&quot;showPeopleOf&quot;,[&quot;rsvps&quot;,&quot;eventId&quot;,${eid},&quot;Кто идёт&quot;]]]">${ICON.users}Кто идёт</button>`) : ''}
     <div class="meta-list">
-      <div>${ICON.cal}${WD_FULL[d.getDay()]}, ${longDate(e.date)}</div>
+      <div>${ICON.cal}${e.permanent ? 'Постоянное событие' : e.endDate && e.endDate !== e.date ? `${longDate(e.date)} — ${longDate(e.endDate)}` : `${WD_FULL[d.getDay()]}, ${longDate(e.date)}`}</div>
       <div>${ICON.clock}${esc(e.time)}</div>
       <div>${ICON.pin}${esc(e.location)}</div>
     </div>
@@ -3438,9 +3559,11 @@ function createNewEvent() {
   const link = val('ev-link');
   if (link && (!/^https?:\/\/\S+$/.test(link) || /['"]/.test(link))) { toast('Ссылка должна начинаться с https:// и не содержать пробелов и кавычек'); return; }
   const pub = readPub('ev'); if (!pub) return;
+  const permanent = document.getElementById('ev-permanent').checked;
+  const endDate = permanent ? '' : val('ev-enddate');
   state.events.push({
     id: genId(), title, lead: val('ev-lead'), description: val('ev-desc'),
-    date, time: val('ev-time') || '19:00', location: val('ev-location') || 'Главный зал',
+    date, endDate, permanent, time: val('ev-time') || '19:00', location: val('ev-location') || 'Главный зал',
     category: val('ev-category'), capacity, link, status: pub.status, publishAt: pub.publishAt,
     image: getImageValue('ev'), shade: getShade('ev'), order: topOrder(state.events),
     needsForm: document.getElementById('ev-form').checked
@@ -3448,10 +3571,15 @@ function createNewEvent() {
   const newEv = state.events[state.events.length - 1];
   if (!DB.save()) { state.events.pop(); return; }
   pushItem('events', newEv);
+  logAction('event.create', { id: newEv.id, title: newEv.title });
   clear('ev-title', 'ev-lead', 'ev-desc', 'ev-location', 'ev-link');
   clearImage('ev'); resetPubChoice('ev');
   document.getElementById('ev-form').checked = false;
+  document.getElementById('ev-permanent').checked = false; togglePermanent('ev', false);
   toast(pub.status === 'draft' ? 'Сохранено как черновик' : pub.status === 'scheduled' ? 'Событие выйдет автоматически в назначенное время' : 'Событие создано — оно первое в списке'); renderContentAdmin();
+}
+function togglePermanent(prefix, on) {
+  const row = document.getElementById(prefix + '-enddate-row'); if (row) row.style.display = on ? 'none' : '';
 }
 // === ПУБЛИКАЦИЯ: сразу / черновик / по времени ===
 function pubChoiceHtml(prefix, status, publishAt) {
@@ -3656,11 +3784,13 @@ function editEvent(id) {
       <div class="form-group"><label class="form-label" for="ee-date">Дата</label><input class="input" id="ee-date" type="date" value="${esc(e.date)}"></div>
       <div class="form-group"><label class="form-label" for="ee-time">Время</label><input class="input" id="ee-time" type="time" value="${esc(e.time)}"></div>
     </div>
+    <div class="form-group"><label class="check"><input type="checkbox" id="ee-permanent" ${e.permanent ? 'checked' : ''} data-on-change="[[&quot;togglePermanent&quot;,[&quot;ee&quot;,{&quot;$&quot;: &quot;checked&quot;}]]]"> Постоянное событие (без даты окончания)</label></div>
+    <div class="form-group" id="ee-enddate-row" style="${e.permanent ? 'display:none' : ''}"><label class="form-label" for="ee-enddate">Длится по (необязательно)</label><input class="input" id="ee-enddate" type="date" value="${esc(e.endDate || '')}"></div>
     <div class="form-group"><label class="form-label" for="ee-location">Место</label><input class="input" id="ee-location" value="${esc(e.location)}"></div>
     <div class="form-group"><label class="form-label" for="ee-link">Ссылка (необязательно)</label><input class="input" id="ee-link" value="${esc(e.link || '')}" placeholder="https://…" inputmode="url"></div>
     <div class="form-row">
       <div class="form-group"><label class="form-label" for="ee-category">Направление</label>
-        <select class="select" id="ee-category">${opt('service', 'Служение')}${opt('youth', 'Молодёжь')}${opt('youth1735', 'Молодёжь 17-35')}${opt('teens', 'Подростки')}${opt('prayer', 'Молитва')}${opt('group', 'Группа')}${opt('seminar', 'Семинар')}${opt('training', 'Тренинг')}${opt('rest', 'Отдых')}</select></div>
+        <select class="select" id="ee-category">${opt('service', 'Служение')}${opt('youth', 'Молодёжь')}${opt('youth1735', 'Молодёжь 17-35')}${opt('teens', 'Подростки')}${opt('prayer', 'Молитва')}${opt('group', 'Группа')}${opt('seminar', 'Семинар')}${opt('training', 'Тренинг')}${opt('rest', 'Отдых')}${categoryOptionsHtml(e.category)}</select></div>
       <div class="form-group"><label class="form-label" for="ee-capacity">Мест</label><input class="input" id="ee-capacity" type="number" min="1" value="${esc(e.capacity)}"></div>
     </div>
     <div class="form-group"><label class="form-label">Фото</label>${imageFieldHtml('ee')}</div>
@@ -3679,9 +3809,11 @@ function saveEvent(id) {
   const eeLink = val('ee-link');
   if (eeLink && (!/^https?:\/\/\S+$/.test(eeLink) || /['"]/.test(eeLink))) { toast('Ссылка должна начинаться с https:// и не содержать пробелов и кавычек'); return; }
   const pub = readPub('ee'); if (!pub) return;
+  const eePermanent = document.getElementById('ee-permanent').checked;
+  const eeEndDate = eePermanent ? '' : val('ee-enddate');
   const backup = { ...e };
   Object.assign(e, {
-    title, lead: val('ee-lead'), description: val('ee-desc'), date,
+    title, lead: val('ee-lead'), description: val('ee-desc'), date, endDate: eeEndDate, permanent: eePermanent,
     time: val('ee-time') || e.time, location: val('ee-location') || e.location,
     category: val('ee-category'), capacity: Math.min(100000, Math.max(1, parseInt(val('ee-capacity')) || e.capacity)), link: eeLink,
     status: pub.status, publishAt: pub.publishAt,
@@ -3689,6 +3821,7 @@ function saveEvent(id) {
   });
   if (!DB.save()) { Object.assign(e, backup); return; }
   pushItem('events', e);
+  logAction('event.update', { id: e.id, title: e.title });
   closeModal();
   if (currentTab === 'admin') renderContentAdmin(); else rerender();
   toast('Изменения сохранены');
@@ -3714,6 +3847,7 @@ function createPost() {
   const newPost = state.posts[state.posts.length - 1];
   if (!DB.save()) { state.posts.pop(); return; }
   pushItem('posts', newPost);
+  logAction('post.create', { id: newPost.id, title: newPost.title });
   clear('po-title', 'po-text');
   toast('Объявление опубликовано'); renderContentAdmin();
 }
@@ -3776,6 +3910,7 @@ function createGroup() {
 async function deleteContent(kind, id) {
   if (!requireAdmin()) return;
   if (!hasSection('content')) { toast('Нет доступа'); return; }
+  logAction(kind + '.delete', { id });
   const extra = kind === 'event' ? ' Отметки «Я приду» и анкеты этого события тоже удалятся из базы (в Google Таблице останутся).'
     : kind === 'group' ? ' Список участников группы тоже удалится.' : '';
   if (!(await ask('Удалить без возможности восстановления?' + extra))) return;
@@ -4869,7 +5004,7 @@ const cloud = {
   prayers: null, refl: null, mine: new Set(), prayMarks: new Set(), amenMarks: new Set(),
   tgTried: false, resetting: false,
   master: false, roleId: '', roleSections: null, roles: null, ministers: null, connects: null,
-  myQuestions: null, pastorQuestions: null, questionCtx: null
+  myQuestions: null, pastorQuestions: null, questionCtx: null, logs: null, categories: null
 };
 let cloudReadyResolve; const cloudReady = new Promise(r => { cloudReadyResolve = r; });
 const modalOpen = () => document.getElementById('modal-overlay').classList.contains('show');
@@ -4994,6 +5129,7 @@ function subscribeContent() {
     if (kind === 'events') maybeSyncStats();
   }, err => console.error('Чтение ' + kind, err));
   eventsUnsub = sub('events'); postsUnsub = sub('posts'); sermonsUnsub = sub('sermons'); groupsUnsub = sub('groups');
+  if (cloud.categories === null) loadCategories();
   statsUnsub = onSnapshot(collection(cloud.fs, 'eventStats'), snap => {
     const m = {};
     snap.forEach(d => { const x = d.data(); m[d.id] = { cap: Number(x.cap) || 0, people: Number(x.people) || 0 }; });
@@ -5518,7 +5654,7 @@ function planPickDay(d, id) { planSelDay = d; showPlan(id, true); }
 function planCtxClear() { bible().planCtx = null; saveLocalOnly(); renderBible(); }
 function stopEvent(ev) { ev.stopPropagation(); }
 
-const ACT_ALLOW = new Set(["adminLogin", "adminLogout", "bibleClearSel", "bibleCopy", "bibleFont", "bibleGo", "bibleHighlight", "bibleNotesToggle", "biblePickBook", "biblePickTr", "bibleReflect", "bibleRunSearch", "bibleSearch", "bibleSetTr", "bibleSettings", "bibleShare", "bibleSize", "bibleStep", "bibleView", "bkSetNt", "bkToggle", "blurOnEnter", "checkSheets", "clearImage", "closeAdmin", "closeModal", "cloudMigrate", "cloudMigrateV3", "copyForms", "copyScriptCode", "createGroup", "createNewEvent", "createPost", "createPrayer", "createRefl", "createSermon", "deleteContent", "deletePrayer", "deleteRefl", "digitsOnly", "editEvent", "editSermon", "endTour", "enterAdminLogin", "enterBibleSearch", "hideEl", "imgUrlChanged", "obAmen", "obBack", "obHighlight", "obNext", "obPick", "obSkip", "obStart", "obToggleInterest", "obTogglePlan", "onImageFile", "openAdmin", "openDonate", "openSermon", "openUrl", "pickLang", "planCtxClear", "planNext", "planPickDay", "planRead", "planReset", "planStart", "planToggleGroup", "regAdd", "regChoose", "regRemove", "regSet", "regSetDigits", "registerEvent", "renderBible", "resetData", "saveEvent", "saveProfile", "saveSermon", "saveSheets", "scrollToId", "setComTab", "setEventQuery", "setLang", "setMediaFilter", "setMediaQuery", "setShade", "setShowPast", "setTheme", "toggleTheme", "showAbout", "showAdminLogin", "showAnnouncements", "showDonate", "showEditProfile", "showEventDetail", "showForms", "showGroupDetail", "showLangPicker", "showMyEvents", "showMyGroups", "showNewsDetail", "showPeopleOf", "showPlan", "showPrayerForm", "showConnectForm", "createConnect", "showMyQuestions", "showQuestionForm", "createQuestion", "showQuestionThread", "sendThreadMessage", "saveTgChatId", "setPubChoice", "markConnectDone", "saveRole", "editRole", "deleteRole", "assignRole", "toggleMinister", "showReflForm", "showRegForm", "showSettings", "startTourSoon", "submitReg", "switchTab", "toggleAmen", "toggleEventForm", "toggleGroup", "togglePray", "toggleSearch", "tourNext", "unregisterEvent", "updatePreviewText"]);
+const ACT_ALLOW = new Set(["adminLogin", "adminLogout", "bibleClearSel", "bibleCopy", "bibleFont", "bibleGo", "bibleHighlight", "bibleNotesToggle", "biblePickBook", "biblePickTr", "bibleReflect", "bibleRunSearch", "bibleSearch", "bibleSetTr", "bibleSettings", "bibleShare", "bibleSize", "bibleStep", "bibleView", "bkSetNt", "bkToggle", "blurOnEnter", "checkSheets", "clearImage", "closeAdmin", "closeModal", "cloudMigrate", "cloudMigrateV3", "copyForms", "copyScriptCode", "createGroup", "createNewEvent", "createPost", "createPrayer", "createRefl", "createSermon", "deleteContent", "deletePrayer", "deleteRefl", "digitsOnly", "editEvent", "editSermon", "endTour", "enterAdminLogin", "enterBibleSearch", "hideEl", "imgUrlChanged", "obAmen", "obBack", "obHighlight", "obNext", "obPick", "obSkip", "obStart", "obToggleInterest", "obTogglePlan", "onImageFile", "openAdmin", "openDonate", "openSermon", "openUrl", "pickLang", "planCtxClear", "planNext", "planPickDay", "planRead", "planReset", "planStart", "planToggleGroup", "regAdd", "regChoose", "regRemove", "regSet", "regSetDigits", "registerEvent", "renderBible", "resetData", "saveEvent", "saveProfile", "saveSermon", "saveSheets", "scrollToId", "setComTab", "setEventQuery", "setLang", "setMediaFilter", "setMediaQuery", "setShade", "setShowPast", "setTheme", "toggleTheme", "showAbout", "showAdminLogin", "showAnnouncements", "showDonate", "showEditProfile", "showEventDetail", "showForms", "showGroupDetail", "showLangPicker", "showMyEvents", "showMyGroups", "showNewsDetail", "showPeopleOf", "showPlan", "showPrayerForm", "showConnectForm", "createConnect", "showMyQuestions", "showQuestionForm", "createQuestion", "showQuestionThread", "sendThreadMessage", "saveTgChatId", "setPubChoice", "markConnectDone", "saveRole", "editRole", "deleteRole", "assignRole", "toggleMinister", "togglePermanent", "saveCategory", "deleteCategoryCustom", "pickCatColor", "showReflForm", "showRegForm", "showSettings", "startTourSoon", "submitReg", "switchTab", "toggleAmen", "toggleEventForm", "toggleGroup", "togglePray", "toggleSearch", "tourNext", "unregisterEvent", "updatePreviewText"]);
 function actArg(a, el, ev) {
   if (a && typeof a === 'object' && !Array.isArray(a) && typeof a.$ === 'string') {
     if (a.$ === 'el') return el;
