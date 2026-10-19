@@ -1,79 +1,402 @@
 rules_version = '2';
-
-// Meta Church — правила безопасности Firestore.
-// Служители (админы) — это пользователи, вошедшие по почте и паролю (Firebase → Authentication → Users).
-// Все остальные входят анонимно и могут только отмечаться, вступать в группы и оставлять молитвенные нужды.
+// Meta Church — правила Firestore (версия приложения 3.0 — архитектурная ревизия).
+//
+// Что изменилось относительно 2.1:
+//  1. Контент (события/объявления/проповеди/группы) переехал с одного документа app/content
+//     на отдельные коллекции events/posts/sermons/groups — каждая запись своим документом.
+//     Это даёт то, чего не было в 2.1: черновики и роли теперь проверяются здесь, в правилах,
+//     а не только в JS-коде приложения.
+//  2. Права по ролям (hasSection) теперь проверяются и здесь, а не только в интерфейсе.
+//  3. Добавлены правила для connects, questions (+messages), roles, notifyQueue — в версии 2.1
+//     их не было вовсе, и правила по умолчанию отклоняли любую запись в эти коллекции.
+//  4. admins/{u}: раньше запись была закрыта полностью (allow write: if false) — это делало
+//     функции назначения ролей нерабочими против настоящей базы. Теперь мастер-админ может
+//     писать строго определённые поля в чужой документ.
+//  5. Молитвенные нужды: непубличные/адресованные конкретному служителю теперь видны по
+//     отдельному разделу доступа prayers, а не всем администраторам подряд.
 service cloud.firestore {
   match /databases/{database}/documents {
 
+    // ---------- общие функции ----------
     function signedIn() { return request.auth != null; }
-    function isAdmin() { return signedIn() && request.auth.token.firebase.sign_in_provider == 'password'; }
-    function isOwner(uid) { return signedIn() && request.auth.uid == uid; }
-    function shortText(v, max) { return v is string && v.size() <= max; }
+    function me() { return request.auth.uid; }
+    function isAdmin() {
+      return signedIn() && (request.auth.token.get('admin', false) == true
+        || exists(/databases/$(database)/documents/admins/$(request.auth.uid)));
+    }
+    function tgName() { return request.auth.token.get('tgUsername', ''); }
+    function nd() { return request.resource.data; }
+    function str(v, max) { return v is string && v.size() <= max; }
+    function nonEmpty(v, max) { return v is string && v.size() > 0 && v.size() <= max; }
+    function exactKeys(k) { return nd().keys().hasAll(k) && nd().keys().hasOnly(k); }
+    function p(coll, id) { return /databases/$(database)/documents/$(coll)/$(id); }
 
-    // Контент приложения: читают все, меняют только служители
-    match /app/{docId} {
+    // ---------- роли: зеркало client-side hasSection() из приложения ----------
+    // Мастер-админ и администраторы без назначенной роли (старые, легаси) — видят всё.
+    // Остальные — только те разделы, что перечислены в их роли.
+    function myAdminDoc() { return get(p('admins', me())).data; }
+    function isMaster() { return isAdmin() && myAdminDoc().get('master', false) == true; }
+    function myRoleId() { return isAdmin() ? myAdminDoc().get('roleId', '') : ''; }
+    function hasSection(sec) {
+      return isAdmin() && (isMaster() || myRoleId() == ''
+        || (exists(p('roles', myRoleId())) && sec in get(p('roles', myRoleId())).data.get('sections', [])));
+    }
+
+    // ---------- администраторы ----------
+    match /admins/{u} {
+      allow get: if signedIn() && (u == me() || isAdmin());
+      allow list: if isMaster();
+      // Мастер может менять только эти три поля у ЛЮБОГО администратора, включая себя
+      // не может создавать/удалять документы — это по-прежнему вручную, через Console.
+      allow update: if isMaster()
+        && nd().diff(resource.data).affectedKeys().hasOnly(['roleId', 'minister', 'tgChatId'])
+        && (!('roleId' in nd().diff(resource.data).affectedKeys()) || str(nd().get('roleId', ''), 80))
+        && (!('minister' in nd().diff(resource.data).affectedKeys()) || nd().get('minister', false) is bool)
+        && (!('tgChatId' in nd().diff(resource.data).affectedKeys()) || str(nd().get('tgChatId', ''), 40));
+      allow create, delete: if false;
+    }
+
+    // ---------- роли: читают все админы, пишет только мастер ----------
+    match /roles/{id} {
+      allow read: if isAdmin();
+      allow write: if isMaster()
+        && exactKeys(['name', 'sections'])
+        && nonEmpty(nd().name, 60)
+        && nd().sections is list && nd().sections.size() <= 10
+        && nd().sections.hasOnly(['content', 'create', 'team', 'connect', 'questions', 'prayers']);
+    }
+
+    // ---------- контент: было одним документом app/content, стало отдельными коллекциями ----------
+    // Черновик/отложенная публикация хранится прямо в документе (status, publishAt), но
+    // документ остаётся ПУБЛИЧНО читаемым — иначе посетители не увидят опубликованные записи.
+    // Это значит: скрытие черновиков в интерфейсе приложения — это удобство, а не секретность;
+    // кто-то специально обученный всё ещё может прочитать текст черновика напрямую через
+    // Firestore. Если для вас это важно — нужна отдельная защищённая коллекция для черновиков,
+    // это следующий шаг сверх этой ревизии, не часть неё.
+    function validStatus() {
+      return !('status' in nd().keys()) || nd().status in ['published', 'draft', 'scheduled'];
+    }
+    // ВАЖНО: у разных типов контента РАЗНАЯ форма данных в этом приложении —
+    // события/объявления/группы сортируются (есть order), проповеди — нет;
+    // группы называются полем name, а не title, как у остальных трёх типов.
+    // Единая проверка на всех была ошибкой — проверено переносом реальных данных через
+    // эмулятор: с общей contentBase() группы и проповеди не проходили вообще.
+    function contentBase(titleField, maxTitle) {
+      return nonEmpty(nd().get(titleField, ''), maxTitle) && nd().id is string && validStatus();
+    }
+    function orderOk() { return nd().get('order', 0) is number; }
+
+    match /events/{id} {
+      allow read: if true;
+      allow create: if hasSection('create') && contentBase('title', 160) && orderOk()
+        && nd().keys().hasOnly(['id', 'title', 'lead', 'description', 'date', 'time', 'location',
+            'category', 'capacity', 'link', 'status', 'publishAt', 'image', 'shade', 'order', 'needsForm'])
+        && str(nd().get('link', ''), 600) && (nd().get('link', '') == '' || nd().link.matches('https?://.*'));
+      allow update: if hasSection('content') && contentBase('title', 160) && orderOk()
+        && str(nd().get('link', ''), 600) && (nd().get('link', '') == '' || nd().link.matches('https?://.*'));
+      allow delete: if hasSection('content');
+    }
+    match /posts/{id} {
+      allow read: if true;
+      allow create, update: if hasSection(resource == null ? 'create' : 'content') && contentBase('title', 160) && orderOk()
+        && nd().keys().hasOnly(['id', 'title', 'text', 'topic', 'order', 'createdAt'])
+        && str(nd().get('text', ''), 4000) && str(nd().get('topic', ''), 60);
+      allow delete: if hasSection('content');
+    }
+    match /sermons/{id} {
+      allow read: if true;
+      // у проповедей нет order — своей очерёдности в списке у них в приложении не предусмотрено
+      allow create, update: if hasSection(resource == null ? 'create' : 'content') && contentBase('title', 160)
+        && nd().keys().hasOnly(['id', 'title', 'speaker', 'series', 'date', 'duration', 'url', 'image'])
+        && str(nd().get('url', ''), 600) && (nd().get('url', '') == '' || nd().url.matches('https?://.*'));
+      allow delete: if hasSection('content');
+    }
+    match /groups/{id} {
+      allow read: if true;
+      // у групп название в поле name, а не title
+      allow create, update: if hasSection(resource == null ? 'create' : 'content') && contentBase('name', 160) && orderOk()
+        && nd().keys().hasOnly(['id', 'name', 'sub', 'description', 'when', 'leader', 'image', 'order'])
+        && str(nd().get('sub', ''), 160) && str(nd().get('description', ''), 2000)
+        && str(nd().get('when', ''), 160) && str(nd().get('leader', ''), 120);
+      allow delete: if hasSection('content');
+    }
+
+    // старое место — оставлено только на время переноса данных (см. migrate_v3.js);
+    // после переноса можно закрыть совсем (allow write: if false).
+    match /app/content {
       allow read: if true;
       allow write: if isAdmin();
     }
-
-    // Фото событий и групп
-    match /images/{imageId} {
+    match /app/settings {
+      allow read, write: if isAdmin();
+    }
+    match /appPrivate/{d} {
+      allow read, write: if isAdmin();
+    }
+    match /images/{id} {
       allow read: if true;
-      allow write: if isAdmin();
+      allow create, update: if isAdmin()
+        && nd().keys().hasOnly(['data', 'at'])
+        && nd().data is string && nd().data.size() < 1048000
+        && nd().data.matches('data:image/(jpeg|png|webp|gif);base64,[A-Za-z0-9+/]+=*');
+      allow delete: if isAdmin();
     }
 
-    // Профили участников (имя и ник в Telegram)
-    match /users/{uid} {
-      allow read: if signedIn();
-      allow create, update: if isOwner(uid)
-        && request.resource.data.keys().hasOnly(['name', 'username', 'photoUrl', 'at'])
-        && shortText(request.resource.data.name, 60)
-        && shortText(request.resource.data.username, 64)
-        && shortText(request.resource.data.photoUrl, 500);
-      allow delete: if isOwner(uid) || isAdmin();
+    // ---------- профили ----------
+    match /users/{u} {
+      allow read: if signedIn() && (u == me() || isAdmin());
+      allow create, update: if signedIn() && u == me()
+        && exactKeys(['name', 'username', 'photoUrl', 'at'])
+        && str(nd().name, 60) && nd().username == tgName()
+        && (nd().photoUrl == '' || nd().photoUrl.matches('https://t[.]me/i/userpic/[A-Za-z0-9_/.-]{1,200}'))
+        && nd().at == request.time;
+      allow delete: if (signedIn() && u == me()) || isAdmin();
     }
 
-    // «Я приду» и регистрации на события
+    // ---------- места на событиях ----------
+    function rsvpPath(eid) { return p('rsvps', eid + '_' + me()); }
+    function peopleBefore(eid) { return exists(rsvpPath(eid)) ? get(rsvpPath(eid)).data.get('people', 1) : 0; }
+    function peopleAfter(eid) { return existsAfter(rsvpPath(eid)) ? getAfter(rsvpPath(eid)).data.get('people', 1) : 0; }
+    function statsDelta(eid) { return getAfter(p('eventStats', eid)).data.people - get(p('eventStats', eid)).data.people; }
+
+    match /eventStats/{eid} {
+      allow read: if true;
+      allow create, delete: if isAdmin();
+      allow update: if (signedIn()
+          && nd().diff(resource.data).affectedKeys().hasOnly(['people'])
+          && nd().people is int && nd().people >= 0
+          && (nd().people <= resource.data.cap || nd().people < resource.data.people)
+          && nd().people - resource.data.people == peopleAfter(eid) - peopleBefore(eid))
+        || isAdmin();
+    }
+
     match /rsvps/{id} {
-      allow read: if isAdmin() || (signedIn() && resource.data.uid == request.auth.uid);
+      allow get: if signedIn() && (resource == null || resource.data.uid == me() || isAdmin());
+      allow list: if signedIn() && (resource.data.uid == me() || isAdmin());
       allow create, update: if signedIn()
-        && request.resource.data.uid == request.auth.uid
-        && id == request.resource.data.eventId + '_' + request.auth.uid
-        && request.resource.data.keys().hasOnly(['eventId', 'uid', 'name', 'username', 'people', 'at'])
-        && shortText(request.resource.data.name, 60)
-        && request.resource.data.people is int && request.resource.data.people >= 1 && request.resource.data.people <= 50;
-      allow delete: if isAdmin() || (signedIn() && resource.data.uid == request.auth.uid);
+        && id == nd().eventId + '_' + me()
+        && exactKeys(['eventId', 'uid', 'name', 'username', 'people', 'at'])
+        && nd().uid == me() && str(nd().eventId, 80) && str(nd().name, 60)
+        && nd().username == tgName()
+        && nd().people is int && nd().people >= 1 && nd().people <= 200
+        && nd().at == request.time
+        && statsDelta(nd().eventId) == peopleAfter(nd().eventId) - peopleBefore(nd().eventId);
+      allow delete: if (signedIn() && resource.data.uid == me()
+          && statsDelta(resource.data.eventId) == 0 - peopleBefore(resource.data.eventId))
+        || isAdmin();
     }
 
-    // Участники малых групп
+    // ---------- малые группы ----------
     match /members/{id} {
-      allow read: if isAdmin() || (signedIn() && resource.data.uid == request.auth.uid);
-      allow create, update: if signedIn()
-        && request.resource.data.uid == request.auth.uid
-        && id == request.resource.data.groupId + '_' + request.auth.uid
-        && request.resource.data.keys().hasOnly(['groupId', 'uid', 'name', 'username', 'at'])
-        && shortText(request.resource.data.name, 60);
-      allow delete: if isAdmin() || (signedIn() && resource.data.uid == request.auth.uid);
+      allow get: if signedIn() && (resource == null || resource.data.uid == me() || isAdmin());
+      allow list: if signedIn() && (resource.data.uid == me() || isAdmin());
+      allow create: if signedIn()
+        && id == nd().groupId + '_' + me()
+        && exactKeys(['groupId', 'uid', 'name', 'username', 'at'])
+        && nd().uid == me() && str(nd().groupId, 80) && str(nd().name, 60)
+        && nd().username == tgName() && nd().at == request.time;
+      allow update: if false;
+      allow delete: if (signedIn() && resource.data.uid == me()) || isAdmin();
     }
 
-    // Молитвенные нужды
-    match /prayers/{id} {
-      allow read: if signedIn();
-      allow create: if signedIn()
-        && request.resource.data.uid == request.auth.uid
-        && request.resource.data.keys().hasOnly(['text', 'anonymous', 'name', 'uid', 'at', 'praying'])
-        && shortText(request.resource.data.text, 600) && request.resource.data.text.size() > 0
-        && shortText(request.resource.data.name, 60)
-        && request.resource.data.anonymous is bool
-        && request.resource.data.praying.size() == 0;
-      // «Помолиться»: можно только добавить или убрать себя
-      allow update: if signedIn()
-        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['praying'])
-        && request.resource.data.praying.toSet().difference(resource.data.praying.toSet())
-             .union(resource.data.praying.toSet().difference(request.resource.data.praying.toSet()))
-           == [request.auth.uid].toSet();
-      allow delete: if isAdmin() || (signedIn() && resource.data.uid == request.auth.uid);
+    // ---------- анкеты регистрации ----------
+    function validPerson(x) {
+      return x.keys().hasOnly(['fullName', 'age', 'city', 'attends', 'church'])
+        && x.fullName is string && x.fullName.size() <= 120
+        && x.city is string && x.city.size() <= 80
+        && x.church is string && x.church.size() <= 120
+        && x.age is int && x.attends is bool;
     }
+    function validPeople(ps) {
+      return ps is list && ps.size() >= 1 && ps.size() <= 10
+        && validPerson(ps[0])
+        && (ps.size() < 2 || validPerson(ps[1]))
+        && (ps.size() < 3 || validPerson(ps[2]))
+        && (ps.size() < 4 || validPerson(ps[3]))
+        && (ps.size() < 5 || validPerson(ps[4]))
+        && (ps.size() < 6 || validPerson(ps[5]))
+        && (ps.size() < 7 || validPerson(ps[6]))
+        && (ps.size() < 8 || validPerson(ps[7]))
+        && (ps.size() < 9 || validPerson(ps[8]))
+        && (ps.size() < 10 || validPerson(ps[9]));
+    }
+    match /forms/{id} {
+      allow get: if signedIn() && (resource == null || resource.data.uid == me() || isAdmin());
+      allow list: if isAdmin();
+      allow create: if signedIn()
+        && id.matches('id_[0-9]{10,16}_[a-z0-9]{1,8}')
+        && exactKeys(['eventId', 'uid', 'name', 'username', 'people', 'at'])
+        && nd().uid == me() && str(nd().eventId, 80) && str(nd().name, 60)
+        && nd().username == tgName() && nd().at == request.time
+        && validPeople(nd().people)
+        && peopleAfter(nd().eventId) == peopleBefore(nd().eventId) + nd().people.size();
+      allow update: if false;
+      allow delete: if isAdmin();
+    }
+
+    // ---------- молитвенные нужды и размышления ----------
+    function ownerOf(kind, pid) { return get(p('owners', kind + '_' + pid)).data.uid == me(); }
+    // Вариант для случая «запись-владелец создаётся тем же батчем, что и сама проверка»
+    // (вопрос + первое сообщение + owners — один commit) — get() внутри ЧТЕНИЯ не должен
+    // смешиваться с getAfter(), поэтому это отдельная функция, а не замена ownerOf() везде.
+    function ownerOfAfter(kind, pid) {
+      return existsAfter(p('owners', kind + '_' + pid)) && getAfter(p('owners', kind + '_' + pid)).data.uid == me();
+    }
+    function createdWithOwner(kind, pid) { return getAfter(p('owners', kind + '_' + pid)).data.uid == me(); }
+    function markToggled(marks, pid) {
+      let m = p(marks, pid + '_' + me());
+      let d = nd().n - resource.data.n;
+      return (d == 1 && !exists(m) && existsAfter(m)) || (d == -1 && exists(m) && !existsAfter(m));
+    }
+    function reactionOnly(marks, pid) {
+      return nd().diff(resource.data).affectedKeys().hasOnly(['n']) && nd().n is int && markToggled(marks, pid);
+    }
+    function rateOk() { return getAfter(p('limits', me())).data.at == request.time; }
+    function baseEntry() {
+      return rateOk() && nd().anonymous is bool && str(nd().name, 60) && (!nd().anonymous || nd().name == '')
+        && nd().at == request.time && nd().n == 0;
+    }
+
+    // Публичная нужда (public: true либо поля нет — обратная совместимость) видна всем вошедшим,
+    // как раньше. Непубличная — автору, конкретному адресату (to), и только тем администраторам,
+    // у кого в роли отмечен раздел prayers (или мастер/легаси-админ без роли). Раньше это видели
+    // ВСЕ администраторы без исключения — отдельный раздел доступа появился по вашей просьбе.
+    match /prayers/{id} {
+      allow get: if signedIn() && (
+        resource.data.get('public', true) != false
+        || hasSection('prayers')
+        || resource.data.get('to', '') == me()
+        || ownerOf('prayers', id)
+      );
+      allow list: if signedIn(); // список всегда фильтруется запросом; get решает видимость конкретной записи
+      allow create: if signedIn() && id.matches('[A-Za-z0-9]{20}')
+        && exactKeys(['text', 'anonymous', 'name', 'at', 'n', 'to', 'toName', 'public'])
+        && nonEmpty(nd().text, 600) && baseEntry()
+        && str(nd().get('to', ''), 80) && str(nd().get('toName', ''), 80)
+        && nd().get('public', true) is bool
+        && createdWithOwner('prayers', id);
+      allow update: if (signedIn() && reactionOnly('prayMarks', id)) || isAdmin();
+      allow delete: if (signedIn() && (ownerOf('prayers', id) || resource.data.get('uid', '') == me())) || isAdmin();
+    }
+
+    match /reflections/{id} {
+      allow read: if signedIn();
+      allow create: if signedIn() && id.matches('[A-Za-z0-9]{20}')
+        && exactKeys(['text', 'anonymous', 'name', 'at', 'n', 'ref', 'rb', 'rc', 'rv', 'quote'])
+        && nonEmpty(nd().text, 1500) && baseEntry()
+        && str(nd().ref, 80) && nd().rb is int && nd().rc is int && nd().rv is int && str(nd().quote, 500)
+        && createdWithOwner('reflections', id);
+      allow update: if (signedIn() && reactionOnly('amenMarks', id)) || isAdmin();
+      allow delete: if (signedIn() && (ownerOf('reflections', id) || resource.data.get('uid', '') == me())) || isAdmin();
+    }
+
+    match /limits/{u} {
+      allow get: if signedIn() && u == me();
+      allow create, update: if signedIn() && u == me()
+        && exactKeys(['at']) && nd().at == request.time
+        && (resource == null || request.time > resource.data.at + duration.value(30, 's'));
+    }
+
+    match /owners/{key} {
+      allow get: if signedIn() && (resource == null || resource.data.uid == me() || isAdmin());
+      allow list: if signedIn() && (resource.data.uid == me() || isAdmin());
+      allow create: if (signedIn()
+          && exactKeys(['uid', 'kind', 'pid']) && nd().uid == me()
+          && nd().kind in ['prayers', 'reflections', 'connects', 'questions'] && nd().pid is string
+          && key == nd().kind + '_' + nd().pid
+          && !exists(p(nd().kind, nd().pid)) && existsAfter(p(nd().kind, nd().pid)))
+        || isAdmin();
+      allow update: if isAdmin();
+      allow delete: if (signedIn() && resource.data.uid == me()) || isAdmin();
+    }
+
+    match /prayMarks/{id} {
+      allow get: if signedIn() && (resource == null || resource.data.uid == me());
+      allow list: if signedIn() && resource.data.uid == me();
+      allow create: if (signedIn() && exactKeys(['pid', 'uid']) && nd().uid == me()
+          && nd().pid is string && id == nd().pid + '_' + me()
+          && getAfter(p('prayers', nd().pid)).data.n == get(p('prayers', nd().pid)).data.n + 1)
+        || isAdmin();
+      allow delete: if (signedIn() && resource.data.uid == me()
+          && getAfter(p('prayers', resource.data.pid)).data.n == get(p('prayers', resource.data.pid)).data.n - 1)
+        || isAdmin();
+    }
+
+    match /amenMarks/{id} {
+      allow get: if signedIn() && (resource == null || resource.data.uid == me());
+      allow list: if signedIn() && resource.data.uid == me();
+      allow create: if (signedIn() && exactKeys(['pid', 'uid']) && nd().uid == me()
+          && nd().pid is string && id == nd().pid + '_' + me()
+          && getAfter(p('reflections', nd().pid)).data.n == get(p('reflections', nd().pid)).data.n + 1)
+        || isAdmin();
+      allow delete: if (signedIn() && resource.data.uid == me()
+          && getAfter(p('reflections', resource.data.pid)).data.n == get(p('reflections', resource.data.pid)).data.n - 1)
+        || isAdmin();
+    }
+
+    // ---------- «Ищу общение»: отправить может любой вошедший, видят — admin с доступом connect ----------
+    match /connects/{id} {
+      allow get: if signedIn() && (hasSection('connect') || ownerOf('connects', id));
+      allow list: if hasSection('connect');
+      allow create: if signedIn()
+        && exactKeys(['name', 'contact', 'note', 'status', 'uid', 'at'])
+        && nonEmpty(nd().name, 60) && nonEmpty(nd().contact, 120) && str(nd().note, 400)
+        && nd().status == 'new' && nd().uid == me() && nd().at == request.time
+        && createdWithOwner('connects', id);
+      allow update: if hasSection('connect')
+        && nd().diff(resource.data).affectedKeys().hasOnly(['status'])
+        && nd().status in ['new', 'contacted'];
+      allow delete: if hasSection('connect') || isMaster();
+    }
+
+    // ---------- Консультация пастора: анонимно, видят адресат/мастер/роль questions ----------
+    // ВАЖНО: id вопроса берём из переменной пути {id}, а не из поля документа — в самом
+    // документе такого поля нет (как и у prayers/connects, где тоже нет своего 'id' в данных).
+    function questionVisible(qdata, qid) {
+      return hasSection('questions') || isMaster() || qdata.to == me() || ownerOf('questions', qid);
+    }
+    match /questions/{id} {
+      allow get: if signedIn() && questionVisible(resource.data, id);
+      allow list: if signedIn() && (hasSection('questions') || isMaster());
+      allow create: if signedIn()
+        && exactKeys(['to', 'toName', 'anonymous', 'name', 'status', 'lastFrom', 'at', 'lastAt'])
+        && str(nd().to, 80) && str(nd().toName, 80) && nd().anonymous is bool
+        && str(nd().name, 60) && (!nd().anonymous || nd().name == '')
+        && nd().status == 'new' && nd().lastFrom == 'user'
+        && createdWithOwner('questions', id);
+      allow update: if signedIn()
+        && questionVisible(resource.data, id)
+        && nd().diff(resource.data).affectedKeys().hasOnly(['status', 'lastFrom', 'lastAt'])
+        && nd().status in ['new', 'answered'] && nd().lastFrom in ['user', 'pastor'];
+      allow delete: if isMaster();
+
+      match /messages/{mid} {
+        // read: родительский вопрос уже существует — обычный get() корректен.
+        allow read: if signedIn() && questionVisible(get(p('questions', id)).data, id);
+        // create: первое сообщение пишется ОДНИМ батчем вместе с созданием самого вопроса и
+        // его owners-записи (так делает настоящий клиент — см. createQuestion()), поэтому
+        // здесь везде нужны getAfter()/ownerOfAfter(), а не get()/ownerOf() — на момент
+        // проверки ни вопрос, ни owners ещё не видны как «текущее» состояние, только «после».
+        allow create: if signedIn()
+          && exactKeys(['from', 'text', 'at'])
+          && nd().from in ['user', 'pastor'] && nonEmpty(nd().text, 800) && nd().at == request.time
+          && (
+            (nd().from == 'user' && ownerOfAfter('questions', id))
+            || (nd().from == 'pastor' && isAdmin()
+                && (hasSection('questions') || isMaster() || getAfter(p('questions', id)).data.to == me()))
+          );
+        allow update, delete: if false;
+      }
+    }
+
+    // ---------- уведомления в Telegram: пишет клиент, читает только Cloud Function ----------
+    match /notifyQueue/{id} {
+      allow create: if signedIn()
+        && exactKeys(['toUid', 'type', 'questionId', 'at'])
+        && str(nd().toUid, 80) && nd().type == 'question' && str(nd().questionId, 80) && nd().at == request.time;
+      allow read, update, delete: if false; // Cloud Function ходит через Admin SDK — он правила не проверяет
+    }
+
+    // всё остальное закрыто
   }
 }

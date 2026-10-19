@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-+pzHxBs/XaFUVYxbsKGioS19TnTdR5jkais6867/URc=' 'sha256-F6b4Q6KamFe/QvSH24gbfrKzeW8XEAzyItlzN84Lj+I=' 'sha256-NZi9hjq2z6k2qE+IC1ry+5D1nc4rgaIrzPuiXYXKtK8=' https://telegram.org https://www.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com data:; img-src 'self' data: blob: https:; media-src 'self' blob: https:; connect-src 'self' https://*.googleapis.com https://*.cloudfunctions.net https://*.run.app https://bolls.life https://script.google.com https://script.googleusercontent.com; frame-src https://www.youtube.com https://www.youtube-nocookie.com https://metachurch-e800d.firebaseapp.com; script-src-attr 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-+pzHxBs/XaFUVYxbsKGioS19TnTdR5jkais6867/URc=' 'sha256-F6b4Q6KamFe/QvSH24gbfrKzeW8XEAzyItlzN84Lj+I=' 'sha256-N1okj9h5gep0HYTDgEOlMPpiZ+KFgxccCs6aGUSHs94=' https://telegram.org https://www.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com data:; img-src 'self' data: blob: https:; media-src 'self' blob: https:; connect-src 'self' https://*.googleapis.com https://*.cloudfunctions.net https://*.run.app https://bolls.life https://script.google.com https://script.googleusercontent.com; frame-src https://www.youtube.com https://www.youtube-nocookie.com https://metachurch-e800d.firebaseapp.com; script-src-attr 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
 <!-- НАСТРОЙКИ ПРИЛОЖЕНИЯ: меняйте только значения внутри content (формат JSON). Код ниже не трогайте —
      он защищён хешами в Content-Security-Policy; после правок кода запустите: node update-csp.mjs файл.html -->
 <meta name="mc-config" content='{
@@ -47,6 +47,8 @@
   --violet: #A99BFF;  /* семинар */
   --amber: #FFC24B;   /* тренинг */
   --mint: #5ED3A5;    /* отдых */
+  --teal: #4FC9B8;    /* молодёжь 17-35 */
+  --rose: #F28FA3;    /* подростки */
   --danger: #FF6B5E;
   /* -fg: версии акцентов для текста прямо на фоне экрана (не на цветной плашке).
      В тёмной теме совпадают с акцентом; в светлой — темнее, чтобы читались на белом. */
@@ -142,6 +144,7 @@ img { display:block; max-width:100%; }
   padding: calc(var(--safe-top) + 16px) 20px 12px;
   background: linear-gradient(var(--bg) 70%, rgba(11,11,12,0));
   display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  transform: translateZ(0); -webkit-transform: translateZ(0); will-change: transform;
 }
 .header h1 { font-family: var(--display); font-size: 24px; font-weight: 700; letter-spacing: -.4px; }
 .header .back { display:flex; align-items:center; gap: 6px; }
@@ -864,7 +867,7 @@ body.touring .toast { z-index: 900; }
 .chips { gap: 8px; }
 .chip { padding: 10px 18px; font-size: 14px; font-weight: 500; background: var(--surface-2); color: var(--text); border: 1px solid #303035; transition: background .2s, color .2s, transform .15s, box-shadow .2s; }
 .chip:active { transform: scale(.96); }
-.chip.active { background: var(--text); color: var(--bg); border-color: var(--text); font-weight: 700; box-shadow: 0 6px 18px rgba(255,255,255,.14); }
+.chip.active { background: var(--text); color: var(--bg); border-color: var(--text); font-weight: 700; box-shadow: none; }
 .chips.sect { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; overflow: visible; }
 .chips.sect .chip { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; padding: 12px 6px 11px; border-radius: 18px; font-size: 13px; font-weight: 600; white-space: normal; text-align: center; line-height: 1.15; min-height: 70px; }
 .chips.sect .chip svg { width: 22px; height: 22px; stroke: currentColor; stroke-width: 1.8; fill: none; }
@@ -879,7 +882,7 @@ body.touring .toast { z-index: 900; }
 .chip.tint { background: var(--surface-2); background: color-mix(in srgb, var(--c) 13%, var(--surface-2)); border-color: color-mix(in srgb, var(--c) 42%, transparent); color: var(--text); }
 .chip.tint svg { stroke: var(--c); }
 .chip.tint.dot::before { content: ''; display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--c); margin-right: 8px; vertical-align: 1px; }
-.chip.tint.active { background: var(--c); border-color: var(--c); color: #111; box-shadow: 0 8px 22px color-mix(in srgb, var(--c) 38%, transparent); }
+.chip.tint.active { background: var(--c); border-color: var(--c); color: #111; box-shadow: none; }
 .chip.tint.active svg { stroke: #111; }
 .chip.tint.active.dot::before { background: #111; }
 .seg button.tint, .bb-tabs button.tint { color: var(--text); }
@@ -1084,7 +1087,7 @@ html[data-theme="light"] .seg, html[data-theme="light"] .bb-tabs {
 }
 /* «нейтральные» кнопки (например «Все»): белые, активная — тёмная */
 html[data-theme="light"] .chip { background: #fff; color: var(--text-2); border: 1px solid #E1E5EB; box-shadow: none; }
-html[data-theme="light"] .chip.active { background: var(--ink); color: #fff; border-color: var(--ink); box-shadow: 0 6px 16px rgba(14,20,32,.22); }
+html[data-theme="light"] .chip.active { background: var(--ink); color: #fff; border-color: var(--ink); box-shadow: none; }
 
 /* цветные разделы: лёгкая заливка цветом, у активной — сплошной цвет (как в тёмной теме) */
 html[data-theme="light"] .chip.tint {
@@ -1378,6 +1381,8 @@ html[data-theme="light"] .header .icon-btn svg, html[data-theme="light"] .tab sv
     <button class="chip active" data-filter="all">Все</button>
     <button class="chip tint dot" style="--c:var(--ember)" data-filter="service">Служения</button>
     <button class="chip tint dot" style="--c:var(--sky)" data-filter="youth">Молодёжь</button>
+    <button class="chip tint dot" style="--c:var(--teal)" data-filter="youth1735">Молодёжь 17-35</button>
+    <button class="chip tint dot" style="--c:var(--rose)" data-filter="teens">Подростки</button>
     <button class="chip tint dot" style="--c:var(--lime)" data-filter="prayer">Молитва</button>
     <button class="chip tint dot" style="--c:#E6E6E3" data-filter="group">Группы</button>
     <button class="chip tint dot" style="--c:var(--violet)" data-filter="seminar">Семинары</button>
@@ -1423,6 +1428,14 @@ html[data-theme="light"] .header .icon-btn svg, html[data-theme="light"] .tab sv
     <button class="menu-item" data-on-click="[[&quot;switchTab&quot;,[&quot;community&quot;]],[&quot;setComTab&quot;,[&quot;prayer&quot;]]]">
       <svg viewBox="0 0 24 24"><path d="M12 20.5s-8.5-5-8.5-11A4.5 4.5 0 0112 7a4.5 4.5 0 018.5 2.5c0 6-8.5 11-8.5 11z"/></svg>
       <span>Молитвенные нужды</span><svg class="chev" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg>
+    </button>
+    <button class="menu-item" data-on-click="[[&quot;showConnectForm&quot;,[]]]">
+      <svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6"/><path d="M19 8v6M22 11h-6"/></svg>
+      <span>Ищу общение</span><svg class="chev" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg>
+    </button>
+    <button class="menu-item" data-on-click="[[&quot;showMyQuestions&quot;,[]]]">
+      <svg viewBox="0 0 24 24"><path d="M4 5.5A1.5 1.5 0 015.5 4h13A1.5 1.5 0 0120 5.5v9a1.5 1.5 0 01-1.5 1.5H10l-4 4v-4H5.5A1.5 1.5 0 014 14.5z"/></svg>
+      <span>Консультация пастора</span><svg class="chev" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg>
     </button>
     <button class="menu-item" data-on-click="[[&quot;showDonate&quot;,[]]]">
       <svg viewBox="0 0 24 24"><path d="M12 20.5s-8.5-5-8.5-11A4.5 4.5 0 0112 7a4.5 4.5 0 018.5 2.5c0 6-8.5 11-8.5 11z"/><path d="M12 10v5M9.5 12.5h5"/></svg>
@@ -1494,15 +1507,17 @@ html[data-theme="light"] .header .icon-btn svg, html[data-theme="light"] .tab sv
         <div class="form-group"><label class="form-label" for="ev-time">Время</label><input class="input" id="ev-time" type="time"></div>
       </div>
       <div class="form-group"><label class="form-label" for="ev-location">Место</label><input class="input" id="ev-location" placeholder="Главный зал"></div>
+      <div class="form-group"><label class="form-label" for="ev-link">Ссылка (необязательно)</label><input class="input" id="ev-link" placeholder="https://…" inputmode="url"><div class="hint">Покажется кнопкой в карточке события — например, ссылка на трансляцию или форму.</div></div>
       <div class="form-row">
         <div class="form-group"><label class="form-label" for="ev-category">Направление</label>
-          <select class="select" id="ev-category"><option value="service">Служение</option><option value="youth">Молодёжь</option><option value="prayer">Молитва</option><option value="group">Группа</option><option value="seminar">Семинар</option><option value="training">Тренинг</option><option value="rest">Отдых</option></select>
+          <select class="select" id="ev-category"><option value="service">Служение</option><option value="youth">Молодёжь</option><option value="youth1735">Молодёжь 17-35</option><option value="teens">Подростки</option><option value="prayer">Молитва</option><option value="group">Группа</option><option value="seminar">Семинар</option><option value="training">Тренинг</option><option value="rest">Отдых</option></select>
         </div>
         <div class="form-group"><label class="form-label" for="ev-capacity">Мест</label><input class="input" id="ev-capacity" type="number" value="100" min="1"></div>
       </div>
       <div class="form-group"><label class="form-label">Фото</label><div id="ev-imgbox"></div></div>
       <label class="toggle-row" style="margin-bottom:16px"><div><span>Регистрация с анкетой</span><small>ФИО, возраст, город, церковь. Заявки попадут в Google Таблицу</small></div>
         <span class="switch"><input type="checkbox" id="ev-form"><i></i></span></label>
+      <div id="ev-pub-box"></div>
       <button class="btn btn-light btn-full" data-on-click="[[&quot;createNewEvent&quot;,[]]]">Создать событие</button>
     </div>
 
@@ -1554,8 +1569,14 @@ html[data-theme="light"] .header .icon-btn svg, html[data-theme="light"] .tab sv
   </div>
 
   <div id="admin-team" class="pad hidden">
-    <p class="hint" style="margin:0 0 6px;font-size:13px;">Администраторов назначают в Firebase Console (коллекция admins).</p>
+    <p class="hint" style="margin:0 0 6px;font-size:13px;">Новых администраторов назначают в Firebase Console (коллекция admins). Здесь — роли и заявки.</p>
+    <div id="roles-box"></div>
+    <div class="sub-title">Команда</div>
     <div id="team-list"></div>
+    <div class="sub-title" id="connect-title" style="display:none">Заявки «Ищу общение»</div>
+    <div id="admin-connect"></div>
+    <div class="sub-title" id="questions-title" style="display:none">Вопросы пастору</div>
+    <div id="admin-questions"></div>
   </div>
 </section>
 
@@ -1625,7 +1646,8 @@ const CONFIG = {
     if (Number.isInteger(o.maxPeople)) CONFIG.maxPeople = Math.min(10, Math.max(1, o.maxPeople));
   } catch (e) { console.warn('mc-config: ошибка в настройках', e); }
 })();
-const STORE_KEY = 'metachurch_v1';
+const STORE_KEY = 'metachurch_v1'; // ФИЧИ v1 === молитва-адресат/паблик, заявки на общение, роли админов UI-FIX v1 PUBLISH v1 SECURITY v1 SECURITY v2 ARCH v3
+// ФИЧИ v2 === консультация пастора (анонимно/с именем, переписка, Telegram-уведомление), категории 17-35/подростки, ссылка в событии
 
 // === STATE ===
 // Роли и счётчики здесь не хранятся: права администратора и места на событиях проверяет только сервер.
@@ -1662,9 +1684,9 @@ const DB = {
     ['events', 'posts', 'sermons', 'groups'].forEach(k => { if (!Array.isArray(state[k])) state[k] = []; });
   },
   save() {
-    const ok = saveLocalOnly(true);
-    if (ok && typeof cloudQueuePush === 'function') cloudQueuePush();
-    return ok;
+    // раньше здесь была отправка ВСЕГО контента в одну запись (cloudQueuePush) —
+    // теперь каждая правка публикуется отдельно сама, см. pushItem()/pushDelete()/pushReorder()
+    return saveLocalOnly(true);
   }
 };
 
@@ -1726,6 +1748,18 @@ function nextWeekday(wd, extraWeeks = 0) { const d = new Date(); d.setHours(0,0,
 function daysAgo(n) { const d = new Date(); d.setDate(d.getDate() - n); return isoDate(d); }
 function longDate(s, withYear) { const d = parseDate(s); return d.getDate() + (LANG === 'uz' ? '-' : ' ') + MON_GEN[d.getMonth()] + (withYear ? ' ' + d.getFullYear() : ''); }
 function isPast(e) { const d = parseDate(e.date); const [h, m] = (e.time || '23:59').split(':').map(Number); d.setHours(h || 0, m || 0); return d.getTime() + 3 * 3600000 < Date.now(); }
+// Черновик не виден никому, кроме администратора. «Отложенное» становится видно всем само,
+// как только текущее время проходит отметку publishAt — пересчитывается при каждом рендере.
+function isEffectivelyPublished(e) {
+  if (e.status === 'draft') return isAdmin();
+  if (e.status === 'scheduled') return isAdmin() || (!!e.publishAt && Date.parse(e.publishAt) <= Date.now());
+  return true;
+}
+function pubBadge(e) {
+  if (e.status === 'draft') return ' · черновик';
+  if (e.status === 'scheduled' && (!e.publishAt || Date.parse(e.publishAt) > Date.now())) return ' · выйдет ' + (e.publishAt ? longDate(e.publishAt.slice(0, 10), true) + ', ' + e.publishAt.slice(11, 16) : '?');
+  return '';
+}
 function tsMs(t) {
   if (!t) return 0;
   if (typeof t === 'number') return t;
@@ -2101,7 +2135,9 @@ const CAT = {
   group:   { name: 'Группа',   color: 'var(--text)' },
   seminar: { name: 'Семинар',  color: 'var(--violet)' },
   training:{ name: 'Тренинг',  color: 'var(--amber)' },
-  rest:    { name: 'Отдых',    color: 'var(--mint)' }
+  rest:    { name: 'Отдых',    color: 'var(--mint)' },
+  youth1735: { name: 'Молодёжь 17-35', color: 'var(--teal)' },
+  teens:     { name: 'Подростки',      color: 'var(--rose)' }
 };
 const TOPIC = {
   announce:  { name: 'Анонс', color: 'var(--sky)' },
@@ -2232,7 +2268,7 @@ function renderHome() {
   } else hero.innerHTML = '';
 
   // События — ближайшие по дате, с учётом приоритета
-  const upcoming = state.events.filter(e => !isPast(e))
+  const upcoming = state.events.filter(e => isEffectivelyPublished(e) && !isPast(e))
     .sort((a, b) => byOrder(a, b) || parseDate(a.date) - parseDate(b.date));
   document.getElementById('home-events').innerHTML = upcoming.length
     ? upcoming.slice(0, 3).map(eventRowHtml).join('')
@@ -2355,7 +2391,7 @@ function openSermon(id) {
 // === RENDER: EVENTS ===
 let eventFilter = 'all', eventQuery = '';
 function renderEvents() {
-  let list = state.events;
+  let list = state.events.filter(isEffectivelyPublished);
   if (eventFilter !== 'all') list = list.filter(e => e.category === eventFilter);
   if (!state.settings.showPast) list = list.filter(e => !isPast(e));
   const q = eventQuery.trim().toLowerCase();
@@ -2423,7 +2459,9 @@ function renderPrayers() {
     if (cloud.on && cloud.uid) loadPrayers().then(() => { if (comTab === 'prayer') renderPrayers(); }).catch(() => { box.innerHTML = '<div class="empty"><p>Не удалось загрузить. Потяните экран вниз, чтобы обновить.</p></div>'; });
     return;
   }
-  const list = cloud.prayers.map(p => ({ ...p, mine: isMine('prayers', p), n: prayerCount(p), on: cloud.prayMarks.has(p.id) }));
+  const list = cloud.prayers
+    .filter(p => p.public !== false || isAdmin() || (cloud.uid && p.to === cloud.uid))
+    .map(p => ({ ...p, mine: isMine('prayers', p), n: prayerCount(p), on: cloud.prayMarks.has(p.id) }));
   box.innerHTML = `
     <div class="verse"><p>«В тесноте моей я призвал Господа и к Богу моему воззвал…»</p><b>Псалтирь 17:7</b></div>
     <div class="pad">
@@ -2431,6 +2469,7 @@ function renderPrayers() {
         const canDel = p.mine || isAdmin();
         return `<div class="prayer">
           <div class="prayer-head"><span>${p.anonymous ? 'Анонимно' : esc(p.name || 'Участник')}</span><span>${timeAgo(p.at)}</span></div>
+          ${p.toName || p.public === false ? `<div class="hint" style="margin:-4px 0 6px">${p.toName ? 'Адресовано: ' + esc(p.toName) : ''}${p.toName && p.public === false ? ' · ' : ''}${p.public === false ? 'не опубликовано' : ''}</div>` : ''}
           <div class="prayer-text">${esc(p.text)}</div>
           <div class="prayer-foot">
             <button class="pray-btn ${p.on ? 'on' : ''}" data-on-click="[[&quot;togglePray&quot;,[${js(p.id)}]]]">${ICON.hands}${p.on ? 'Молюсь' : 'Помолиться'}${p.n ? ' · ' + p.n : ''}</button>
@@ -2465,7 +2504,11 @@ function openAdmin() { if (!isAdmin()) { toast('Нет доступа'); return;
 function closeAdmin() { switchTab('more'); }
 function renderAdmin() {
   if (!isAdmin()) { switchTab('home'); toast('Нет доступа'); return; }
-  renderContentAdmin();
+  document.querySelectorAll('#admin-seg [data-atab]').forEach(btn => {
+    const sec = btn.dataset.atab; const ok = sec === 'team' ? true : hasSection(sec);
+    btn.classList.toggle('hidden', !ok);
+  });
+  if (hasSection('content')) renderContentAdmin();
   renderTeam();
   renderCloudBanner();
   loadAdminCounts();
@@ -2488,8 +2531,9 @@ function formToggleBtn(e) {
 }
 function toggleEventForm(id) {
   if (!requireAdmin()) return;
+  if (!hasSection('content')) { toast('Нет доступа'); return; }
   const e = state.events.find(x => x.id === id); if (!e) return;
-  e.needsForm = !e.needsForm; DB.save(); renderContentAdmin();
+  e.needsForm = !e.needsForm; DB.save(); pushItem('events', e); renderContentAdmin();
   toast(e.needsForm ? 'Анкета включена' : 'Анкета выключена');
 }
 function renderContentAdmin() {
@@ -2497,14 +2541,14 @@ function renderContentAdmin() {
   const ev = [...state.events].sort(byOrder);
   const evEl = document.getElementById('prio-events');
   evEl.innerHTML = ev.length ? ev.map(e => sortItem('event', e.id, e.title,
-    esc(cat(e.category).name + ' · ' + longDate(e.date) + (isPast(e) ? ' · прошло' : '') + (e.needsForm ? ' · анкета' : '')) + `<span id="cnt-ev-${esc(e.id)}"></span>`,
+    esc(cat(e.category).name + ' · ' + longDate(e.date) + (isPast(e) ? ' · прошло' : '') + (e.needsForm ? ' · анкета' : '')) + esc(pubBadge(e)) + `<span id="cnt-ev-${esc(e.id)}"></span>`,
     `<button class="prio-btn" data-on-click="[[&quot;editEvent&quot;,[${js(e.id)}]]]" aria-label="Изменить">${PENCIL}</button>` + formToggleBtn(e), isPast(e))).join('') : none;
-  makeSortable(evEl, ids => applyOrder(state.events, ids));
+  makeSortable(evEl, ids => applyOrder(state.events, ids), 'events', state.events);
 
   const po = [...state.posts].sort(byOrder);
   const poEl = document.getElementById('prio-posts');
   poEl.innerHTML = po.length ? po.map(p => sortItem('post', p.id, p.title, esc(topic(p.topic).name + ' · ' + timeAgo(p.createdAt)))).join('') : none;
-  makeSortable(poEl, ids => applyOrder(state.posts, ids));
+  makeSortable(poEl, ids => applyOrder(state.posts, ids), 'posts', state.posts);
 
   const se = [...state.sermons].sort((a, b) => parseDate(b.date) - parseDate(a.date));
   document.getElementById('list-sermons').innerHTML = se.length ? se.map(s => simpleItem('sermon', s.id, s.title, esc(s.speaker + ' · ' + longDate(s.date, true) + (ytId(s.url) ? ' · YouTube' : s.url ? ' · ссылка' : ' · без видео')))).join('') : none;
@@ -2512,7 +2556,7 @@ function renderContentAdmin() {
   const gr = [...state.groups].sort(byOrder);
   const grEl = document.getElementById('list-groups');
   grEl.innerHTML = gr.length ? gr.map(g => sortItem('group', g.id, g.name, `<span id="cnt-gr-${esc(g.id)}">Группа</span>`)).join('') : none;
-  makeSortable(grEl, ids => applyOrder(state.groups, ids));
+  makeSortable(grEl, ids => applyOrder(state.groups, ids), 'groups', state.groups);
   fillAdminCounts();
 }
 
@@ -2533,7 +2577,7 @@ function ensureOrder() {
   // группы раньше сортировались порядком массива — переводим на поле order (нужно для слияния правок)
   if (state.groups.some(g => typeof g.order !== 'number')) state.groups.forEach((g, i) => { g.order = i; });
 }
-function makeSortable(list, onDone) {
+function makeSortable(list, onDone, kind, arr) {
   list.classList.add('sort-list');
   list.querySelectorAll('.drag-handle').forEach(handle => {
     handle.addEventListener('pointerdown', ev => {
@@ -2584,8 +2628,10 @@ function makeSortable(list, onDone) {
         handle.removeEventListener('pointercancel', onUp);
         item.style.transform = ''; item.classList.remove('dragging'); document.body.classList.remove('sorting');
         if (moved) {
-          onDone([...list.querySelectorAll('.sort-item')].map(el => el.dataset.id));
+          const ids = [...list.querySelectorAll('.sort-item')].map(el => el.dataset.id);
+          onDone(ids);
           DB.save(); toast('Порядок сохранён');
+          if (kind && arr) pushReorder(kind, ids.map(id => arr.find(x => x.id === id)).filter(Boolean));
         }
       };
       handle.addEventListener('pointermove', onMove);
@@ -2594,13 +2640,105 @@ function makeSortable(list, onDone) {
     });
   });
 }
+const ALL_SECTIONS = [['content', 'Контент'], ['create', 'Создание'], ['team', 'Доступы'], ['connect', 'Заявки «Ищу общение»'], ['questions', 'Вопросы пастору']];
+async function loadRoles() {
+  try {
+    const { collection, getDocs } = cloud.m;
+    const snap = await getDocs(collection(cloud.fs, 'roles'));
+    cloud.roles = snap.docs.map(d => ({ id: d.id, name: d.data().name || '', sections: d.data().sections || [] }));
+  } catch (e) { cloud.roles = []; }
+}
+async function loadTeam() {
+  try {
+    const { collection, getDocs } = cloud.m;
+    const snap = await getDocs(collection(cloud.fs, 'admins'));
+    cloud.team = snap.docs.map(d => ({ uid: d.id, ...d.data() }));
+  } catch (e) { cloud.team = []; }
+}
+async function saveRole() {
+  if (!cloud.master) { toast('Нет доступа'); return; }
+  const name = document.getElementById('role-name').value.trim();
+  if (!name) { toast('Введите название'); return; }
+  const sections = ALL_SECTIONS.filter(([k]) => document.getElementById('rs-' + k).checked).map(([k]) => k);
+  try {
+    const { collection, doc, setDoc } = cloud.m;
+    const id = document.getElementById('role-id').value || doc(collection(cloud.fs, 'roles')).id;
+    await setDoc(doc(cloud.fs, 'roles', id), { name: name.slice(0, 60), sections });
+    toast('Роль сохранена'); document.getElementById('role-name').value = ''; document.getElementById('role-id').value = '';
+    await loadRoles(); renderTeam();
+  } catch (e) { toast('Не удалось сохранить. Проверьте правила Firestore'); }
+}
+function editRole(id) {
+  const r = (cloud.roles || []).find(x => x.id === id); if (!r) return;
+  document.getElementById('role-id').value = r.id;
+  document.getElementById('role-name').value = r.name;
+  ALL_SECTIONS.forEach(([k]) => { const el = document.getElementById('rs-' + k); if (el) el.checked = r.sections.includes(k); });
+}
+async function deleteRole(id) {
+  if (!cloud.master) { toast('Нет доступа'); return; }
+  if (!confirm('Удалить эту роль? У администраторов с этой ролью пропадёт доступ к её разделам.')) return;
+  try { await cloud.m.deleteDoc(cloud.m.doc(cloud.fs, 'roles', id)); await loadRoles(); renderTeam(); }
+  catch (e) { toast('Не удалось удалить'); }
+}
+async function assignRole(uid, roleId) {
+  if (!cloud.master) { toast('Нет доступа'); return; }
+  try { await cloud.m.setDoc(cloud.m.doc(cloud.fs, 'admins', uid), { roleId: roleId || '' }, { merge: true }); toast('Роль назначена'); await loadTeam(); renderTeam(); }
+  catch (e) { toast('Не удалось сохранить'); }
+}
+async function toggleMinister(uid, on) {
+  if (!cloud.master) { toast('Нет доступа'); return; }
+  try { await cloud.m.setDoc(cloud.m.doc(cloud.fs, 'admins', uid), { minister: on }, { merge: true }); await loadTeam(); renderTeam(); }
+  catch (e) { toast('Не удалось сохранить'); }
+}
+async function saveTgChatId(uid, value) {
+  if (!cloud.master) { toast('Нет доступа'); return; }
+  const v = String(value || '').trim();
+  if (v && !/^-?\d+$/.test(v)) { toast('Chat ID — это просто число (можно отрицательное)'); return; }
+  try { await cloud.m.setDoc(cloud.m.doc(cloud.fs, 'admins', uid), { tgChatId: v }, { merge: true }); toast('Сохранено'); await loadTeam(); renderTeam(); }
+  catch (e) { toast('Не удалось сохранить'); }
+}
+function rolesBoxHtml() {
+  if (!cloud.master) return '';
+  const rows = (cloud.roles || []).map(r => `<div class="cloud-box" style="display:flex;align-items:center;gap:8px;margin:0 0 8px">
+    <div style="flex:1"><b>${esc(r.name)}</b><br><span class="hint">${r.sections.map(k => (ALL_SECTIONS.find(s => s[0] === k) || [k, k])[1]).join(', ') || 'без разделов'}</span></div>
+    <button class="link" data-on-click="[[&quot;editRole&quot;,[${js(r.id)}]]]">Изменить</button>
+    <button class="link-danger" data-on-click="[[&quot;deleteRole&quot;,[${js(r.id)}]]]">Удалить</button>
+  </div>`).join('');
+  const checks = ALL_SECTIONS.map(([k, label]) => `<label class="check"><input type="checkbox" id="rs-${k}"> ${esc(label)}</label>`).join('');
+  return `<div class="sub-title">Роли</div>${rows || '<p class="hint">Ролей пока нет — ниже можно создать первую.</p>'}
+    <div class="cloud-box">
+      <input type="hidden" id="role-id">
+      <div class="form-group"><label class="form-label" for="role-name">Название роли</label><input class="input" id="role-name" placeholder="Например, «Модератор событий»"></div>
+      <div class="form-group"><label class="form-label">Разделы, которые эта роль открывает</label>${checks}</div>
+      <button class="btn btn-light btn-full" data-on-click="[[&quot;saveRole&quot;,[]]]">Сохранить роль</button>
+    </div>`;
+}
+function teamRowHtml(m) {
+  const roleOpts = (cloud.roles || []).map(r => `<option value="${esc(r.id)}" ${m.roleId === r.id ? 'selected' : ''}>${esc(r.name)}</option>`).join('');
+  return `<div class="cloud-box" style="margin:0 0 8px">
+    <b>${esc(m.name || m.uid)}</b>${m.master ? ' <span class="hint">(мастер-админ)</span>' : ''}<br><span class="hint">UID: ${esc(m.uid)}</span>
+    ${cloud.master && !m.master ? `<div class="form-group" style="margin-top:8px"><select class="select" data-on-change="[[&quot;assignRole&quot;,[${js(m.uid)},{&quot;$&quot;: &quot;value&quot;}]]]"><option value="">Полный доступ (без роли)</option>${roleOpts}</select></div>
+      <label class="check" style="margin-top:8px"><input type="checkbox" ${m.minister ? 'checked' : ''} data-on-change="[[&quot;toggleMinister&quot;,[${js(m.uid)},{&quot;$&quot;: &quot;checked&quot;}]]]"> Служитель (видно в молитвенных нуждах)</label>
+      <div class="form-group" style="margin-top:8px"><label class="form-label">Telegram chat ID (для уведомлений о вопросах)</label><input class="input" value="${esc(m.tgChatId || '')}" placeholder="узнать: бот @userinfobot" data-on-change="[[&quot;saveTgChatId&quot;,[${js(m.uid)},{&quot;$&quot;: &quot;value&quot;}]]]"></div>` : ''}
+  </div>`;
+}
 function renderTeam() {
   const hint = document.querySelector('#admin-team > p.hint'); if (hint) hint.style.display = 'none';
-  document.getElementById('team-list').innerHTML = `
-    <div class="cloud-box" style="margin:0 0 14px"><b>Вы вошли как</b>${esc(cloud.email || (cloud.tgUsername ? '@' + cloud.tgUsername : 'пользователь Telegram'))}<br><span class="hint">UID: ${esc(cloud.uid)}</span></div>
+  document.getElementById('roles-box').innerHTML = `
+    <div class="cloud-box" style="margin:0 0 14px"><b>Вы вошли как</b>${esc(cloud.email || (cloud.tgUsername ? '@' + cloud.tgUsername : 'пользователь Telegram'))}<br><span class="hint">UID: ${esc(cloud.uid)}${cloud.master ? ' · мастер-админ' : ''}</span></div>
     ${sheetsBoxHtml()}
-    <div class="cloud-box" style="margin:0 0 14px"><b>Как добавить администратора</b>1. Firebase Console → Authentication → Users → Add user (почта и пароль). Если настроен вход через Telegram, достаточно, чтобы человек один раз открыл приложение.<br>2. Скопируйте UID пользователя.<br>3. Firestore → коллекция <b>admins</b> → документ с ID, равным UID (поле любое, например name).<br><br><b>Как убрать доступ</b>Удалите документ из коллекции admins. Аккаунт с почтой, которого там нет, в управление не попадёт.<br><br>Самостоятельную регистрацию по почте отключите: Authentication → Settings → User actions → снимите «Enable create (sign-up)».</div>
+    ${rolesBoxHtml()}
+    <div class="cloud-box" style="margin:14px 0"><b>Как добавить администратора</b>1. Firebase Console → Authentication → Users → Add user. 2. Скопируйте UID. 3. Firestore → коллекция <b>admins</b> → документ с ID = UID. Мастер-админу нужно поле <b>master: true</b> — его выставляют только в Firebase Console.<br><br><b>Как убрать доступ</b>Удалите документ из коллекции admins.</div>
     ${cloud.email ? '<button class="btn btn-danger btn-full" data-on-click="[[&quot;adminLogout&quot;,[]]]">Выйти из аккаунта администратора</button>' : ''}`;
+  document.getElementById('team-list').innerHTML = (cloud.team || []).map(teamRowHtml).join('') || '<p class="hint">Загружаем список…</p>';
+  const connectTitle = document.getElementById('connect-title');
+  if (hasSection('connect')) { connectTitle.style.display = ''; renderConnects(); if (cloud.connects === null) loadConnects().then(renderConnects); }
+  else { connectTitle.style.display = 'none'; document.getElementById('admin-connect').innerHTML = ''; }
+  const qTitle = document.getElementById('questions-title');
+  if (hasSection('questions')) { qTitle.style.display = ''; renderPastorQuestions(); if (cloud.pastorQuestions === null) loadPastorQuestions().then(renderPastorQuestions); }
+  else { qTitle.style.display = 'none'; document.getElementById('admin-questions').innerHTML = ''; }
+  if (cloud.roles === null) loadRoles().then(() => renderTeam());
+  if (cloud.team === null) loadTeam().then(() => renderTeam());
 }
 
 // === ACTIONS ===
@@ -2756,7 +2894,7 @@ function showEventDetail(id) {
   const cap = esc(e.capacity);
   openModal(`
     ${eventCover(e)}
-    <div class="post-tag" style="color:${cat(e.category).color}">${cat(e.category).name}${e.needsForm ? '<span class="form-badge">· нужна регистрация</span>' : ''}</div>
+    <div class="post-tag" style="color:${cat(e.category).color}">${cat(e.category).name}${e.needsForm ? '<span class="form-badge">· нужна регистрация</span>' : ''}${pubBadge(e) ? `<span class="form-badge">${esc(pubBadge(e))}</span>` : ''}</div>
     <h3 style="font-size:26px">${esc(e.title)}</h3>
     ${isAdmin() ? `<button class="admin-edit" data-on-click="[[&quot;editEvent&quot;,[${eid}]]]">${PENCIL}Изменить событие</button>` + (e.needsForm
       ? `<button class="admin-edit" data-on-click="[[&quot;showForms&quot;,[${eid}]]]">${ICON.users}Анкеты</button>`
@@ -2766,6 +2904,7 @@ function showEventDetail(id) {
       <div>${ICON.clock}${esc(e.time)}</div>
       <div>${ICON.pin}${esc(e.location)}</div>
     </div>
+    ${e.link ? `<button class="btn btn-dark btn-full" style="margin-bottom:14px" data-on-click="[[&quot;openUrl&quot;,[${js(e.link)}]]]">Открыть ссылку ${ICON.arrow}</button>` : ''}
     ${e.lead ? `<div class="desc" style="color:var(--text)">${esc(e.lead)}</div>` : ''}
     ${e.description ? `<div class="desc">${rich(e.description)}</div>` : ''}
     ${e.needsForm
@@ -2977,15 +3116,214 @@ function showGroupDetail(id) {
              : `<button class="btn btn-light btn-full" data-on-click="[[&quot;toggleGroup&quot;,[${gid}]],[&quot;closeModal&quot;,[]]]">Вступить в группу</button>`}
   `);
 }
-function showPrayerForm() {
+// === КОНСУЛЬТАЦИЯ ПАСТОРА: анонимный вопрос с перепиской ===
+async function showQuestionForm() {
+  if (cloud.ministers === null) await loadMinisters();
+  if (!cloud.ministers || !cloud.ministers.length) { toast('Пока ни один пастор не отмечен как служитель — обратитесь к администратору'); return; }
+  const opts = cloud.ministers.map(m => `<option value="${esc(m.uid)}">${esc(m.name)}</option>`).join('');
+  openModal(`
+    <div class="modal-handle"></div>
+    <h3>Консультация пастора</h3>
+    <p class="hint" style="margin:0 0 14px">Личный вопрос пастору. По умолчанию анонимно — ваше имя пастор не увидит, если вы сами его не укажете.</p>
+    <div class="form-group"><label class="form-label" for="qf-to">Кому адресовать</label><select class="select" id="qf-to">${opts}</select></div>
+    <div class="form-group"><label class="form-label" for="qf-text">Ваш вопрос</label><textarea class="textarea" id="qf-text" maxlength="800" placeholder="Можно коротко"></textarea></div>
+    <div class="form-group"><label class="check"><input type="checkbox" id="qf-name"> Указать моё имя</label></div>
+    <button class="btn btn-light btn-full" data-on-click="[[&quot;createQuestion&quot;,[]]]">Отправить</button>
+  `);
+  setTimeout(() => { const t = document.getElementById('qf-text'); t && t.focus(); }, 300);
+}
+async function createQuestion() {
+  const toUid = document.getElementById('qf-to').value;
+  const toName = document.getElementById('qf-to').selectedOptions[0] ? document.getElementById('qf-to').selectedOptions[0].textContent : '';
+  const text = document.getElementById('qf-text').value.trim();
+  if (!toUid) { toast('Выберите, кому адресовать вопрос'); return; }
+  if (!text) { toast('Напишите вопрос'); return; }
+  if (!cloud.uid) { toast('Нет связи с базой. Проверьте интернет'); return; }
+  if (!navigator.onLine) { showNet('offline'); toast('Нет интернета'); return; }
+  const showName = document.getElementById('qf-name').checked;
+  const { collection, doc, writeBatch, serverTimestamp } = cloud.m;
+  const ref = doc(collection(cloud.fs, 'questions'));
+  const msgRef = doc(collection(cloud.fs, 'questions', ref.id, 'messages'));
+  const btn = document.querySelector('#modal-content .btn-light'); if (btn) btn.disabled = true;
+  try {
+    const b = writeBatch(cloud.fs);
+    b.set(ref, { to: toUid, toName, anonymous: !showName, name: showName ? myName() : '', status: 'new', lastFrom: 'user', at: serverTimestamp(), lastAt: serverTimestamp() });
+    b.set(msgRef, { from: 'user', text: text.slice(0, 800), at: serverTimestamp() });
+    b.set(doc(cloud.fs, 'owners', 'questions_' + ref.id), { uid: cloud.uid, kind: 'questions', pid: ref.id });
+    b.set(doc(cloud.fs, 'notifyQueue', ref.id), { toUid, type: 'question', questionId: ref.id, at: serverTimestamp() });
+    await b.commit();
+    closeModal(); toast('Вопрос отправлен'); cloud.myQuestions = null;
+  } catch (e) { toast('Не удалось отправить. Проверьте интернет'); }
+  if (btn) btn.disabled = false;
+}
+async function loadMyQuestions() {
+  try {
+    const { collection, getDocs, query, where } = cloud.m;
+    const owned = await getDocs(query(collection(cloud.fs, 'owners'), where('uid', '==', cloud.uid), where('kind', '==', 'questions')));
+    const ids = owned.docs.map(d => d.data().pid);
+    const list = [];
+    for (const id of ids) {
+      const snap = await cloud.m.getDoc(cloud.m.doc(cloud.fs, 'questions', id));
+      if (snap.exists()) list.push({ id, ...snap.data() });
+    }
+    list.sort((a, b) => (b.lastAt && b.lastAt.toMillis ? b.lastAt.toMillis() : 0) - (a.lastAt && a.lastAt.toMillis ? a.lastAt.toMillis() : 0));
+    cloud.myQuestions = list;
+  } catch (e) { cloud.myQuestions = []; }
+}
+function showMyQuestions() {
+  if (!cloud.uid) { toast('Подключаемся к базе, попробуйте через пару секунд'); return; }
+  openModal(`
+    <div style="height:30px"></div>
+    <h3 style="padding-right:44px">Консультация пастора</h3>
+    <div id="my-questions-list">${myQuestionsListHtml()}</div>
+  `, { full: true, foot: `<button class="btn btn-light btn-full" data-on-click="[[&quot;showQuestionForm&quot;,[]]]">Задать новый вопрос</button>` });
+  if (cloud.myQuestions === null) loadMyQuestions().then(() => { const box = document.getElementById('my-questions-list'); if (box) box.innerHTML = myQuestionsListHtml(); });
+}
+function myQuestionsListHtml() {
+  if (cloud.myQuestions === null) return `<div class="empty"><p>Загружаем…</p></div>`;
+  if (!cloud.myQuestions.length) return `<div class="empty"><p>Вопросов пока нет.</p></div>`;
+  return cloud.myQuestions.map(q => `<div class="g-list-item" data-on-click="[[&quot;showQuestionThread&quot;,[${js(q.id)},false]]]"><div><div class="person-name">${esc(q.toName || 'Пастору')}</div><div class="person-sub">${q.status === 'answered' ? 'Пастор ответил' : 'Ждём ответа'}</div></div></div>`).join('');
+}
+async function loadThread(id) {
+  const { collection, getDocs, query, orderBy } = cloud.m;
+  const snap = await getDocs(query(collection(cloud.fs, 'questions', id, 'messages'), orderBy('at', 'asc')));
+  return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+}
+function threadHtml(msgs, mine) {
+  if (!msgs.length) return `<div class="empty"><p>Сообщений пока нет.</p></div>`;
+  return msgs.map(m => `<div class="prayer" style="${(m.from === 'pastor') === mine ? '' : 'opacity:.85'}">
+    <div class="prayer-head"><span>${m.from === 'pastor' ? 'Пастор' : 'Вы'}</span><span>${timeAgo(m.at)}</span></div>
+    <div class="prayer-text">${esc(m.text)}</div>
+  </div>`).join('');
+}
+async function showQuestionThread(id, asPastor) {
+  cloud.questionCtx = { id, asPastor };
+  openModal(`
+    <div class="modal-handle"></div>
+    <h3>Переписка</h3>
+    <div id="thread-box"><div class="empty"><p>Загружаем…</p></div></div>
+    <div class="form-group" style="margin-top:10px"><textarea class="textarea" id="qt-text" maxlength="800" placeholder="Ваш ответ"></textarea></div>
+  `, { foot: `<button class="btn btn-light btn-full" data-on-click="[[&quot;sendThreadMessage&quot;,[]]]">Отправить</button>` });
+  const msgs = await loadThread(id);
+  const box = document.getElementById('thread-box'); if (box) box.innerHTML = threadHtml(msgs, !asPastor);
+}
+async function sendThreadMessage() {
+  const ctx = cloud.questionCtx; if (!ctx) return;
+  const text = document.getElementById('qt-text').value.trim();
+  if (!text) { toast('Напишите сообщение'); return; }
+  if (!navigator.onLine) { showNet('offline'); toast('Нет интернета'); return; }
+  const from = ctx.asPastor ? 'pastor' : 'user';
+  const { collection, doc, writeBatch, serverTimestamp } = cloud.m;
+  const msgRef = doc(collection(cloud.fs, 'questions', ctx.id, 'messages'));
+  try {
+    const b = writeBatch(cloud.fs);
+    b.set(msgRef, { from, text: text.slice(0, 800), at: serverTimestamp() });
+    b.update(doc(cloud.fs, 'questions', ctx.id), { lastFrom: from, lastAt: serverTimestamp(), status: ctx.asPastor ? 'answered' : 'new' });
+    await b.commit();
+    document.getElementById('qt-text').value = '';
+    const msgs = await loadThread(ctx.id);
+    const box = document.getElementById('thread-box'); if (box) box.innerHTML = threadHtml(msgs, !ctx.asPastor);
+    cloud.myQuestions = null; cloud.pastorQuestions = null;
+  } catch (e) { toast('Не удалось отправить. Проверьте интернет'); }
+}
+async function loadPastorQuestions() {
+  try {
+    const { collection, getDocs, query, where, orderBy } = cloud.m;
+    const q = cloud.master
+      ? query(collection(cloud.fs, 'questions'), orderBy('lastAt', 'desc'))
+      : query(collection(cloud.fs, 'questions'), where('to', '==', cloud.uid), orderBy('lastAt', 'desc'));
+    const snap = await getDocs(q);
+    cloud.pastorQuestions = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  } catch (e) { cloud.pastorQuestions = []; }
+}
+function renderPastorQuestions() {
+  const box = document.getElementById('admin-questions'); if (!box) return;
+  const list = cloud.pastorQuestions || [];
+  box.innerHTML = !list.length ? `<div class="empty"><p>Вопросов пока нет.</p></div>` : list.map(q => `<div class="g-list-item" data-on-click="[[&quot;showQuestionThread&quot;,[${js(q.id)},true]]]"><div><div class="person-name">${q.anonymous ? 'Анонимно' : esc(q.name || 'Без имени')}</div><div class="person-sub">${q.status === 'answered' ? 'Вы ответили' : 'Ждёт ответа'}</div></div></div>`).join('');
+}
+function showConnectForm() {
+  openModal(`
+    <div class="modal-handle"></div>
+    <h3>Ищу общение</h3>
+    <p class="hint" style="margin:0 0 14px">Оставьте заявку — с вами свяжется служитель церкви.</p>
+    <div class="form-group"><label class="form-label" for="co-name">Как к вам обращаться</label><input class="input" id="co-name" maxlength="60" placeholder="Ваше имя"></div>
+    <div class="form-group"><label class="form-label" for="co-contact">Телефон или Telegram</label><input class="input" id="co-contact" maxlength="120" placeholder="Как с вами связаться"></div>
+    <div class="form-group"><label class="form-label" for="co-note">Коротко о себе</label><textarea class="textarea" id="co-note" maxlength="400" placeholder="Необязательно"></textarea></div>
+    <button class="btn btn-light btn-full" data-on-click="[[&quot;createConnect&quot;,[]]]">Отправить</button>
+  `);
+  setTimeout(() => { const t = document.getElementById('co-name'); t && t.focus(); }, 300);
+}
+async function createConnect() {
+  const name = document.getElementById('co-name').value.trim();
+  const contact = document.getElementById('co-contact').value.trim();
+  const note = document.getElementById('co-note').value.trim();
+  if (!name) { toast('Напишите, как к вам обращаться'); return; }
+  if (!contact) { toast('Укажите, как с вами связаться'); return; }
+  if (!cloud.uid) { toast('Нет связи с базой. Проверьте интернет'); return; }
+  if (!navigator.onLine) { showNet('offline'); toast('Нет интернета'); return; }
+  const { collection, doc, writeBatch, serverTimestamp } = cloud.m;
+  const ref = doc(collection(cloud.fs, 'connects'));
+  const btn = document.querySelector('#modal-content .btn-light'); if (btn) btn.disabled = true;
+  try {
+    const b = writeBatch(cloud.fs);
+    b.set(ref, { name: name.slice(0, 60), contact: contact.slice(0, 120), note: note.slice(0, 400), status: 'new', uid: cloud.uid, at: serverTimestamp() });
+    b.set(doc(cloud.fs, 'owners', 'connects_' + ref.id), { uid: cloud.uid, kind: 'connects', pid: ref.id });
+    await b.commit();
+    closeModal(); toast('Заявка отправлена — с вами скоро свяжутся');
+  } catch (e) { toast('Не удалось отправить. Проверьте интернет'); }
+  if (btn) btn.disabled = false;
+}
+async function loadConnects() {
+  try {
+    const { collection, getDocs, orderBy, query } = cloud.m;
+    const snap = await getDocs(query(collection(cloud.fs, 'connects'), orderBy('at', 'desc')));
+    cloud.connects = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  } catch (e) { cloud.connects = []; }
+}
+async function markConnectDone(id) {
+  try {
+    await cloud.m.updateDoc(cloud.m.doc(cloud.fs, 'connects', id), { status: 'contacted' });
+    toast('Отмечено');
+    const i = (cloud.connects || []).findIndex(c => c.id === id); if (i > -1) cloud.connects[i].status = 'contacted';
+    renderConnects();
+  } catch (e) { toast('Не удалось сохранить'); }
+}
+function connectsListHtml() {
+  const list = cloud.connects || [];
+  if (!list.length) return `<div class="empty"><p>Заявок пока нет.</p></div>`;
+  return list.map(c => `<div class="prayer">
+    <div class="prayer-head"><span>${esc(c.name)}</span><span>${timeAgo(c.at)}</span></div>
+    <div class="prayer-text">${esc(c.contact)}${c.note ? '<br>' + esc(c.note) : ''}</div>
+    <div class="prayer-foot">${c.status === 'contacted' ? '<span class="hint">Связались</span>' : `<button class="pray-btn" data-on-click="[[&quot;markConnectDone&quot;,[${js(c.id)}]]]">Отметить: связались</button>`}</div>
+  </div>`).join('');
+}
+function renderConnects() {
+  const box = document.getElementById('admin-connect'); if (!box) return;
+  box.innerHTML = connectsListHtml();
+}
+async function showPrayerForm() {
+  if (cloud.ministers === null) await loadMinisters();
+  const opts = (cloud.ministers || []).map(m => `<option value="${esc(m.uid)}">${esc(m.name)}</option>`).join('');
   openModal(`
     <div class="modal-handle"></div>
     <h3>Попросить молитву</h3>
     <div class="form-group"><label class="form-label" for="pr-text">О чём молиться?</label><textarea class="textarea" id="pr-text" maxlength="600" placeholder="Можно коротко — церковь поймёт"></textarea></div>
+    <div class="form-group"><label class="form-label" for="pr-to">Кому адресовать</label>
+      <select class="select" id="pr-to"><option value="">Всем служителям</option>${opts}</select></div>
+    <div class="form-group"><label class="check"><input type="checkbox" id="pr-public" checked> Опубликовать для всех</label>
+      <div class="hint">Если снять галочку, нужду увидят только выбранный служитель и администраторы — остальным она показана не будет.</div></div>
     <div class="form-group"><label class="check"><input type="checkbox" id="pr-anon"> Не показывать моё имя</label></div>
     <button class="btn btn-light btn-full" data-on-click="[[&quot;createPrayer&quot;,[]]]">Отправить</button>
   `);
   setTimeout(() => { const t = document.getElementById('pr-text'); t && t.focus(); }, 300);
+}
+// Список служителей — админы с пометкой minister:true (ставится в Доступах). Кешируется на сессию.
+async function loadMinisters() {
+  try {
+    const { collection, query, where, getDocs } = cloud.m;
+    const snap = await getDocs(query(collection(cloud.fs, 'admins'), where('minister', '==', true)));
+    cloud.ministers = snap.docs.map(d => ({ uid: d.id, name: (d.data().name || 'Служитель').slice(0, 60) }));
+  } catch (e) { cloud.ministers = []; }
 }
 async function createPrayer() {
   const text = document.getElementById('pr-text').value.trim();
@@ -2993,10 +3331,13 @@ async function createPrayer() {
   if (!cloud.uid) { toast('Нет связи с базой. Проверьте интернет'); return; }
   if (!navigator.onLine) { showNet('offline'); toast('Нет интернета'); return; }
   const anonymous = document.getElementById('pr-anon').checked;
+  const toUid = document.getElementById('pr-to').value;
+  const toName = toUid ? (document.getElementById('pr-to').selectedOptions[0].textContent) : '';
+  const isPublic = document.getElementById('pr-public').checked;
   const { collection, doc, writeBatch, serverTimestamp } = cloud.m;
   const ref = doc(collection(cloud.fs, 'prayers'));
   // автор не пишется в саму запись: для анонимных нужд его нельзя вычислить даже через базу
-  const item = { text: text.slice(0, 600), anonymous, name: anonymous ? '' : myName(), n: 0 };
+  const item = { text: text.slice(0, 600), anonymous, name: anonymous ? '' : myName(), n: 0, to: toUid, toName, public: isPublic };
   const b = writeBatch(cloud.fs);
   b.set(ref, { ...item, at: serverTimestamp() });
   b.set(doc(cloud.fs, 'owners', 'prayers_' + ref.id), { uid: cloud.uid, kind: 'prayers', pid: ref.id });
@@ -3090,21 +3431,65 @@ const val = id => document.getElementById(id).value.trim();
 const clear = (...ids) => ids.forEach(id => document.getElementById(id).value = '');
 function createNewEvent() {
   if (!requireAdmin()) return;
+  if (!hasSection('create')) { toast('Нет доступа'); return; }
   const title = val('ev-title'); if (!title) { toast('Введите название'); return; }
   const date = val('ev-date'); if (!date) { toast('Выберите дату'); return; }
   const capacity = Math.min(100000, Math.max(1, parseInt(val('ev-capacity')) || 100));
+  const link = val('ev-link');
+  if (link && (!/^https?:\/\/\S+$/.test(link) || /['"]/.test(link))) { toast('Ссылка должна начинаться с https:// и не содержать пробелов и кавычек'); return; }
+  const pub = readPub('ev'); if (!pub) return;
   state.events.push({
     id: genId(), title, lead: val('ev-lead'), description: val('ev-desc'),
     date, time: val('ev-time') || '19:00', location: val('ev-location') || 'Главный зал',
-    category: val('ev-category'), capacity,
+    category: val('ev-category'), capacity, link, status: pub.status, publishAt: pub.publishAt,
     image: getImageValue('ev'), shade: getShade('ev'), order: topOrder(state.events),
     needsForm: document.getElementById('ev-form').checked
   });
+  const newEv = state.events[state.events.length - 1];
   if (!DB.save()) { state.events.pop(); return; }
-  clear('ev-title', 'ev-lead', 'ev-desc', 'ev-location');
-  clearImage('ev');
+  pushItem('events', newEv);
+  clear('ev-title', 'ev-lead', 'ev-desc', 'ev-location', 'ev-link');
+  clearImage('ev'); resetPubChoice('ev');
   document.getElementById('ev-form').checked = false;
-  toast('Событие создано — оно первое в списке'); renderContentAdmin();
+  toast(pub.status === 'draft' ? 'Сохранено как черновик' : pub.status === 'scheduled' ? 'Событие выйдет автоматически в назначенное время' : 'Событие создано — оно первое в списке'); renderContentAdmin();
+}
+// === ПУБЛИКАЦИЯ: сразу / черновик / по времени ===
+function pubChoiceHtml(prefix, status, publishAt) {
+  status = status || 'published';
+  const dt = publishAt ? new Date(publishAt) : null;
+  const dd = dt ? publishAt.slice(0, 10) : '';
+  const tt = dt ? publishAt.slice(11, 16) : '09:00';
+  const btn = (m, label) => `<button type="button" class="${status === m ? 'on' : ''}" data-pub="${m}" data-on-click="[[&quot;setPubChoice&quot;,[${js(prefix)},${js(m)},{&quot;$&quot;: &quot;el&quot;}]]]">${label}</button>`;
+  return `
+    <div class="form-group"><label class="form-label">Публикация</label>
+      <div class="choice" id="${prefix}-pub">${btn('published', 'Сразу')}${btn('draft', 'Черновик')}${btn('scheduled', 'По времени')}</div>
+      <div class="form-row" id="${prefix}-pubat-row" style="margin-top:10px${status === 'scheduled' ? '' : ';display:none'}">
+        <div class="form-group"><input class="input" id="${prefix}-pubat-date" type="date" value="${dd}"></div>
+        <div class="form-group"><input class="input" id="${prefix}-pubat-time" type="time" value="${tt}"></div>
+      </div>
+      <div class="hint">Черновик видят только администраторы. «По времени» — событие само появится у всех в указанный момент, менять вручную не нужно.</div>
+    </div>`;
+}
+function setPubChoice(prefix, mode, btnEl) {
+  const box = document.getElementById(prefix + '-pub'); if (!box) return;
+  box.querySelectorAll('button').forEach(b => b.classList.remove('on'));
+  btnEl.classList.add('on');
+  const row = document.getElementById(prefix + '-pubat-row'); if (row) row.style.display = mode === 'scheduled' ? '' : 'none';
+}
+function resetPubChoice(prefix) {
+  const box = document.getElementById(prefix + '-pub'); if (!box) return;
+  box.querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.pub === 'published'));
+  const row = document.getElementById(prefix + '-pubat-row'); if (row) row.style.display = 'none';
+}
+// Возвращает { status, publishAt } по состоянию контрола или null, если «по времени» не заполнено (валидирует сама)
+function readPub(prefix) {
+  const on = document.querySelector('#' + prefix + '-pub .on');
+  const mode = on ? on.dataset.pub : 'published';
+  if (mode !== 'scheduled') return { status: mode, publishAt: null };
+  const d = val(prefix + '-pubat-date'), t = val(prefix + '-pubat-time') || '09:00';
+  if (!d) { toast('Укажите дату и время публикации'); return null; }
+  const iso = new Date(d + 'T' + t + ':00').toISOString();
+  return { status: 'scheduled', publishAt: iso };
 }
 // === ФОТО: загрузка с телефона или ссылка ===
 const imgState = {};
@@ -3272,30 +3657,38 @@ function editEvent(id) {
       <div class="form-group"><label class="form-label" for="ee-time">Время</label><input class="input" id="ee-time" type="time" value="${esc(e.time)}"></div>
     </div>
     <div class="form-group"><label class="form-label" for="ee-location">Место</label><input class="input" id="ee-location" value="${esc(e.location)}"></div>
+    <div class="form-group"><label class="form-label" for="ee-link">Ссылка (необязательно)</label><input class="input" id="ee-link" value="${esc(e.link || '')}" placeholder="https://…" inputmode="url"></div>
     <div class="form-row">
       <div class="form-group"><label class="form-label" for="ee-category">Направление</label>
-        <select class="select" id="ee-category">${opt('service', 'Служение')}${opt('youth', 'Молодёжь')}${opt('prayer', 'Молитва')}${opt('group', 'Группа')}${opt('seminar', 'Семинар')}${opt('training', 'Тренинг')}${opt('rest', 'Отдых')}</select></div>
+        <select class="select" id="ee-category">${opt('service', 'Служение')}${opt('youth', 'Молодёжь')}${opt('youth1735', 'Молодёжь 17-35')}${opt('teens', 'Подростки')}${opt('prayer', 'Молитва')}${opt('group', 'Группа')}${opt('seminar', 'Семинар')}${opt('training', 'Тренинг')}${opt('rest', 'Отдых')}</select></div>
       <div class="form-group"><label class="form-label" for="ee-capacity">Мест</label><input class="input" id="ee-capacity" type="number" min="1" value="${esc(e.capacity)}"></div>
     </div>
     <div class="form-group"><label class="form-label">Фото</label>${imageFieldHtml('ee')}</div>
     <label class="toggle-row" style="margin-bottom:16px"><div><span>Регистрация с анкетой</span><small>ФИО, возраст, город, церковь</small></div>
       <span class="switch"><input type="checkbox" id="ee-form" ${e.needsForm ? 'checked' : ''}><i></i></span></label>
+    ${pubChoiceHtml('ee', e.status, e.publishAt)}
   `, { full: true, foot: `<button class="btn btn-light btn-full" data-on-click="[[&quot;saveEvent&quot;,[${js(e.id)}]]]">Сохранить изменения</button>` });
   setImageField('ee', e.image, e.shade);
 }
 function saveEvent(id) {
   if (!requireAdmin()) return;
+  if (!hasSection('content')) { toast('Нет доступа'); return; }
   const e = state.events.find(x => x.id === id); if (!e) return;
   const title = val('ee-title'); if (!title) { toast('Введите название'); return; }
   const date = val('ee-date'); if (!date) { toast('Выберите дату'); return; }
+  const eeLink = val('ee-link');
+  if (eeLink && (!/^https?:\/\/\S+$/.test(eeLink) || /['"]/.test(eeLink))) { toast('Ссылка должна начинаться с https:// и не содержать пробелов и кавычек'); return; }
+  const pub = readPub('ee'); if (!pub) return;
   const backup = { ...e };
   Object.assign(e, {
     title, lead: val('ee-lead'), description: val('ee-desc'), date,
     time: val('ee-time') || e.time, location: val('ee-location') || e.location,
-    category: val('ee-category'), capacity: Math.min(100000, Math.max(1, parseInt(val('ee-capacity')) || e.capacity)),
+    category: val('ee-category'), capacity: Math.min(100000, Math.max(1, parseInt(val('ee-capacity')) || e.capacity)), link: eeLink,
+    status: pub.status, publishAt: pub.publishAt,
     image: getImageValue('ee'), shade: getShade('ee'), needsForm: document.getElementById('ee-form').checked
   });
   if (!DB.save()) { Object.assign(e, backup); return; }
+  pushItem('events', e);
   closeModal();
   if (currentTab === 'admin') renderContentAdmin(); else rerender();
   toast('Изменения сохранены');
@@ -3315,24 +3708,31 @@ function checkImageLink(raw, label) {
 }
 function createPost() {
   if (!requireAdmin()) return;
+  if (!hasSection('create')) { toast('Нет доступа'); return; }
   const title = val('po-title'); if (!title) { toast('Введите заголовок'); return; }
   state.posts.push({ id: genId(), title, text: val('po-text'), topic: val('po-topic'), order: topOrder(state.posts), createdAt: Date.now() });
+  const newPost = state.posts[state.posts.length - 1];
   if (!DB.save()) { state.posts.pop(); return; }
+  pushItem('posts', newPost);
   clear('po-title', 'po-text');
   toast('Объявление опубликовано'); renderContentAdmin();
 }
 function createSermon() {
   if (!requireAdmin()) return;
+  if (!hasSection('create')) { toast('Нет доступа'); return; }
   const title = val('se-title'); if (!title) { toast('Введите название'); return; }
   const url = checkLink(val('se-url'), 'Ссылка на запись'); if (url === null) return;
   const image = checkImageLink(val('se-image'), 'Ссылка на обложку'); if (image === null) return;
   state.sermons.push({ id: genId(), title, speaker: val('se-speaker') || 'Пастор Артем Магай', series: val('se-series') || 'Воскресное слово', date: val('se-date') || isoDate(new Date()), duration: val('se-duration'), url, image });
+  const newSermon = state.sermons[state.sermons.length - 1];
   if (!DB.save()) { state.sermons.pop(); return; }
+  pushItem('sermons', newSermon);
   clear('se-title', 'se-duration', 'se-url', 'se-image');
   toast('Проповедь добавлена'); renderContentAdmin();
 }
 function editSermon(id) {
   if (!requireAdmin()) return;
+  if (!hasSection('content')) { toast('Нет доступа'); return; }
   const s = state.sermons.find(x => x.id === id); if (!s) return;
   openModal(`
     <div class="modal-handle"></div>
@@ -3349,6 +3749,7 @@ function editSermon(id) {
 }
 function saveSermon(id) {
   if (!requireAdmin()) return;
+  if (!hasSection('content')) { toast('Нет доступа'); return; }
   const s = state.sermons.find(x => x.id === id); if (!s) return;
   const url = checkLink(val('es-url'), 'Ссылка'); if (url === null) return;
   const im = checkImageLink(val('es-image'), 'Ссылка на обложку'); if (im === null) return;
@@ -3357,20 +3758,24 @@ function saveSermon(id) {
   s.duration = val('es-duration');
   s.date = val('es-date') || s.date;
   if (im) s.image = im; else if (!/^(img|fs):/.test(s.image || '') || ytId(url)) s.image = '';
-  DB.save(); closeModal(); renderContentAdmin();
+  DB.save(); pushItem('sermons', s); closeModal(); renderContentAdmin();
   toast(ytId(url) ? 'Сохранено — видео будет открываться в приложении' : 'Сохранено');
 }
 function createGroup() {
   if (!requireAdmin()) return;
+  if (!hasSection('create')) { toast('Нет доступа'); return; }
   const name = val('gr-name'); if (!name) { toast('Введите название'); return; }
   const image = checkImageLink(val('gr-image'), 'Ссылка на фото'); if (image === null) return;
   state.groups.push({ id: genId(), name, sub: val('gr-sub'), description: val('gr-desc'), when: val('gr-when'), leader: val('gr-leader'), image, order: topOrder(state.groups) });
+  const newGroup = state.groups[state.groups.length - 1];
   if (!DB.save()) { state.groups.pop(); return; }
+  pushItem('groups', newGroup);
   clear('gr-name', 'gr-sub', 'gr-desc', 'gr-when', 'gr-leader', 'gr-image');
   toast('Группа создана'); renderContentAdmin();
 }
 async function deleteContent(kind, id) {
   if (!requireAdmin()) return;
+  if (!hasSection('content')) { toast('Нет доступа'); return; }
   const extra = kind === 'event' ? ' Отметки «Я приду» и анкеты этого события тоже удалятся из базы (в Google Таблице останутся).'
     : kind === 'group' ? ' Список участников группы тоже удалится.' : '';
   if (!(await ask('Удалить без возможности восстановления?' + extra))) return;
@@ -3379,6 +3784,7 @@ async function deleteContent(kind, id) {
   if (kind === 'sermon') state.sermons = state.sermons.filter(s => s.id !== id);
   if (kind === 'group') { state.groups = state.groups.filter(g => g.id !== id); state.memberships = state.memberships.filter(m => m.groupId !== id); }
   DB.save(); renderContentAdmin(); toast('Удалено');
+  pushDelete(kind + 's', id);
   cloudDeleteRelated(kind, id).catch(e => { console.warn(e); toast('Связанные записи удалились не полностью — повторите позже'); });
 }
 
@@ -4461,7 +4867,9 @@ const cloud = {
   contentExists: null, base: null, baseVersion: 0, lastPushed: '', dirty: false, editSeq: 0, pendingRemote: null,
   stats: {}, statsLoaded: false, statsSynced: false, priv: null, groupCounts: {},
   prayers: null, refl: null, mine: new Set(), prayMarks: new Set(), amenMarks: new Set(),
-  tgTried: false, resetting: false
+  tgTried: false, resetting: false,
+  master: false, roleId: '', roleSections: null, roles: null, ministers: null, connects: null,
+  myQuestions: null, pastorQuestions: null, questionCtx: null
 };
 let cloudReadyResolve; const cloudReady = new Promise(r => { cloudReadyResolve = r; });
 const modalOpen = () => document.getElementById('modal-overlay').classList.contains('show');
@@ -4505,6 +4913,26 @@ async function signInDefault() {
 async function hasAdminDoc(uid) {
   try { return (await cloud.m.getDoc(cloud.m.doc(cloud.fs, 'admins', uid))).exists(); } catch (e) { return false; }
 }
+// Загружает master/roleId текущего админа и, если есть roleId, список разделов этой роли.
+// Админ без roleId (старый, назначенный до этой версии) считается полнодоступным — см. hasSection().
+async function loadMyRole(uid) {
+  try {
+    const snap = await cloud.m.getDoc(cloud.m.doc(cloud.fs, 'admins', uid));
+    const d = snap.exists() ? snap.data() : {};
+    cloud.master = !!d.master; cloud.roleId = d.roleId || '';
+    if (cloud.roleId && !cloud.master) {
+      const rsnap = await cloud.m.getDoc(cloud.m.doc(cloud.fs, 'roles', cloud.roleId));
+      cloud.roleSections = rsnap.exists() ? (rsnap.data().sections || []) : [];
+    } else cloud.roleSections = null;
+  } catch (e) { cloud.master = false; cloud.roleId = ''; cloud.roleSections = null; }
+}
+// true, если текущий админ видит раздел sec ('content','create','team','connect').
+// Мастер-админ и старые админы без назначенной роли видят всё.
+function hasSection(sec) {
+  if (!isAdmin()) return false;
+  if (cloud.master || !cloud.roleId) return true;
+  return (cloud.roleSections || []).includes(sec);
+}
 async function onAuth(user) {
   if (cloud.resetting) return;
   const U = cloud.m;
@@ -4529,6 +4957,7 @@ async function onAuth(user) {
   }
   const changed = cloud.uid !== user.uid, becameAdmin = admin && !cloud.admin;
   cloud.uid = user.uid; cloud.admin = admin; cloud.email = user.email || '';
+  if (admin) { await loadMyRole(user.uid); } else { cloud.master = false; cloud.roleId = ''; cloud.roleSections = null; }
   cloud.tgUsername = typeof claims.tgUsername === 'string' && RE_TG_USERNAME.test(claims.tgUsername) ? claims.tgUsername : '';
   if (changed) {
     cloud.prayers = null; cloud.refl = null; cloud.groupCounts = {}; cloud.statsSynced = false;
@@ -4544,30 +4973,27 @@ async function onAuth(user) {
   if (currentTab === 'admin' && !admin) switchTab('more'); else rerender();
 }
 
-// --- Контент ---
-let contentUnsub = null, statsUnsub = null, privUnsub = null;
+// --- Контент: отдельные документы (events/{id}, posts/{id}, sermons/{id}, groups/{id}) ---
+// Самодельного слияния правок (contentDiff/applyDiff) больше нет — за это теперь отвечает
+// сам Firestore: каждая запись мутируется отдельным документом, конфликтов на уровне
+// "всего контента сразу" просто не может возникнуть.
+let eventsUnsub = null, postsUnsub = null, sermonsUnsub = null, groupsUnsub = null, statsUnsub = null, privUnsub = null;
 const KINDS = ['events', 'posts', 'sermons', 'groups'];
-const pickContent = o => JSON.parse(JSON.stringify({ events: (o && o.events) || [], posts: (o && o.posts) || [], sermons: (o && o.sermons) || [], groups: (o && o.groups) || [] }));
-function applyRemote(c, version) {
-  cloud.base = c; cloud.baseVersion = version || 0; cloud.lastPushed = JSON.stringify(c);
-  Object.assign(state, JSON.parse(cloud.lastPushed)); state.seeded = true;
+function applySnapshot(kind, snap) {
+  state[kind] = snap.docs.map(d => ({ id: d.id, ...d.data() }));
   ensureOrder(); saveLocalOnly();
   if (currentTab === 'admin') { if (!modalOpen()) renderContentAdmin(); } else if (!modalOpen()) rerender();
+  renderCloudBanner();
 }
 function subscribeContent() {
-  if (contentUnsub) return;
-  const { doc, collection, onSnapshot } = cloud.m;
-  contentUnsub = onSnapshot(doc(cloud.fs, 'app', 'content'), snap => {
-    if (!snap.exists()) { cloud.contentExists = false; if (currentTab === 'admin') renderCloudBanner(); return; }
+  if (eventsUnsub) return;
+  const { collection, onSnapshot } = cloud.m;
+  const sub = (kind) => onSnapshot(collection(cloud.fs, kind), snap => {
     cloud.contentExists = true;
-    if (snap.metadata.hasPendingWrites) return;
-    const c = pickContent(snap.data()), v = Number(snap.data().version) || 0;
-    // есть неотправленные правки администратора — не затираем их, сольём при отправке
-    if (cloud.dirty || pushing) { cloud.pendingRemote = { c, v }; return; }
-    if (JSON.stringify(c) === cloud.lastPushed) { cloud.base = c; cloud.baseVersion = v; renderCloudBanner(); maybeSyncStats(); return; }
-    applyRemote(c, v);
-    renderCloudBanner(); maybeSyncStats();
-  }, err => { console.error('Чтение базы', err); });
+    applySnapshot(kind, snap);
+    if (kind === 'events') maybeSyncStats();
+  }, err => console.error('Чтение ' + kind, err));
+  eventsUnsub = sub('events'); postsUnsub = sub('posts'); sermonsUnsub = sub('sermons'); groupsUnsub = sub('groups');
   statsUnsub = onSnapshot(collection(cloud.fs, 'eventStats'), snap => {
     const m = {};
     snap.forEach(d => { const x = d.data(); m[d.id] = { cap: Number(x.cap) || 0, people: Number(x.people) || 0 }; });
@@ -4586,93 +5012,49 @@ function subscribePrivate() {
   }, err => console.warn('settings', err));
 }
 function unsubscribePrivate() { if (privUnsub) { privUnsub(); privUnsub = null; } cloud.priv = null; }
-
-// --- Слияние правок ---
-function contentDiff(base, cur) {
-  const d = {};
-  for (const k of KINDS) {
-    const bm = new Map((base[k] || []).map(x => [x.id, JSON.stringify(x)]));
-    const up = [], rm = [];
-    const cm = new Set();
-    for (const x of cur[k] || []) { cm.add(x.id); if (bm.get(x.id) !== JSON.stringify(x)) up.push(x); }
-    for (const id of bm.keys()) if (!cm.has(id)) rm.push(id);
-    d[k] = { up, rm };
-  }
-  return d;
-}
-const diffEmpty = d => KINDS.every(k => !d[k].up.length && !d[k].rm.length);
-function applyDiff(remote, d) {
-  const out = {};
-  for (const k of KINDS) {
-    const rm = new Set(d[k].rm), up = new Map(d[k].up.map(x => [x.id, x]));
-    const list = (remote[k] || []).filter(x => !rm.has(x.id)).map(x => up.has(x.id) ? up.get(x.id) : x);
-    for (const [id, x] of up) if (!list.some(y => y.id === id)) list.push(x);
-    out[k] = list;
-  }
-  return JSON.parse(JSON.stringify(out));
-}
-
-let pushTimer, pushing = false;
-function cloudQueuePush() {
+// Пишет ОДНУ запись контента в её собственный документ. Локальное состояние (state.events и т.п.)
+// уже обновлено вызывающей функцией до этого вызова — здесь только отправка в облако.
+async function pushItem(kind, item) {
   if (!cloud.on || !cloud.admin) return;
-  cloud.dirty = true; cloud.editSeq++;
-  if (cloud.contentExists === false) return;           // пустая база: сначала явная загрузка через баннер
-  clearTimeout(pushTimer); pushTimer = setTimeout(() => cloudPushContent(false), 700);
-}
-async function cloudPushContent(force) {
-  if (!cloud.on || !cloud.admin) return false;
-  if (pushing) { clearTimeout(pushTimer); pushTimer = setTimeout(() => cloudPushContent(force), 500); return false; }
-  if (!force && !cloud.base) { clearTimeout(pushTimer); pushTimer = setTimeout(() => cloudPushContent(false), 1500); return false; }   // ждём первую версию из базы
-  pushing = true;
-  const seq = cloud.editSeq;
-  const { doc, runTransaction, serverTimestamp } = cloud.m;
   try {
     setSync('saving');
-    await uploadInlineImages();                       // фото с телефона → коллекция images
-    const local = pickContent(state);
-    const d = cloud.base ? contentDiff(cloud.base, local) : null;
-    let result = null, resultV = cloud.baseVersion;
-    if (!(d && diffEmpty(d)) || force) {
-      const ref = doc(cloud.fs, 'app', 'content');
-      await runTransaction(cloud.fs, async tx => {
-        const snap = await tx.get(ref);
-        const remote = pickContent(snap.exists() ? snap.data() : {});
-        const v = (snap.exists() && Number(snap.data().version)) || 0;
-        result = d ? applyDiff(remote, d) : local;
-        resultV = v + 1;
-        tx.set(ref, { ...result, version: resultV, updatedAt: serverTimestamp(), by: cloud.email || cloud.uid });
-      });
+    if (typeof item.image === 'string' && item.image.startsWith('data:')) {
+      item.image = validImgData(item.image) ? await uploadImageData(item.image) : '';
     }
-    const before = cloud.base;
-    const pend = cloud.pendingRemote; cloud.pendingRemote = null;
-    let latest = result, latestV = resultV;
-    if (pend && pend.v > latestV) { latest = pend.c; latestV = pend.v; }
-    const clean = seq === cloud.editSeq;
-    if (clean) {
-      cloud.dirty = false;
-      if (latest) applyRemote(latest, latestV);
-    } else if (latest) {
-      // пока шла отправка, администратор успел сделать ещё правки — переносим их поверх свежей версии
-      const newer = contentDiff(local, pickContent(state));
-      Object.assign(state, applyDiff(latest, newer));
-      cloud.base = latest; cloud.baseVersion = latestV; cloud.lastPushed = JSON.stringify(latest);
-      ensureOrder(); saveLocalOnly();
-    }
-    if (result) {
-      cloud.contentExists = true;
-      cleanupImages(before, result);
-      syncEventStats(result);
-    }
-    if (!clean) { clearTimeout(pushTimer); pushTimer = setTimeout(() => cloudPushContent(false), 300); }
-    setSync('saved'); renderCloudBanner();
-    return true;
+    const { doc, setDoc, serverTimestamp } = cloud.m;
+    const { id, ...data } = item;
+    await setDoc(doc(cloud.fs, kind, id), { ...data, id, updatedAt: serverTimestamp() });
+    setSync('saved');
+    if (kind === 'events') syncEventStats(state);
   } catch (e) {
-    console.error('Сохранение в базу', e);
+    console.error('Сохранение', kind, e);
     setSync('error');
     toast(isPermErr(e) ? 'Нет прав на запись. Проверьте, что ваш UID есть в коллекции admins' : 'Не удалось сохранить в общую базу. Проверьте интернет');
-    return false;
-  } finally { pushing = false; }
+  }
 }
+async function pushDelete(kind, id) {
+  if (!cloud.on || !cloud.admin) return;
+  try {
+    setSync('saving');
+    await cloud.m.deleteDoc(cloud.m.doc(cloud.fs, kind, id));
+    setSync('saved');
+  } catch (e) {
+    console.error('Удаление', kind, e);
+    setSync('error');
+    toast('Не удалось удалить из общей базы. Проверьте интернет');
+  }
+}
+// Порядок после перетаскивания — обновляем только поле order у затронутых записей, одним батчем.
+async function pushReorder(kind, items) {
+  if (!cloud.on || !cloud.admin) return;
+  try {
+    const { doc, writeBatch } = cloud.m;
+    const b = writeBatch(cloud.fs);
+    items.forEach(it => b.update(doc(cloud.fs, kind, it.id), { order: it.order }));
+    await b.commit();
+  } catch (e) { console.error('Порядок', kind, e); toast('Не удалось сохранить порядок. Проверьте интернет'); }
+}
+
 function setSync(k) {
   const el = document.getElementById('sync-line'); if (!el) return;
   el.dataset.state = k;
@@ -4691,8 +5073,11 @@ function renderCloudBanner() {
 }
 async function cloudMigrate(btn) {
   btn.disabled = true; btn.innerHTML = '<span class="spin"></span>&nbsp; Загружаем…';
-  const ok = await cloudPushContent(true);
-  if (ok) toast('Готово! Теперь это видят все'); else { btn.disabled = false; btn.textContent = 'Попробовать ещё раз'; }
+  try {
+    for (const kind of KINDS) for (const it of state[kind]) await pushItem(kind, it);
+    cloud.contentExists = true;
+    toast('Готово! Теперь это видят все');
+  } catch (e) { console.error(e); btn.disabled = false; btn.textContent = 'Попробовать ещё раз'; }
   renderContentAdmin();
 }
 
@@ -4715,7 +5100,7 @@ async function syncEventStats(content) {
   }
 }
 function maybeSyncStats() {
-  if (isAdmin() && cloud.statsLoaded && cloud.base && !cloud.statsSynced) { cloud.statsSynced = true; syncEventStats(cloud.base); }
+  if (isAdmin() && cloud.statsLoaded && !cloud.statsSynced && state.events.length) { cloud.statsSynced = true; syncEventStats(state); }
 }
 
 // --- Фото из базы ---
@@ -4906,7 +5291,7 @@ async function cloudMigrateV3(btn) {
     }
     await setDoc(doc(cloud.fs, 'appPrivate', 'settings'), patch, { merge: true });
     if (old && old.exists()) await deleteDoc(doc(cloud.fs, 'app', 'settings')).catch(() => {});
-    await syncEventStats(cloud.base || pickContent(state));
+    await syncEventStats(state);
     cloud.prayers = null; cloud.refl = null; loadMine();
     toast(patch.sheetsUrl ? 'База обновлена. Скопируйте код скрипта заново — в нём появился секретный ключ' : 'База обновлена');
     renderCloudBanner(); renderTeam();
@@ -5010,8 +5395,8 @@ async function doRefresh() {
   const finishSoft = (msg) => { rerender(); setTimeout(() => { ptrReset(); refreshing = false; if (msg) toast(msg); }, 450); };
   if (!navigator.onLine) { showNet('offline'); finishSoft(); return; }
   if (!/^https?:/.test(location.protocol)) { finishSoft('Обновлено'); return; }
-  // неотправленные правки администратора сначала уходят в базу, иначе перезагрузка их потеряет
-  if (cloud.dirty || pushing) { clearTimeout(pushTimer); await cloudPushContent(false); }
+  // раньше здесь ждали отправки отложенных правок перед обновлением — теперь каждая правка
+  // уходит в базу сразу при сохранении, ждать перед обновлением больше нечего
   const slow = setTimeout(reportSlow, 3000);
   try {
     const ctrl = new AbortController(); const t = setTimeout(() => ctrl.abort(), 15000);
@@ -5133,7 +5518,7 @@ function planPickDay(d, id) { planSelDay = d; showPlan(id, true); }
 function planCtxClear() { bible().planCtx = null; saveLocalOnly(); renderBible(); }
 function stopEvent(ev) { ev.stopPropagation(); }
 
-const ACT_ALLOW = new Set(["adminLogin", "adminLogout", "bibleClearSel", "bibleCopy", "bibleFont", "bibleGo", "bibleHighlight", "bibleNotesToggle", "biblePickBook", "biblePickTr", "bibleReflect", "bibleRunSearch", "bibleSearch", "bibleSetTr", "bibleSettings", "bibleShare", "bibleSize", "bibleStep", "bibleView", "bkSetNt", "bkToggle", "blurOnEnter", "checkSheets", "clearImage", "closeAdmin", "closeModal", "cloudMigrate", "cloudMigrateV3", "copyForms", "copyScriptCode", "createGroup", "createNewEvent", "createPost", "createPrayer", "createRefl", "createSermon", "deleteContent", "deletePrayer", "deleteRefl", "digitsOnly", "editEvent", "editSermon", "endTour", "enterAdminLogin", "enterBibleSearch", "hideEl", "imgUrlChanged", "obAmen", "obBack", "obHighlight", "obNext", "obPick", "obSkip", "obStart", "obToggleInterest", "obTogglePlan", "onImageFile", "openAdmin", "openDonate", "openSermon", "openUrl", "pickLang", "planCtxClear", "planNext", "planPickDay", "planRead", "planReset", "planStart", "planToggleGroup", "regAdd", "regChoose", "regRemove", "regSet", "regSetDigits", "registerEvent", "renderBible", "resetData", "saveEvent", "saveProfile", "saveSermon", "saveSheets", "scrollToId", "setComTab", "setEventQuery", "setLang", "setMediaFilter", "setMediaQuery", "setShade", "setShowPast", "setTheme", "toggleTheme", "showAbout", "showAdminLogin", "showAnnouncements", "showDonate", "showEditProfile", "showEventDetail", "showForms", "showGroupDetail", "showLangPicker", "showMyEvents", "showMyGroups", "showNewsDetail", "showPeopleOf", "showPlan", "showPrayerForm", "showReflForm", "showRegForm", "showSettings", "startTourSoon", "submitReg", "switchTab", "toggleAmen", "toggleEventForm", "toggleGroup", "togglePray", "toggleSearch", "tourNext", "unregisterEvent", "updatePreviewText"]);
+const ACT_ALLOW = new Set(["adminLogin", "adminLogout", "bibleClearSel", "bibleCopy", "bibleFont", "bibleGo", "bibleHighlight", "bibleNotesToggle", "biblePickBook", "biblePickTr", "bibleReflect", "bibleRunSearch", "bibleSearch", "bibleSetTr", "bibleSettings", "bibleShare", "bibleSize", "bibleStep", "bibleView", "bkSetNt", "bkToggle", "blurOnEnter", "checkSheets", "clearImage", "closeAdmin", "closeModal", "cloudMigrate", "cloudMigrateV3", "copyForms", "copyScriptCode", "createGroup", "createNewEvent", "createPost", "createPrayer", "createRefl", "createSermon", "deleteContent", "deletePrayer", "deleteRefl", "digitsOnly", "editEvent", "editSermon", "endTour", "enterAdminLogin", "enterBibleSearch", "hideEl", "imgUrlChanged", "obAmen", "obBack", "obHighlight", "obNext", "obPick", "obSkip", "obStart", "obToggleInterest", "obTogglePlan", "onImageFile", "openAdmin", "openDonate", "openSermon", "openUrl", "pickLang", "planCtxClear", "planNext", "planPickDay", "planRead", "planReset", "planStart", "planToggleGroup", "regAdd", "regChoose", "regRemove", "regSet", "regSetDigits", "registerEvent", "renderBible", "resetData", "saveEvent", "saveProfile", "saveSermon", "saveSheets", "scrollToId", "setComTab", "setEventQuery", "setLang", "setMediaFilter", "setMediaQuery", "setShade", "setShowPast", "setTheme", "toggleTheme", "showAbout", "showAdminLogin", "showAnnouncements", "showDonate", "showEditProfile", "showEventDetail", "showForms", "showGroupDetail", "showLangPicker", "showMyEvents", "showMyGroups", "showNewsDetail", "showPeopleOf", "showPlan", "showPrayerForm", "showConnectForm", "createConnect", "showMyQuestions", "showQuestionForm", "createQuestion", "showQuestionThread", "sendThreadMessage", "saveTgChatId", "setPubChoice", "markConnectDone", "saveRole", "editRole", "deleteRole", "assignRole", "toggleMinister", "showReflForm", "showRegForm", "showSettings", "startTourSoon", "submitReg", "switchTab", "toggleAmen", "toggleEventForm", "toggleGroup", "togglePray", "toggleSearch", "tourNext", "unregisterEvent", "updatePreviewText"]);
 function actArg(a, el, ev) {
   if (a && typeof a === 'object' && !Array.isArray(a) && typeof a.$ === 'string') {
     if (a.$ === 'el') return el;
@@ -5176,6 +5561,7 @@ function init() {
   ensureOrder(); DB.save();
   renderLogos();
   document.getElementById('ev-imgbox').innerHTML = imageFieldHtml('ev');
+  document.getElementById('ev-pub-box').innerHTML = pubChoiceHtml('ev', 'published', null);
   imgState.ev = { data: '', shade: 0 }; syncShadeButtons('ev');
   document.getElementById('splash-img').src = resolvedTheme() === 'light' ? IMG.hands : IMG.prayer;
   document.getElementById('ob-lang').innerHTML = langButtonsHtml();
@@ -5199,6 +5585,10 @@ function init() {
   });
 }
 init();
+setInterval(() => {
+  if (currentTab === 'home') renderHome();
+  else if (currentTab === 'events') renderEvents();
+}, 60000); // раз в минуту — чтобы «отложенные» события появлялись сами, без перезагрузки страницы
 </script>
 </body>
 </html>
